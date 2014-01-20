@@ -22,6 +22,13 @@ data Term a = NullTerm
 data Poly a = NullPoly
             | Term a :-: Poly a deriving (Eq,Show)
 
+-- ODER:
+{-data Poly a = NullTerm-}
+            {-|  Term { degree :: Integer-}
+                   {-, coeff :: a-}
+                   {-} deriving (Eq,Show)-}
+            {-| Term a :-: Poly a deriving (Eq,Show)-}
+
 
 {-
  - Funktionen auf Polynomen
