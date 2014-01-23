@@ -3,7 +3,10 @@ module Project.Core.PrimeFields where
 data Z   --Zero
 data S a --Succ a
 
+--data Mod a = Integer deriving (Show)
 
+--instance  Eq (Mod a) where
+--  Eq g h = false
 
 {-
 -- Umwandlung in Werte
