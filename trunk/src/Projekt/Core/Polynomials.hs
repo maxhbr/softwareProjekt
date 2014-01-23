@@ -14,7 +14,7 @@ instance (Show a,Eq a) => Show (Polynom a) where
   show (P [])         = ""
   show (P ((i,c):ms))
     | ms == []   = show c ++ "·X^{" ++ show i ++ "}"
-    | otherwise = show c ++ "·X^{" ++ show i ++ "}+" ++ show (P ms)
+    | otherwise = show c ++ "·X^{" ++ show i ++ "} + " ++ show (P ms)
 
 unP :: Num a => Polynom a -> [(Integer,a)]
 unP (P ms) = ms
@@ -37,11 +37,15 @@ getMaxDegree = maximum . getDegrees
 
 -- aggregate Coeffs
 aggCoeffs :: Num a => Polynom a -> Polynom a
-aggCoeffs f = P [(i,sum [c | (j,c) <- unP f, j==i]) | i <- (reverse . sort $ getDegrees f)]
+aggCoeffs f =
+  P [(i,sum [c | (j,c) <- unP f, j==i]) | i <- (reverse . sort $ getDegrees f)]
 
---negatePolynom :: Num a => Polynom a -> Polynom a
---negatePolynom (P []) = (P [])
---negatePolynom (P ((i,c):ms)) = P ((i,c * (fromIntegral -1)) : (unP . negatePolynom ms))
+negatePolynom :: Num a => Polynom a -> Polynom a
+negatePolynom (P []) = (P [])
+negatePolynom f = P (negatePolynom' $ unP f)
+  where negatePolynom' :: Num a => [(Integer,a)] -> [(Integer,a)]
+        negatePolynom' [] = []
+        negatePolynom' ((i,c):ms) = (i,-1 * c): (negatePolynom' ms)
 
 addPolynoms :: Num a => Polynom a -> Polynom a -> Polynom a
 addPolynoms f g = aggCoeffs $ addPolynoms' f g
@@ -49,14 +53,12 @@ addPolynoms f g = aggCoeffs $ addPolynoms' f g
   where addPolynoms' :: Num a => Polynom a -> Polynom a -> Polynom a
         addPolynoms' f g = P (unP f ++ (unP g))
 
-list = [1,"a"]
-
 --subtractPolynoms :: Num a => Polynom a -> Polynom a -> Polynom a
 --subtractPolynoms f g = addPolynoms f $ negatePolynom g
 
-multPolynoms :: Num a => Polynom a -> Polynom a -> Polynom a 
+multPolynoms :: Num a => Polynom a -> Polynom a -> Polynom a
 multPolynoms (P []) g = P []
-multPolynoms (P (m:ms)) g =  addPolynoms (multPolynoms (P ms) g) 
+multPolynoms (P (m:ms)) g =  addPolynoms (multPolynoms (P ms) g)
                             $ multWithMonom m g
   where multWithMonom :: Num a => (Integer,a) -> Polynom a -> Polynom a
         multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
@@ -65,7 +67,7 @@ derivePolynom :: Num a => Polynom a -> Polynom a
 derivePolynom = P . derivePolynom' . unP
   where derivePolynom' :: Num a => [(Integer,a)] -> [(Integer,a)]
         derivePolynom' [] = []
-        derivePolynom' ((i,c):ms) 
+        derivePolynom' ((i,c):ms)
           | i == 0     = derivePolynom' ms
           | otherwise = (i-1,c*(fromIntegral i)): (derivePolynom' ms)
 
