@@ -1,9 +1,20 @@
+--------------------------------------------------------------------------------
+-- | 
+-- Module      : Project.Core.PrimeFields
+-- Note        : Einfache prim Körper
+-- 
+-- 
+-- 
+--------------------------------------------------------------------------------
 module Project.Core.PrimeFields where
 
 data Z   --Zero
 data S a --Succ a
 
---data Mod a = Integer deriving (Show)
+
+--------------------------------------------------------------------------------
+--  Data
+data Mod a = Integer deriving (Show)
 
 --instance  Eq (Mod a) where
 --  Eq g h = false
