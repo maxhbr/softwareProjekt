@@ -35,7 +35,7 @@ instance (Eq a, Num a) => Eq (Polynom a) where
   f == g = unP (aggCoeffs f) == unP (aggCoeffs g)
 
 instance (Show a,Eq a) => Show (Polynom a) where
-  show (P [])         = ""
+  show (P []) = ""
   show (P ((i,c):ms))
     | null ms   = show c ++ "·X^{" ++ show i ++ "}"
     | otherwise = show c ++ "·X^{" ++ show i ++ "} + " ++ show (P ms)
@@ -63,7 +63,7 @@ getDegrees f = getDegrees' [] [getDegree m | m <- unP f]
   where getDegrees' distinct [] = distinct
         getDegrees' distinct (i:is)
           | i `elem` distinct = getDegrees' distinct is
-          | otherwise       = getDegrees' (distinct ++ [i]) is
+          | otherwise         = getDegrees' (distinct ++ [i]) is
 
 -- |Gibt zu einem Polynom den maximalen Grad zurrück.
 getMaxDegree :: Num a => Polynom a -> Integer
@@ -77,15 +77,15 @@ aggCoeffs f = P [(i,sum [c | (j,c) <- unP f, j==i]) | i <- degrees]
 
 -- |Gibt zu einem Polynom das Negative Polynom zurrück.
 negatePolynom :: Num a => Polynom a -> Polynom a
-negatePolynom f      = P (negatePolynom' $ unP f)
+negatePolynom f = P (negatePolynom' $ unP f)
   where negatePolynom' :: Num a => [(Integer,a)] -> [(Integer,a)]
-        negatePolynom' [] = []
+        negatePolynom' []         = []
         negatePolynom' ((i,c):ms) = (i,-1 * c) : negatePolynom' ms
 
 -- |Nimmt zwei Polynome und addierte diese zusammen.
 addPolynoms :: Num a => Polynom a -> Polynom a -> Polynom a
 addPolynoms f g = aggCoeffs $ addPolynoms' f g
--- vlt keine aggCoeffs um mehr performance zu bekommen?
+-- TODO: vlt keine aggCoeffs um mehr performance zu bekommen?
   where addPolynoms' :: Num a => Polynom a -> Polynom a -> Polynom a
         addPolynoms' f g = P (unP f ++ unP g)
 
