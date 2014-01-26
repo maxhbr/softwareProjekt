@@ -11,7 +11,6 @@ module Project.Core.PrimeFields where
 data Z   --Zero
 data S a --Succ a
 
-
 --------------------------------------------------------------------------------
 --  Data
 data Mod a = Integer deriving (Show)

@@ -32,12 +32,12 @@ import Data.List
 data Polynom a = P [(Integer,a)] deriving ()
 
 instance (Eq a, Num a) => Eq (Polynom a) where
-  f == g = ((unP (aggCoeffs f)) == (unP (aggCoeffs g)))
+  f == g = unP (aggCoeffs f) == unP (aggCoeffs g)
 
 instance (Show a,Eq a) => Show (Polynom a) where
   show (P [])         = ""
   show (P ((i,c):ms))
-    | ms == []   = show c ++ "·X^{" ++ show i ++ "}"
+    | null ms   = show c ++ "·X^{" ++ show i ++ "}"
     | otherwise = show c ++ "·X^{" ++ show i ++ "} + " ++ show (P ms)
 
 -- |Macht aus einem Polynom wieder eine Liste, also quasi das Gegenteil des
@@ -59,10 +59,10 @@ getDegree (i,c) = i
 
 -- |Nimmt ein Polynom und gibt eine unsortierte liste der Gräder zurrück.
 getDegrees :: Num a => Polynom a -> [Integer]
-getDegrees f = getDegrees' [] [getDegree m | m <- (unP f)]
+getDegrees f = getDegrees' [] [getDegree m | m <- unP f]
   where getDegrees' distinct [] = distinct
         getDegrees' distinct (i:is)
-          | elem i distinct = getDegrees' distinct is
+          | i `elem` distinct = getDegrees' distinct is
           | otherwise       = getDegrees' (distinct ++ [i]) is
 
 -- |Gibt zu einem Polynom den maximalen Grad zurrück.
@@ -73,21 +73,21 @@ getMaxDegree = maximum . getDegrees
 -- zusammen.
 aggCoeffs :: Num a => Polynom a -> Polynom a
 aggCoeffs f = P [(i,sum [c | (j,c) <- unP f, j==i]) | i <- degrees]
-  where degrees = reverse . sort $ getDegrees f
+  where degrees = sortBy (flip compare) $ getDegrees f
 
 -- |Gibt zu einem Polynom das Negative Polynom zurrück.
 negatePolynom :: Num a => Polynom a -> Polynom a
 negatePolynom f      = P (negatePolynom' $ unP f)
   where negatePolynom' :: Num a => [(Integer,a)] -> [(Integer,a)]
         negatePolynom' [] = []
-        negatePolynom' ((i,c):ms) = (i,-1 * c): (negatePolynom' ms)
+        negatePolynom' ((i,c):ms) = (i,-1 * c) : negatePolynom' ms
 
 -- |Nimmt zwei Polynome und addierte diese zusammen.
 addPolynoms :: Num a => Polynom a -> Polynom a -> Polynom a
 addPolynoms f g = aggCoeffs $ addPolynoms' f g
 -- vlt keine aggCoeffs um mehr performance zu bekommen?
   where addPolynoms' :: Num a => Polynom a -> Polynom a -> Polynom a
-        addPolynoms' f g = P (unP f ++ (unP g))
+        addPolynoms' f g = P (unP f ++ unP g)
 
 -- |Nimmt zwei Polynome und zieht das zweite von dem ersten ab.
 subtractPolynoms :: Num a => Polynom a -> Polynom a -> Polynom a
@@ -108,11 +108,11 @@ derivePolynom = P . derivePolynom' . unP
         derivePolynom' [] = []
         derivePolynom' ((i,c):ms)
           | i == 0     = derivePolynom' ms
-          | otherwise = (i-1,c*(fromIntegral i)): (derivePolynom' ms)
+          | otherwise = (i - 1 , c * fromIntegral i) : derivePolynom' ms
 
 -- |Nimmt einen Wert und ein Polynom umd wertet das Polynom an dem Wert aus.
 evalPolynom :: Num a => a -> Polynom a -> a
-evalPolynom x f = sum [evalMonom m | m <- (unP f)]
+evalPolynom x f = sum [evalMonom m | m <- unP f]
   where evalMonom (i,c) = product [x | j <- [1..i]] * c
 
 --------------------------------------------------------------------------------
