@@ -7,20 +7,20 @@
 -- 
 --------------------------------------------------------------------------------
 module Project.Core.Polynomials
-    ( Polynom -- Data
-    , unP
-    -- getter
-    , getDegrees
-    , getMaxDegree
-    -- operations
-    , aggCoeffs
-    , negatePolynom
-    , addPolynoms
-    , subtractPolynoms
-    , multPolynoms
-    , derivePolynom
-    , evalPolynom
-    ) where
+  ( Polynom -- Data
+  , unP
+  -- getter
+  , getDegrees
+  , getMaxDegree
+  -- operations
+  , aggCoeffs
+  , negatePolynom
+  , addPolynoms
+  , subtractPolynoms
+  , multPolynoms
+  , derivePolynom
+  , evalPolynom
+  ) where
 import Data.List
 
 --------------------------------------------------------------------------------

@@ -1,41 +1,64 @@
 --------------------------------------------------------------------------------
--- | 
+-- |
 -- Module      : Project.Core.PrimeFields
 -- Note        : Einfache prim Körper
--- 
--- 
--- 
+--
+--
+--
 --------------------------------------------------------------------------------
-module Project.Core.PrimeFields where
-
-data Z   --Zero
-data S a --Succ a
+module Project.Core.PrimeFields 
+  ( Zero
+  , Succ
+  , Two , Three , Five , Seven
+  , Mod
+  , modulus
+  , Z2 , Z3 , Z5 , Z7
+  ) where
 
 --------------------------------------------------------------------------------
---  Data
-data Mod a = Integer deriving (Show)
+--  Peano numbers
 
---instance  Eq (Mod a) where
---  Eq g h = false
+data Zero
+data Succ a
 
-{-
--- Umwandlung in Werte
-class Numeral a where toInt :: a -> Int
+numPred :: Succ a -> a
+numPred = const undefined
 
-instance Numeral Z where toInt _ = 0
-instance (Numeral a) => Numeral (S a) where
-    toInt = succ . toInt . pred'
-            where pred' :: S a -> a
+class Number a where
+  numValue :: a -> Integer
 
-newtype Mod n = MkMod { unMod :: Int }
-    deriving (Show)
+instance Number Zero where
+  numValue = const 0
+instance Number a => Number (Succ a) where
+  numValue x = numValue (numPred x) + 1
 
-modulus :: Mod n -> n
-modulus = undefined
+-- shortcuts
+type Two   = Succ (Succ Zero)
+type Three = Succ Two
+type Five  = Succ (Succ Three)
+type Seven = Succ (Succ Five)
 
-instance (Numeral n) => Num (Mod n) where
-    MkMod x + MkMod y = MkMod $ (x+y) `mod` toInt (modulus x)
+--------------------------------------------------------------------------------
+--  Prime fields
 
--- Beispiel
-type Z5 = Mod (S (S (S (S (S Z)))))
- -}
+newtype Mod n = MkMod { unMod :: Integer }
+  deriving (Show)
+
+modulus :: Number a => Mod a -> a
+modulus = const undefined
+
+instance (Number n) => Num (Mod n) where
+  x + y       = MkMod $ (unMod x + unMod y) `mod` numValue (modulus x)
+  x * y       = MkMod $ (unMod x * unMod y) `mod` numValue (modulus x)
+  fromInteger = MkMod
+  abs         = undefined
+  signum 0    = 0
+
+instance (Number n) => Eq (Mod n) where
+  x == y = representant x == representant y
+    where representant x = unMod x `mod` numValue (modulus x)
+
+type Z2 = Mod Two
+type Z3 = Mod Three
+type Z5 = Mod Five
+type Z7 = Mod Seven
