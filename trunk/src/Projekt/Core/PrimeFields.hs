@@ -66,7 +66,7 @@ instance (Numeral n) => Num (Mod n) where
   fromInteger = MkMod
   abs         = undefined
   signum 0    = 0
-  negate x    = MkMod $ -1 *  unMod x
+  negate x    = MkMod $ negate $ unMod x
 
 instance (Numeral n) => Eq (Mod n) where
   x == y = getRepr x == getRepr y
