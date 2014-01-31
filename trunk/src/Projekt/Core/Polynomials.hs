@@ -1,10 +1,10 @@
 --------------------------------------------------------------------------------
--- | 
+-- |
 -- Module      : Project.Core.Polynomials
 -- Note        : Allgemeine implementierung von Polynomen in einer Variablen
--- 
--- 
--- 
+--
+--
+--
 --------------------------------------------------------------------------------
 module Project.Core.Polynomials
   ( Polynom -- Data

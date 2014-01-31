@@ -6,7 +6,7 @@
 --
 --
 --------------------------------------------------------------------------------
-module Project.Core.PrimeFields 
+module Project.Core.PrimeFields
   ( Zero
   , Succ
   , Two , Three , Five , Seven
@@ -24,12 +24,19 @@ data Succ a
 numPred :: Succ a -> a
 numPred = const undefined
 
-class Number a where
+--TODO
+{-toPeano :: Integer -> Either Zero (Succ a)-}
+--toPeano i = toPeano' (i, undefined :: Zero)
+--  where toPeano' :: Numeral a => (Integer, a) -> Either Zero (Succ a)
+--        toPeano' 0 = Left undefined :: Zero
+--        toPeano' i = Right $ toPeano' (i-1 , undefined)
+
+class Numeral a where
   numValue :: a -> Integer
 
-instance Number Zero where
+instance Numeral Zero where
   numValue = const 0
-instance Number a => Number (Succ a) where
+instance Numeral a => Numeral (Succ a) where
   numValue x = numValue (numPred x) + 1
 
 -- shortcuts
@@ -44,19 +51,70 @@ type Seven = Succ (Succ Five)
 newtype Mod n = MkMod { unMod :: Integer }
   deriving (Show)
 
-modulus :: Number a => Mod a -> a
+modulus :: Numeral a => Mod a -> a
 modulus = const undefined
 
-instance (Number n) => Num (Mod n) where
+getRepr :: (Numeral n) => Mod n -> Integer
+getRepr x = unMod x `mod` numValue (modulus x)
+
+--setRepr :: (Numeral n) => Mod n -> Mod n
+--setRepr = MkMod getRepr
+
+instance (Numeral n) => Num (Mod n) where
   x + y       = MkMod $ (unMod x + unMod y) `mod` numValue (modulus x)
   x * y       = MkMod $ (unMod x * unMod y) `mod` numValue (modulus x)
   fromInteger = MkMod
   abs         = undefined
   signum 0    = 0
+  negate x    = MkMod $ -1 *  unMod x
 
-instance (Number n) => Eq (Mod n) where
-  x == y = representant x == representant y
-    where representant x = unMod x `mod` numValue (modulus x)
+instance (Numeral n) => Eq (Mod n) where
+  x == y = getRepr x == getRepr y
+
+--------------------------------------------------------------------------------
+--  Operations on prime fields
+
+
+--------------------------------------------------------------------------------
+--  Inversion
+--
+--  Besser: Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
+
+--Input a \in Mod P
+-- y_1=1                    1
+-- y_2=0                    2
+-- While ( x != 0 )         3
+--   x=abs(P/x)             3.1
+--   x=P-qx;  P=x;
+--   y_2=y_1; v_1=y_2-qy_1
+-- Return(y_1)
+
+{-invPrimeField :: Numeral a => Mod a -> Mod a-}
+{-invPrimeField x = invPrimeField' (unMod x) 1 0 p-}
+  {-where p = numValue (modulus x)-}
+        {-invPrimeField' x y1 y2 p -}
+          {-| x == 0 = MkMod y1-}
+          {-| otherwise = invPrimeField' -}
+
+--------------------------------------------------------------------------------
+--  Division
+
+-- v=0                      1
+-- While (b > 0)            2
+--   While (b_0 = 0)        2.1
+--     b=b_2;  a=a/2;       2.1.1
+--   if (b >= P)            2.2
+--     b=b-P;  a=a-v;       2.2.1
+--   else                   2.3
+--     b=P-b;  P=b;         2.3.1
+--     a=v-a;  y=a          2.3.2
+-- Return(v)                3.
+--
+-- b_o represents the least significant bit (LSB) of b.
+{-divPrimeField :: Numeral a => Mod a -> Mod a -> Mod a-}
+
+--------------------------------------------------------------------------------
+--  Examples
 
 type Z2 = Mod Two
 type Z3 = Mod Three
