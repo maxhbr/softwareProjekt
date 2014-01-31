@@ -64,16 +64,16 @@ instance (Numeral n) => Num (Mod n) where
   x + y       = MkMod $ (unMod x + unMod y) `mod` numValue (modulus x)
   x * y       = MkMod $ (unMod x * unMod y) `mod` numValue (modulus x)
   fromInteger = MkMod
-  abs         = undefined
-  signum 0    = 0
+  abs _       = error "Prelude.Num.abs: inappropriate abstraction"
+  signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate x    = MkMod $ negate $ unMod x
+
 
 instance (Numeral n) => Eq (Mod n) where
   x == y = getRepr x == getRepr y
 
 --------------------------------------------------------------------------------
 --  Operations on prime fields
-
 
 --------------------------------------------------------------------------------
 --  Inversion
