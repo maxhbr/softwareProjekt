@@ -14,6 +14,7 @@ module Project.Core.PrimeFields
   , modulus
   , Z2 , Z3 , Z5 , Z7
   ) where
+--import Data.Typeable
 
 --------------------------------------------------------------------------------
 --  Peano numbers
@@ -24,13 +25,6 @@ data Succ a
 numPred :: Succ a -> a
 numPred = const undefined
 
---TODO
-{-toPeano :: Integer -> Either Zero (Succ a)-}
---toPeano i = toPeano' (i, undefined :: Zero)
---  where toPeano' :: Numeral a => (Integer, a) -> Either Zero (Succ a)
---        toPeano' 0 = Left undefined :: Zero
---        toPeano' i = Right $ toPeano' (i-1 , undefined)
-
 class Numeral a where
   numValue :: a -> Integer
 
@@ -38,6 +32,28 @@ instance Numeral Zero where
   numValue = const 0
 instance Numeral a => Numeral (Succ a) where
   numValue x = numValue (numPred x) + 1
+
+instance Show Zero where
+  show = show . numValue
+instance Numeral a => Show (Succ a) where
+  show = show . numValue
+
+--TODO
+{-toPeano :: Integer -> Either Zero (Succ a)-}
+{-toPeano 0 = Left (undefined :: Zero)-}
+--toPeano i = toPeano' (i, undefined :: Zero)
+--  where toPeano' :: Numeral a => (Integer, a) -> Either Zero (Succ a)
+--        toPeano' 0 = Left undefined :: Zero
+--        toPeano' i = Right $ toPeano' (i-1 , undefined)
+--
+--toPeano 0 = undefined :: Zero
+--toPeano i = next :: (Succ (typeOf next))
+--  where next = toPeano (i-1)
+
+--toPeano :: forall a. (Integer, a) -> Either Zero (Succ a)
+
+{-addOne :: Succ a -> Succ (Succ a)-}
+{-addOne = undefined-}
 
 -- shortcuts
 type Two   = Succ (Succ Zero)
