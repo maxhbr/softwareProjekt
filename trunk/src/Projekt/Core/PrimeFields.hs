@@ -1,3 +1,4 @@
+{-# LANGUAGE Rank2Types #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Project.Core.PrimeFields
@@ -22,8 +23,11 @@ module Project.Core.PrimeFields
 data Zero
 data Succ a
 
-numPred :: Succ a -> a
-numPred = const undefined
+succ :: a -> Succ a
+succ = const undefined
+
+pred :: Succ a -> a
+pred = const undefined
 
 class Numeral a where
   numValue :: a -> Integer
@@ -31,7 +35,7 @@ class Numeral a where
 instance Numeral Zero where
   numValue = const 0
 instance Numeral a => Numeral (Succ a) where
-  numValue x = numValue (numPred x) + 1
+  numValue x = numValue (pred x) + 1
 
 instance Show Zero where
   show = show . numValue
@@ -39,6 +43,12 @@ instance Numeral a => Show (Succ a) where
   show = show . numValue
 
 --TODO
+toPeano :: integer -> r
+toPeano i = toPeano' i id
+  where toPeano' :: Integer -> (forall n. (Number n) => n -> r) -> r
+        toPeano' 0 k     = k (undefined :: Zero)
+        toPeano' (n+1) k = toPeano' n (\x . k (succ x))
+
 {-toPeano :: Integer -> Either Zero (Succ a)-}
 {-toPeano 0 = Left (undefined :: Zero)-}
 --toPeano i = toPeano' (i, undefined :: Zero)
