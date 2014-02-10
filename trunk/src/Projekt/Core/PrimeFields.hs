@@ -24,7 +24,7 @@ module Project.Core.PrimeFields
 import Prelude hiding (divMod, succ)
 import Data.Bits (shift)
 import GHC.Err (divZeroError)
-import Test.QuickCheck hiding (elements)
+--import Test.QuickCheck hiding (elements)
 
 --------------------------------------------------------------------------------
 --  Peano numbers
@@ -69,6 +69,15 @@ type Seven = Succ (Succ Five)
 --------------------------------------------------------------------------------
 --  Prime fields
 
+{-
+class PrimeField a where
+  zero, one          :: a
+  fromInteger        :: Integer -> a
+  negate             :: a -> a
+  (+), (-), (*), (/) :: a -> a -> a
+  elem, units        :: [a]
+ -}
+
 newtype Mod n = MkMod { unMod :: Integer }
   deriving (Show)
 
@@ -103,26 +112,24 @@ units = tail . elements
 
 --------------------------------------------------------------------------------
 --  Inversion
---
---  Besser: Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
 
---Input a \in Mod P
--- y_1=1                    1
--- y_2=0                    2
--- While ( x != 0 )         3
---   x=abs(P/x)             3.1
---   x=P-qx;  P=x;
---   y_2=y_1; v_1=y_2-qy_1
--- Return(y_1)
-
---invPrimeField :: Numeral a => Mod a -> Mod a
---invPrimeField x = invPrimeField' (unMod x `mod` p) 1 0 p
---  where p = numValue (modulus x)
---        invPrimeField' x x1 x2 p
---          |
-
--- Algorithm 2.22 aus Guide to Elliptic Curve Cryptography
+-- Inversion mit erweitertem Euklidischem Algorithmus
+-- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
 -- TODO: Finde besseren Namen
+invMod :: Numeral a => Mod a -> Mod a
+invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
+  where p = numValue (modulus x)
+        invMod' :: (Integer, Integer, Integer, Integer) -> Integer
+        invMod' (u,v,x1,x2) 
+          | u == 1     = x1 `mod` p
+          | otherwise = invMod' (v-q*u,u,x2-q*x1,x1)
+            where q = v `div` u
+
+divMod :: Numeral a => Mod a -> Mod a -> Mod a
+divMod x y = x * invMod y
+
+-- Möglicherweise besser aber noch nicht korrekt:
+-- Algorithm 2.22 aus Guide to Elliptic Curve Cryptography
 {-
 divMod :: forall a. Numeral a => Mod a -> Mod a -> Mod a
 divMod x y = divMod' (unMod x `mod` p, p, unMod y `mod` p, 0)
@@ -146,36 +153,6 @@ invMod :: Numeral a => Mod a -> Mod a
 invMod x = divMod x 1
  -}
 
--- Inversion using the extended Euclidean algorithm
-invMod :: Numeral a => Mod a -> Mod a
-invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
-  where p = numValue (modulus x)
-        invMod' :: (Integer, Integer, Integer, Integer) -> Integer
-        invMod' (u,v,x1,x2) 
-          | u == 1     = x1 `mod` p
-          | otherwise = invMod' (v-q*u,u,x2-q*x1,x1)
-            where q = v `div` u
-
-testInvMod = do
-  print $ show $ invMod (1 :: Z7) == (1::Z7)
-  print $ show $ all (\x -> invMod x * x == (1::Z7)) $ units (0::Z7)
-
---------------------------------------------------------------------------------
---  Division
-
--- v=0                      1
--- While (b > 0)            2
---   While (b_0 = 0)        2.1
---     b=b_2;  a=a/2;       2.1.1
---   if (b >= P)            2.2
---     b=b-P;  a=a-v;       2.2.1
---   else                   2.3
---     b=P-b;  P=b;         2.3.1
---     a=v-a;  y=a          2.3.2
--- Return(v)                3.
---
--- b_o represents the least significant bit (LSB) of b.
-{-divPrimeField :: Numeral a => Mod a -> Mod a -> Mod a-}
 
 --------------------------------------------------------------------------------
 --  Examples
@@ -184,3 +161,10 @@ type Z2 = Mod Two
 type Z3 = Mod Three
 type Z5 = Mod Five
 type Z7 = Mod Seven
+
+--------------------------------------------------------------------------------
+--  Some small Tests
+
+testInvMod = do
+  print $ show $ invMod (1 :: Z7) == (1::Z7)
+  print $ show $ all (\x -> invMod x * x == (1::Z7)) $ units (0::Z7)
