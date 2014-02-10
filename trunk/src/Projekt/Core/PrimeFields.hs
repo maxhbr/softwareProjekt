@@ -1,4 +1,10 @@
-{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE Rank2Types #-} --, DataKinds #-}
+{- or:
+ - RankNTypes
+ - PolymorphicComponents
+ - ExistentialQuantification
+ - ScopedTypeVariables
+ -}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Project.Core.PrimeFields
@@ -15,7 +21,9 @@ module Project.Core.PrimeFields
   , modulus
   , Z2 , Z3 , Z5 , Z7
   ) where
---import Data.Typeable
+import Prelude hiding (divMod, succ)
+import Data.Bits (shift)
+import GHC.Err (divZeroError)
 
 --------------------------------------------------------------------------------
 --  Peano numbers
@@ -26,8 +34,8 @@ data Succ a
 succ :: a -> Succ a
 succ = const undefined
 
-pred :: Succ a -> a
-pred = const undefined
+peanoPred :: Succ a -> a
+peanoPred = const undefined
 
 class Numeral a where
   numValue :: a -> Integer
@@ -35,7 +43,7 @@ class Numeral a where
 instance Numeral Zero where
   numValue = const 0
 instance Numeral a => Numeral (Succ a) where
-  numValue x = numValue (pred x) + 1
+  numValue x = numValue (peanoPred x) + 1
 
 instance Show Zero where
   show = show . numValue
@@ -43,27 +51,13 @@ instance Numeral a => Show (Succ a) where
   show = show . numValue
 
 --TODO
-toPeano :: integer -> r
+{-
+toPeano :: Integer -> r
 toPeano i = toPeano' i id
-  where toPeano' :: Integer -> (forall n. (Number n) => n -> r) -> r
-        toPeano' 0 k     = k (undefined :: Zero)
-        toPeano' (n+1) k = toPeano' n (\x . k (succ x))
-
-{-toPeano :: Integer -> Either Zero (Succ a)-}
-{-toPeano 0 = Left (undefined :: Zero)-}
---toPeano i = toPeano' (i, undefined :: Zero)
---  where toPeano' :: Numeral a => (Integer, a) -> Either Zero (Succ a)
---        toPeano' 0 = Left undefined :: Zero
---        toPeano' i = Right $ toPeano' (i-1 , undefined)
---
---toPeano 0 = undefined :: Zero
---toPeano i = next :: (Succ (typeOf next))
---  where next = toPeano (i-1)
-
---toPeano :: forall a. (Integer, a) -> Either Zero (Succ a)
-
-{-addOne :: Succ a -> Succ (Succ a)-}
-{-addOne = undefined-}
+  where toPeano' :: Integer -> (forall n. (Numeral n) => n -> r) -> r
+        toPeano' 0 k = k (undefined :: Zero)
+        toPeano' n k = toPeano' (n-1) (k . succ)
+ -}
 
 -- shortcuts
 type Two   = Succ (Succ Zero)
@@ -94,9 +88,14 @@ instance (Numeral n) => Num (Mod n) where
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate x    = MkMod $ negate $ unMod x
 
-
 instance (Numeral n) => Eq (Mod n) where
-  x == y = getRepr x == getRepr y
+  x == y = unMod x - unMod y `mod` numValue (modulus x) == 0
+
+elements :: (Numeral n) => Mod n -> [Mod n]
+elements x = map fromInteger [0.. numValue (modulus x)]
+
+units :: (Numeral n) => Mod n -> [Mod n]
+units = tail . elements
 
 --------------------------------------------------------------------------------
 --  Operations on prime fields
@@ -114,6 +113,49 @@ instance (Numeral n) => Eq (Mod n) where
 --   x=P-qx;  P=x;
 --   y_2=y_1; v_1=y_2-qy_1
 -- Return(y_1)
+
+--invPrimeField :: Numeral a => Mod a -> Mod a
+--invPrimeField x = invPrimeField' (unMod x `mod` p) 1 0 p
+--  where p = numValue (modulus x)
+--        invPrimeField' x x1 x2 p
+--          |
+
+-- Algorithm 2.22 aus Guide to Elliptic Curve Cryptography
+-- TODO: Finde besseren Namen
+{-
+divMod :: forall a. Numeral a => Mod a -> Mod a -> Mod a
+divMod x y = divMod' (unMod x `mod` p, p, unMod y `mod` p, 0)
+  where p = numValue (modulus x)
+        divMod' :: (Integer, Integer, Integer, Integer) -> Mod a
+        divMod' (0,_,_,_)   = divZeroError -- 0 ist keine Einheit
+        divMod' (1,_,x1,_)  = MkMod x1
+        divMod' (_,1,_,x2)  = MkMod x2
+        divMod' (u,v,x1,x2)
+          | newU >= newV = divMod' (newU-newV,newV,newX1-newX2,newX2)
+          | otherwise   = divMod' (newU,newV-newU,newX1,newX1-newX2)
+            where loop :: (Integer, Integer) -> (Integer, Integer)
+                  loop (a,b)
+                    | even a && even p = (shift a (-1),shift b (-1))
+                    | even a           = (shift a (-1),shift (b+p) (-1))
+                    | otherwise        = (a,b)
+                  (newU,newX1) = loop (u,x1)
+                  (newV,newX2) = loop (v,x2)
+
+invMod :: Numeral a => Mod a -> Mod a
+invMod x = divMod x 1
+ -}
+
+invMod :: Numeral a => Mod a -> Mod a
+invMod x = invMod (unMod x `mod` p,p,1,0)
+  where p = numValue (modulus x)
+        invMod' :: (Integer, Integer, Integer, Integer)
+        invMod' (u,v,x1,x2) = 
+
+testInvMod = do
+  print $ show $ invMod (1 :: Z7) == (1::Z7)
+  print $ show $ invMod (1 :: Z7) * (1 :: Z7) == (1::Z7)
+  let x = 4
+  print $ show $ invMod (x :: Z7) * (x :: Z7) == (1::Z7)
 
 {-invPrimeField :: Numeral a => Mod a -> Mod a-}
 {-invPrimeField x = invPrimeField' (unMod x) 1 0 p-}
