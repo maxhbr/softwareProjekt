@@ -24,6 +24,7 @@ module Project.Core.PrimeFields
 import Prelude hiding (divMod, succ)
 import Data.Bits (shift)
 import GHC.Err (divZeroError)
+import Test.QuickCheck hiding (elements)
 
 --------------------------------------------------------------------------------
 --  Peano numbers
@@ -92,7 +93,7 @@ instance (Numeral n) => Eq (Mod n) where
   x == y = unMod x - unMod y `mod` numValue (modulus x) == 0
 
 elements :: (Numeral n) => Mod n -> [Mod n]
-elements x = map fromInteger [0.. numValue (modulus x)]
+elements x = map fromInteger [0.. (numValue (modulus x) - 1)]
 
 units :: (Numeral n) => Mod n -> [Mod n]
 units = tail . elements
@@ -145,24 +146,19 @@ invMod :: Numeral a => Mod a -> Mod a
 invMod x = divMod x 1
  -}
 
+-- Inversion using the extended Euclidean algorithm
 invMod :: Numeral a => Mod a -> Mod a
-invMod x = invMod (unMod x `mod` p,p,1,0)
+invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
   where p = numValue (modulus x)
-        invMod' :: (Integer, Integer, Integer, Integer)
-        invMod' (u,v,x1,x2) = 
+        invMod' :: (Integer, Integer, Integer, Integer) -> Integer
+        invMod' (u,v,x1,x2) 
+          | u == 1     = x1 `mod` p
+          | otherwise = invMod' (v-q*u,u,x2-q*x1,x1)
+            where q = v `div` u
 
 testInvMod = do
   print $ show $ invMod (1 :: Z7) == (1::Z7)
-  print $ show $ invMod (1 :: Z7) * (1 :: Z7) == (1::Z7)
-  let x = 4
-  print $ show $ invMod (x :: Z7) * (x :: Z7) == (1::Z7)
-
-{-invPrimeField :: Numeral a => Mod a -> Mod a-}
-{-invPrimeField x = invPrimeField' (unMod x) 1 0 p-}
-  {-where p = numValue (modulus x)-}
-        {-invPrimeField' x y1 y2 p -}
-          {-| x == 0 = MkMod y1-}
-          {-| otherwise = invPrimeField' -}
+  print $ show $ all (\x -> invMod x * x == (1::Z7)) $ units (0::Z7)
 
 --------------------------------------------------------------------------------
 --  Division
