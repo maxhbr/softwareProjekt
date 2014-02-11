@@ -6,7 +6,7 @@
 --
 --
 --------------------------------------------------------------------------------
-module Project.Core.Polynomials
+module Projekt.Core.Polynomials
   ( Polynom -- Data
   , unP
   -- getter

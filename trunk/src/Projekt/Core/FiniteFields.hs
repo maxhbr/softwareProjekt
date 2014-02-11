@@ -6,8 +6,8 @@
 -- 
 -- 
 --------------------------------------------------------------------------------
-module Project.Core.FiniteFields
+module Projekt.Core.FiniteFields
   ( 
   ) where
-import Project.Core.PrimeFields 
+import Projekt.Core.PrimeFields 
 

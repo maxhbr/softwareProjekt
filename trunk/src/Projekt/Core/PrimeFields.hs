@@ -1,10 +1,3 @@
-{-# LANGUAGE Rank2Types #-} --, DataKinds #-}
-{- or:
- - RankNTypes
- - PolymorphicComponents
- - ExistentialQuantification
- - ScopedTypeVariables
- -}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Project.Core.PrimeFields
@@ -13,7 +6,7 @@
 --
 --
 --------------------------------------------------------------------------------
-module Project.Core.PrimeFields
+module Projekt.Core.PrimeFields
   ( Zero
   , Succ
   , Two , Three , Five , Seven
@@ -21,10 +14,13 @@ module Project.Core.PrimeFields
   , modulus
   , Z2 , Z3 , Z5 , Z7
   ) where
-import Prelude hiding (divMod, succ)
-import Data.Bits (shift)
+import Prelude hiding ( divMod
+                      , succ
+                      , (/) )
 import GHC.Err (divZeroError)
+--import Data.Bits (shift)
 --import Test.QuickCheck hiding (elements)
+import Projekt.Core.FiniteField
 
 --------------------------------------------------------------------------------
 --  Peano numbers
@@ -69,15 +65,6 @@ type Seven = Succ (Succ Five)
 --------------------------------------------------------------------------------
 --  Prime fields
 
-{-
-class PrimeField a where
-  zero, one          :: a
-  fromInteger        :: Integer -> a
-  negate             :: a -> a
-  (+), (-), (*), (/) :: a -> a -> a
-  elem, units        :: [a]
- -}
-
 newtype Mod n = MkMod { unMod :: Integer }
   deriving (Show)
 
@@ -90,6 +77,9 @@ getRepr x = unMod x `mod` numValue (modulus x)
 --setRepr :: (Numeral n) => Mod n -> Mod n
 --setRepr = MkMod getRepr
 
+instance (Numeral n) => Eq (Mod n) where
+  x == y = unMod x - unMod y `mod` numValue (modulus x) == 0
+
 instance (Numeral n) => Num (Mod n) where
   x + y       = MkMod $ (unMod x + unMod y) `mod` numValue (modulus x)
   x * y       = MkMod $ (unMod x * unMod y) `mod` numValue (modulus x)
@@ -98,14 +88,23 @@ instance (Numeral n) => Num (Mod n) where
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate x    = MkMod $ negate $ unMod x
 
-instance (Numeral n) => Eq (Mod n) where
-  x == y = unMod x - unMod y `mod` numValue (modulus x) == 0
+instance (Numeral n) => FiniteField (Mod n) where
+  zero  = MkMod 0
+  one   = MkMod 1
+  inv   = invMod
+  x / y = x * inv y
+  -- TODO
+  elems = undefined
+  units = undefined
+{-
+  elems = elems' zero
+  units = units' zero
 
-elements :: (Numeral n) => Mod n -> [Mod n]
-elements x = map fromInteger [0.. (numValue (modulus x) - 1)]
-
-units :: (Numeral n) => Mod n -> [Mod n]
-units = tail . elements
+elems' :: (Numeral n) => Mod n -> [Mod n]
+elems' x = map fromInteger [0.. (numValue (modulus x) - 1)]
+units' :: (Numeral n) => Mod n -> [Mod n]
+units' = tail . elems
+ -}
 
 --------------------------------------------------------------------------------
 --  Operations on prime fields
@@ -119,8 +118,9 @@ units = tail . elements
 invMod :: Numeral a => Mod a -> Mod a
 invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
   where p = numValue (modulus x)
+        divMod' (0,_,_,_)   = divZeroError
         invMod' :: (Integer, Integer, Integer, Integer) -> Integer
-        invMod' (u,v,x1,x2) 
+        invMod' (u,v,x1,x2)
           | u == 1     = x1 `mod` p
           | otherwise = invMod' (v-q*u,u,x2-q*x1,x1)
             where q = v `div` u
@@ -165,6 +165,8 @@ type Z7 = Mod Seven
 --------------------------------------------------------------------------------
 --  Some small Tests
 
+{-
 testInvMod = do
   print $ show $ invMod (1 :: Z7) == (1::Z7)
-  print $ show $ all (\x -> invMod x * x == (1::Z7)) $ units (0::Z7)
+  print $ show $ all (\x -> invMod x * x == (1::Z7)) units
+ -}
