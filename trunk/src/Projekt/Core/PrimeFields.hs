@@ -14,12 +14,10 @@ module Projekt.Core.PrimeFields
   , modulus
   , Z2 , Z3 , Z5 , Z7
   ) where
-import Prelude hiding ( divMod
-                      , succ
-                      , (/) )
+import Prelude hiding ( (/) )
 import GHC.Err (divZeroError)
 --import Data.Bits (shift)
---import Test.QuickCheck hiding (elements)
+--
 import Projekt.Core.FiniteField
 
 --------------------------------------------------------------------------------
@@ -28,8 +26,8 @@ import Projekt.Core.FiniteField
 data Zero
 data Succ a
 
-succ :: a -> Succ a
-succ = const undefined
+succMod :: a -> Succ a
+succMod = const undefined
 
 peanoPred :: Succ a -> a
 peanoPred = const undefined
@@ -106,12 +104,6 @@ units' :: (Numeral n) => Mod n -> [Mod n]
 units' = tail . elems
  -}
 
---------------------------------------------------------------------------------
---  Operations on prime fields
-
---------------------------------------------------------------------------------
---  Inversion
-
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
 -- TODO: Finde besseren Namen
@@ -124,9 +116,6 @@ invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
           | u == 1     = x1 `mod` p
           | otherwise = invMod' (v-q*u,u,x2-q*x1,x1)
             where q = v `div` u
-
-divMod :: Numeral a => Mod a -> Mod a -> Mod a
-divMod x y = x * invMod y
 
 -- Möglicherweise besser aber noch nicht korrekt:
 -- Algorithm 2.22 aus Guide to Elliptic Curve Cryptography
