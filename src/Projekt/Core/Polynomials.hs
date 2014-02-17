@@ -75,6 +75,7 @@ negateP f = P (negateP' $ unP f)
         negateP' ((i,c):ms) = (i,-1 * c) : negateP' ms
 
 -- |Gibt das reziproke Polynom zurrück
+-- TODO: Inverses des konstanten Terms ranmultiplizieren???
 reziprokP :: Num a => Polynom a -> Polynom a
 reziprokP f = P [(maxDeg - i,sum [c | (j,c) <- unPf, j==i])
                    | i <- sortBy (flip compare) degrees]
