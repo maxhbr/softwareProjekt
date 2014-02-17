@@ -7,12 +7,17 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.PrimeFields
-  ( Zero
+  ( 
+  -- Peano Numerale
+    Numeral (numValue)
+  , Zero
   , Succ
   , Two , Three , Five , Seven
+  -- Endliche Körper
   , Mod
   , modulus
-  , Z2 , Z3 , Z5 , Z7
+  -- Beispiele
+  , Z2 , Z3 , Z5 , Z7, Z101
   ) where
 import Prelude hiding ( (/) )
 import GHC.Err (divZeroError)
@@ -26,11 +31,11 @@ import Projekt.Core.FiniteField
 data Zero
 data Succ a
 
-succMod :: a -> Succ a
-succMod = const undefined
+--succPeano :: a -> Succ a
+--succPeano = const undefined
 
-peanoPred :: Succ a -> a
-peanoPred = const undefined
+predPeano :: Succ a -> a
+predPeano = const undefined
 
 class Numeral a where
   numValue :: a -> Integer
@@ -38,7 +43,7 @@ class Numeral a where
 instance Numeral Zero where
   numValue = const 0
 instance Numeral a => Numeral (Succ a) where
-  numValue x = numValue (peanoPred x) + 1
+  numValue x = numValue (predPeano x) + 1
 
 instance Show Zero where
   show = show . numValue
@@ -67,23 +72,22 @@ newtype Mod n = MkMod { unMod :: Integer }
   --deriving (Show)
 
 instance (Numeral n, Show n) => Show (Mod n) where
-  show x = '[' : show (unMod x) ++ "mod" ++ show (numValue $ modulus x) ++ "]"
+  show x = '[' : show (unMod x) ++ "%" ++ show (modulus x) ++ "]"
 
-modulus :: Numeral a => Mod a -> a
-modulus = const undefined
+modulus :: Numeral a => Mod a -> Integer
+modulus x = numValue $ modulus' x
+  where modulus' :: Numeral a => Mod a -> a
+        modulus' = const undefined
 
 getRepr :: (Numeral n) => Mod n -> Integer
-getRepr x = unMod x `mod` numValue (modulus x)
-
---setRepr :: (Numeral n) => Mod n -> Mod n
---setRepr = MkMod getRepr
+getRepr x = unMod x `mod` modulus x
 
 instance (Numeral n) => Eq (Mod n) where
-  x == y = unMod x - unMod y `mod` numValue (modulus x) == 0
+  x == y = unMod x - unMod y `mod` modulus x == 0
 
 instance (Numeral n) => Num (Mod n) where
-  x + y       = MkMod $ (unMod x + unMod y) `mod` numValue (modulus x)
-  x * y       = MkMod $ (unMod x * unMod y) `mod` numValue (modulus x)
+  x + y       = MkMod $ (unMod x + unMod y) `mod` modulus x
+  x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
   fromInteger = MkMod
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
@@ -102,15 +106,14 @@ instance (Numeral n) => FiniteField (Mod n) where
   units = tail $ units' zero
 
 elems' :: (Numeral n) => Mod n -> [Mod n]
-elems' x = map fromInteger [0.. (numValue (modulus x) - 1)]
+elems' x = map fromInteger [0.. (numValue (modulus' x) - 1)]
  -}
 
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
--- TODO: Finde besseren Namen
 invMod :: Numeral a => Mod a -> Mod a
 invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
-  where p = numValue (modulus x)
+  where p = modulus x
         divMod' (0,_,_,_)   = divZeroError
         invMod' :: (Integer, Integer, Integer, Integer) -> Integer
         invMod' (u,v,x1,x2)
@@ -123,7 +126,7 @@ invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
 {-
 divMod :: forall a. Numeral a => Mod a -> Mod a -> Mod a
 divMod x y = divMod' (unMod x `mod` p, p, unMod y `mod` p, 0)
-  where p = numValue (modulus x)
+  where p = numValue (modulus' x)
         divMod' :: (Integer, Integer, Integer, Integer) -> Mod a
         divMod' (0,_,_,_)   = divZeroError -- 0 ist keine Einheit
         divMod' (1,_,x1,_)  = MkMod x1
@@ -142,7 +145,6 @@ divMod x y = divMod' (unMod x `mod` p, p, unMod y `mod` p, 0)
 invMod :: Numeral a => Mod a -> Mod a
 invMod x = divMod x 1
  -}
-
 
 --------------------------------------------------------------------------------
 --  Examples

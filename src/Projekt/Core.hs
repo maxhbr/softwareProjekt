@@ -1,4 +1,4 @@
-module Project.Core
+module Projekt.Core
   ( module Projekt.Core.PrimeFields
   , module Projekt.Core.Polynomials
   ) where

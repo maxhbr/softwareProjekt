@@ -12,9 +12,11 @@ module Projekt.Core.Polynomials
   , unP
   -- getter
   , getDegrees
-  -- operations
+  -- Operationen auf Polynomen
   , aggP
+  -- unär
   , negateP
+  -- binär
   , addP , subP , multP , deriveP
   , evalP
   -- examples
