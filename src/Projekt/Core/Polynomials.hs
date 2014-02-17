@@ -8,7 +8,7 @@
 --------------------------------------------------------------------------------
 module Projekt.Core.Polynomials
   -- Data
-  ( Polynom
+  ( Polynom (P)
   , unP
   -- getter
   , getDegrees
@@ -38,8 +38,8 @@ instance (Eq a, Num a) => Eq (Polynom a) where
 instance (Show a,Eq a) => Show (Polynom a) where
   show (P []) = ""
   show (P ((i,c):ms))
-    | null ms   = show c ++ "·X^{" ++ show i ++ "}"
-    | otherwise = show c ++ "·X^{" ++ show i ++ "} + " ++ show (P ms)
+    | null ms   = show c ++ "·X^{\x1B[01m" ++ show i ++ "\x1B[00m}"
+    | otherwise = show c ++ "·X^{\x1B[01m" ++ show i ++ "\x1B[00m} + " ++ show (P ms)
 
 -- |Macht aus einem Polynom wieder eine Liste, also quasi das Gegenteil des
 -- Polynom Konstruktors.
