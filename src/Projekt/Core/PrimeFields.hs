@@ -64,7 +64,10 @@ type Seven = Succ (Succ Five)
 --  Prime fields
 
 newtype Mod n = MkMod { unMod :: Integer }
-  deriving (Show)
+  --deriving (Show)
+
+instance (Numeral n, Show n) => Show (Mod n) where
+  show x = '[' : show (unMod x) ++ "mod" ++ show (numValue $ modulus x) ++ "]"
 
 modulus :: Numeral a => Mod a -> a
 modulus = const undefined
@@ -96,12 +99,10 @@ instance (Numeral n) => FiniteField (Mod n) where
   units = undefined
 {-
   elems = elems' zero
-  units = units' zero
+  units = tail $ units' zero
 
 elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map fromInteger [0.. (numValue (modulus x) - 1)]
-units' :: (Numeral n) => Mod n -> [Mod n]
-units' = tail . elems
  -}
 
 -- Inversion mit erweitertem Euklidischem Algorithmus
@@ -151,11 +152,15 @@ type Z3 = Mod Three
 type Z5 = Mod Five
 type Z7 = Mod Seven
 
+-- Größere Primzahlen
+data Peano101
+instance Numeral Peano101 where numValue x = 101
+instance Show Peano101    where show       = show
+type Z101 = Mod Peano101
+
 --------------------------------------------------------------------------------
 --  Some small Tests
 
-{-
 testInvMod = do
   print $ show $ invMod (1 :: Z7) == (1::Z7)
   print $ show $ all (\x -> invMod x * x == (1::Z7)) units
- -}
