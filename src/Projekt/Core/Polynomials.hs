@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- |
--- Module      : Project.Core.Polynomials
+-- Module      : Projekt.Core.Polynomials
 -- Note        : Allgemeine implementierung von Polynomen in einer Variablen
 --
 --
@@ -41,6 +41,14 @@ instance (Show a,Eq a) => Show (Polynom a) where
     | otherwise = show c ++ "·X^{\x1B[01m" ++ show i ++ "\x1B[00m} + "
         ++ show (P ms)
 
+instance (Num a, Eq a) => Num (Polynom a) where
+  x + y         = aggP $ addP x y
+  x * y         = aggP $ multP x y
+  fromInteger i = P [(0,fromInteger i)]
+  abs _         = error "Prelude.Num.abs: inappropriate abstraction"
+  signum _      = error "Prelude.Num.signum: inappropriate abstraction"
+  negate        = negateP
+
 -- |Macht aus einem Polynom wieder eine Liste, also quasi das Gegenteil des
 -- Polynom Konstruktors.
 unP :: Num a => Polynom a -> [(Integer,a)]
@@ -48,10 +56,16 @@ unP (P ms) = ms
 
 -- |Sortiert die Koeffizienten absteigend und fasst passende Koeffizienten
 -- zusammen.
-aggP :: Num a => Polynom a -> Polynom a
-aggP f = P [(i,sum [c | (j,c) <- unPf, j==i])
-             | i <- sortBy (flip compare) $ getDegrees f]
-  where unPf    = unP f
+aggP :: (Num a, Eq a) => Polynom a -> Polynom a
+aggP f = P (remZeros [(i,sum [c | (j,c) <- unPf, j==i])
+             | i <- sortBy (flip compare) $ getDegrees f])
+  where unPf = unP f
+        remZeros []     = []
+        remZeros (i:is) | snd i == 0 = remZeros is
+                        | otherwise = i : remZeros is
+
+getLeadingCoeff :: (Num a, Eq a) => Polynom a -> a
+getLeadingCoeff = snd . head . unP . aggP
 
 -- |Nimmt ein Polynom und gibt eine unsortierte liste der Gräder zurrück.
 getDegrees :: Num a => Polynom a -> [Integer]
@@ -98,10 +112,7 @@ deriveP = P . deriveP' . unP
 
 -- |Nimmt zwei Polynome und addierte diese zusammen.
 addP :: Num a => Polynom a -> Polynom a -> Polynom a
-addP f g = aggP $ addP' f g
--- TODO: vlt keine aggP um mehr performance zu bekommen?
-  where addP' :: Num a => Polynom a -> Polynom a -> Polynom a
-        addP' f g = P (unP f ++ unP g)
+addP f g = P (unP f ++ unP g)
 
 -- |Nimmt zwei Polynome und zieht das zweite von dem ersten ab.
 subP :: Num a => Polynom a -> Polynom a -> Polynom a
@@ -114,10 +125,30 @@ multP (P (m:ms)) g = addP (multP (P ms) g) $ multWithMonom m g
   where multWithMonom :: Num a => (Integer,a) -> Polynom a -> Polynom a
         multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
 
+
+--------------------------------------------------------------------------------
+--  teilen mit Rest
+--  durch erweitertem euklidischem Algorithmus
+
+-- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
+divP :: (Num a, FiniteField a) => Polynom a -> Polynom a -> Polynom a
+divP a b | degA > degB = a
+         | otherwise   = P $ (degA-degB,lcA/lcB) : unP divP newA b
+  where degA = maximum $ getDegrees a
+        degB = maximum $ getDegrees b
+        lcA  = getLeadingCoeff a
+        lcB  = getLeadingCoeff b
+        newA = undefined
+
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
 modByP :: Num a => Polynom a -> Polynom a -> Polynom a
 modByP = undefined
+
+--------------------------------------------------------------------------------
+--  TODO
+
+-- |Algorithmus für ggT
 
 --------------------------------------------------------------------------------
 --  Weiteres

@@ -114,8 +114,8 @@ elems' x = map fromInteger [0.. (numValue (modulus' x) - 1)]
 invMod :: Numeral a => Mod a -> Mod a
 invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
   where p = modulus x
-        divMod' (0,_,_,_)   = divZeroError
         invMod' :: (Integer, Integer, Integer, Integer) -> Integer
+        divMod' (0,_,_,_) = divZeroError
         invMod' (u,v,x1,x2)
           | u == 1     = x1 `mod` p
           | otherwise = invMod' (v-q*u,u,x2-q*x1,x1)
