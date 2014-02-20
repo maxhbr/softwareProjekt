@@ -1,10 +1,13 @@
 module Projekt.Core.AlgebraicTypes where
-{-import Prelude hiding ((+))-}
+import Prelude hiding ((+), (-), negate, (*), (/))
 
 class AbGrp a where
   zero    :: a
   (+),(-) :: a -> a -> a
   negate  :: a -> a
+
+  negate x = zero - x
+  x - y    = x + negate y
 
 class (AbGrp a) => Ring a where
   one         :: a

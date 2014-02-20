@@ -1,6 +1,7 @@
+{-# LANGUAGE FlexibleContexts, UndecidableInstances #-}
 --------------------------------------------------------------------------------
 -- |
--- Module      : Project.Core.PrimeFields
+-- Module      : Projekt.Core.PrimeFields
 -- Note        : Einfache prim Körper
 --
 --
@@ -19,11 +20,13 @@ module Projekt.Core.PrimeFields
   -- Beispiele
   , Z2 , Z3 , Z5 , Z7, Z101
   ) where
-import Prelude hiding ( (/) )
+import Prelude hiding ((+), (-), negate, (*), (/))
+import qualified Prelude as P
 import GHC.Err (divZeroError)
 --import Data.Bits (shift)
 --
-import Projekt.Core.FiniteField
+--import Projekt.Core.FiniteField
+import Projekt.Core.AlgebraicTypes
 
 --------------------------------------------------------------------------------
 --  Peano numbers
@@ -43,7 +46,7 @@ class Numeral a where
 instance Numeral Zero where
   numValue = const 0
 instance Numeral a => Numeral (Succ a) where
-  numValue x = numValue (predPeano x) + 1
+  numValue x = succ $ numValue (predPeano x)
 
 instance Show Zero where
   show = show . numValue
@@ -83,19 +86,21 @@ getRepr :: (Numeral n) => Mod n -> Integer
 getRepr x = unMod x `mod` modulus x
 
 instance (Numeral n) => Eq (Mod n) where
-  x == y = unMod x - unMod y `mod` modulus x == 0
+  x == y = unMod x P.- unMod y `mod` modulus x == 0
 
-instance (Numeral n) => Num (Mod n) where
-  x + y       = MkMod $ (unMod x + unMod y) `mod` modulus x
+instance (Numeral n) => AbGrp (Mod n) where
+  x + y    = MkMod $ (unMod x + unMod y) `mod` modulus x
+  zero     = MkMod 0
+  negate x = MkMod $ negate $ unMod x
+
+instance (Numeral n, AbGrp (Mod n)) => Ring (Mod n) where
   x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
+  one         = MkMod 1
   fromInteger = MkMod
-  abs _       = error "Prelude.Num.abs: inappropriate abstraction"
-  signum _    = error "Prelude.Num.signum: inappropriate abstraction"
-  negate x    = MkMod $ negate $ unMod x
 
+{-
 instance (Numeral n) => FiniteField (Mod n) where
   zero  = MkMod 0
-  one   = MkMod 1
   inv   = invMod
   x / y = x * inv y
   -- TODO
@@ -108,6 +113,7 @@ instance (Numeral n) => FiniteField (Mod n) where
 elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map fromInteger [0.. (numValue (modulus' x) - 1)]
  -}
+
 
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
@@ -166,3 +172,4 @@ type Z101 = Mod Peano101
 testInvMod = do
   print $ show $ invMod (1 :: Z7) == (1::Z7)
   print $ show $ all (\x -> invMod x * x == (1::Z7)) units
+ -}
