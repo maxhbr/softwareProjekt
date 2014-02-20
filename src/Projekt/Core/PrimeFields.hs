@@ -98,9 +98,7 @@ instance (Numeral n, AbGrp (Mod n)) => Ring (Mod n) where
   one         = MkMod 1
   fromInteger = MkMod
 
-{-
-instance (Numeral n) => FiniteField (Mod n) where
-  zero  = MkMod 0
+instance (Numeral n) => GalField (Mod n) where
   inv   = invMod
   x / y = x * inv y
   -- TODO
@@ -114,7 +112,9 @@ elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map fromInteger [0.. (numValue (modulus' x) - 1)]
  -}
 
+invMod = undefined
 
+{-
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
 invMod :: Numeral a => Mod a -> Mod a
