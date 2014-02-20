@@ -23,8 +23,7 @@ import Prelude hiding ( (/) )
 import GHC.Err (divZeroError)
 --import Data.Bits (shift)
 --
---import Projekt.Core.FiniteField
-import Projekt.Core.AlgebraicTypes
+import Projekt.Core.FiniteField
 
 --------------------------------------------------------------------------------
 --  Peano numbers

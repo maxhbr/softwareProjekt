@@ -17,11 +17,14 @@ module Projekt.Core.Polynomials
   -- unär
   , negateP, reziprokP, deriveP
   -- binär
-  , addP, subP, multP, modByP
+  , addP, subP, multP
   -- weiteres
   , evalP
   ) where
+import Prelude hiding ( (/) )
 import Data.List
+
+import Projekt.Core.FiniteField
 
 --------------------------------------------------------------------------------
 --  Data Definition
@@ -129,6 +132,9 @@ multP (P (m:ms)) g = addP (multP (P ms) g) $ multWithMonom m g
 --------------------------------------------------------------------------------
 --  teilen mit Rest
 --  durch erweitertem euklidischem Algorithmus
+{-
+
+--TODO
 
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
 divP :: (Num a, FiniteField a) => Polynom a -> Polynom a -> Polynom a
@@ -144,6 +150,8 @@ divP a b | degA > degB = a
 -- Also Division mit rest und Rüchgabewert ist der Rest.
 modByP :: Num a => Polynom a -> Polynom a -> Polynom a
 modByP = undefined
+
+ -}
 
 --------------------------------------------------------------------------------
 --  TODO
