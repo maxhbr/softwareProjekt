@@ -89,12 +89,12 @@ instance (Numeral n) => Eq (Mod n) where
   x == y = unMod x P.- unMod y `mod` modulus x == 0
 
 instance (Numeral n) => AbGrp (Mod n) where
-  x + y    = MkMod $ (unMod x + unMod y) `mod` modulus x
+  x + y    = MkMod $ (unMod x P.+ unMod y) `mod` modulus x
   zero     = MkMod 0
-  negate x = MkMod $ negate $ unMod x
+  negate x = MkMod $ P.negate $ unMod x
 
 instance (Numeral n, AbGrp (Mod n)) => Ring (Mod n) where
-  x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
+  x * y       = MkMod $ (unMod x P.* unMod y) `mod` modulus x
   one         = MkMod 1
   fromInteger = MkMod
 
@@ -112,9 +112,6 @@ elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map fromInteger [0.. (numValue (modulus' x) - 1)]
  -}
 
-invMod = undefined
-
-{-
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
 invMod :: Numeral a => Mod a -> Mod a
@@ -124,7 +121,7 @@ invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
         divMod' (0,_,_,_) = divZeroError
         invMod' (u,v,x1,x2)
           | u == 1     = x1 `mod` p
-          | otherwise = invMod' (v-q*u,u,x2-q*x1,x1)
+          | otherwise = invMod' (v P.- q P.* u,u,x2 P.- q P.* x1,x1)
             where q = v `div` u
 
 -- Möglicherweise besser aber noch nicht korrekt:
@@ -169,6 +166,7 @@ type Z101 = Mod Peano101
 --------------------------------------------------------------------------------
 --  Some small Tests
 
+{-
 testInvMod = do
   print $ show $ invMod (1 :: Z7) == (1::Z7)
   print $ show $ all (\x -> invMod x * x == (1::Z7)) units
