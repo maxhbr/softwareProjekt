@@ -134,10 +134,10 @@ multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
 
 
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
-divP :: FiniteField a => Polynom a -> Polynom a -> (Polynom a, Polynom a)
+divP :: Fractional a => Polynom a -> Polynom a -> (Polynom a, Polynom a)
 divP a b | degDiff < 0 = (P [], a)
          | otherwise   = P $ (degDiff, lcQuot) : unP divP newA b
-  where degDiff = (maximum $ getDegrees a) - (maximum $ getDegrees b)
+  where degDiff = maximum $ getDegrees a - maximum $ getDegrees b
         lcQuot  = getLeadingCoeff a / getLeadingCoeff b
         newA    = subP a $ multWithMonom (degDiff,lcQuot) b
 
