@@ -21,7 +21,6 @@ module Projekt.Core.Polynomials
   -- weiteres
   , evalP
   ) where
-import Prelude hiding ( (/) )
 import Data.List
 
 {-import Projekt.Core.FiniteField-}
@@ -125,33 +124,30 @@ subP f g = addP f $ negateP g
 multP :: Num a => Polynom a -> Polynom a -> Polynom a
 multP (P [])     g = P []
 multP (P (m:ms)) g = addP (multP (P ms) g) $ multWithMonom m g
-  where multWithMonom :: Num a => (Integer,a) -> Polynom a -> Polynom a
-        multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
+
+-- |Multiplikation mit Monom
+multWithMonom :: Num a => (Integer,a) -> Polynom a -> Polynom a
+multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
 
 
 --------------------------------------------------------------------------------
---  teilen mit Rest
+--  Teilen mit Rest
 --  durch erweitertem euklidischem Algorithmus
-{-
 
---TODO
 
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
-divP :: (Num a, FiniteField a) => Polynom a -> Polynom a -> Polynom a
-divP a b | degA > degB = a
-         | otherwise   = P $ (degA-degB,lcA/lcB) : unP divP newA b
-  where degA = maximum $ getDegrees a
-        degB = maximum $ getDegrees b
-        lcA  = getLeadingCoeff a
-        lcB  = getLeadingCoeff b
-        newA = undefined
+divP :: FiniteField a => Polynom a -> Polynom a -> (Polynom a, Polynom a)
+divP a b | degDiff < 0 = (P [], a)
+         | otherwise   = P $ (degDiff, lcQuot) : unP divP newA b
+  where degDiff = (maximum $ getDegrees a) - (maximum $ getDegrees b)
+        lcQuot  = getLeadingCoeff a / getLeadingCoeff b
+        newA    = subP a $ multWithMonom (degDiff,lcQuot) b
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
 modByP :: Num a => Polynom a -> Polynom a -> Polynom a
 modByP = undefined
 
- -}
 
 --------------------------------------------------------------------------------
 --  TODO

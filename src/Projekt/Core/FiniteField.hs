@@ -24,15 +24,9 @@ class (Eq a) => FiniteField a where
   elems, units       :: [a]
  -}
 
-class (Eq a, Num a) => FiniteField a where
+class (Eq a) => FiniteField a where
   zero, one    :: a
-  inv          :: a -> a
-  (%)          :: a -> a -> a
   elems, units :: [a]
-
-  inv x = one % x
-  x % y = x * inv y
-
 {-
  - TODO:
  - * Erweiterungen von Körpern
