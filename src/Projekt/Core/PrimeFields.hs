@@ -19,7 +19,7 @@ module Projekt.Core.PrimeFields
   -- Beispiele
   , Z2 , Z3 , Z5 , Z7, Z101
   ) where
-import Prelude hiding ( (/) )
+{-import Prelude hiding ( (/) )-}
 import GHC.Err (divZeroError)
 --import Data.Bits (shift)
 --
@@ -92,6 +92,10 @@ instance (Numeral n) => Num (Mod n) where
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate      = MkMod . negate . unMod
+
+instance (Numeral n) => Fractional (Mod n) where
+  recip        = invMod
+  fromRational = error ":("
 
 instance (Numeral n) => FiniteField (Mod n) where
   zero  = MkMod 0

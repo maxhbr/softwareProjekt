@@ -23,8 +23,6 @@ module Projekt.Core.Polynomials
   ) where
 import Data.List
 
-{-import Projekt.Core.FiniteField-}
-
 --------------------------------------------------------------------------------
 --  Data Definition
 
@@ -161,3 +159,7 @@ modByP = undefined
 evalP :: Num a => a -> Polynom a -> a
 evalP x f = sum [evalMonom m | m <- unP f]
   where evalMonom (i,c) = product [x | j <- [1..i]] * c
+
+
+
+shiftP (P ms) j = P [(fst m + j, snd m) | m <- ms]
