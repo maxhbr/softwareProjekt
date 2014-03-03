@@ -100,7 +100,6 @@ instance (Numeral n) => Fractional (Mod n) where
 instance (Numeral n) => FiniteField (Mod n) where
   zero  = MkMod 0
   one   = MkMod 1
-  inv   = invMod
   -- TODO
   elems = undefined
   units = undefined

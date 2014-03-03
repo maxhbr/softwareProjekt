@@ -17,7 +17,7 @@ module Projekt.Core.Polynomials
   -- unär
   , negateP, reziprokP, deriveP
   -- binär
-  , addP, subP, multP
+  , addP, subP, multP, divP
   -- weiteres
   , evalP
   ) where
@@ -134,12 +134,13 @@ multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
 
 
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
-divP :: Fractional a => Polynom a -> Polynom a -> (Polynom a, Polynom a)
+divP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
 divP a b | degDiff < 0 = (P [], a)
-         | otherwise   = P $ (degDiff, lcQuot) : unP divP newA b
-  where degDiff = maximum $ getDegrees a - maximum $ getDegrees b
-        lcQuot  = getLeadingCoeff a / getLeadingCoeff b
-        newA    = subP a $ multWithMonom (degDiff,lcQuot) b
+         | otherwise   = divP' (degDiff, lcQuot) $ divP newA b
+  where degDiff       = maximum (getDegrees a) - maximum (getDegrees b)
+        lcQuot        = getLeadingCoeff a / getLeadingCoeff b
+        newA          = subP a $ multWithMonom (degDiff,lcQuot) b
+        divP' m (q,r) = (P $ m : unP q, r)
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
