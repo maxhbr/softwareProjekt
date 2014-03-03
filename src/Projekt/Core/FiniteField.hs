@@ -10,6 +10,7 @@
 module Projekt.Core.FiniteField
   {-( FiniteField )-}
   where
+import Projekt.Core.Polynomials
 
 {-
 import Prelude hiding (fromInteger, negate, (+), (-), (*), (/))
@@ -26,5 +27,13 @@ class (Eq a) => FiniteField a where
 class (Eq a, Num a) => FiniteField a where
   zero, one    :: a
   inv          :: a -> a
-  (/)          :: a -> a -> a
+  (%)          :: a -> a -> a
   elems, units :: [a]
+
+  inv x = one % x
+  x % y = x * inv y
+
+{-
+ - TODO:
+ - * Erweiterungen von Körpern
+ -}

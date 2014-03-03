@@ -24,7 +24,7 @@ module Projekt.Core.Polynomials
 import Prelude hiding ( (/) )
 import Data.List
 
-import Projekt.Core.FiniteField
+{-import Projekt.Core.FiniteField-}
 
 --------------------------------------------------------------------------------
 --  Data Definition

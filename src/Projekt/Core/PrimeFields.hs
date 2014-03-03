@@ -91,13 +91,12 @@ instance (Numeral n) => Num (Mod n) where
   fromInteger = MkMod
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
-  negate x    = MkMod $ negate $ unMod x
+  negate      = MkMod . negate . unMod
 
 instance (Numeral n) => FiniteField (Mod n) where
   zero  = MkMod 0
   one   = MkMod 1
   inv   = invMod
-  x / y = x * inv y
   -- TODO
   elems = undefined
   units = undefined
@@ -112,13 +111,13 @@ elems' x = map fromInteger [0.. (numValue (modulus' x) - 1)]
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
 invMod :: Numeral a => Mod a -> Mod a
-invMod x = MkMod $ invMod' (unMod x `mod` p,p,1,0)
+invMod x = invMod' (unMod x `mod` p,p,one,zero)
   where p = modulus x
-        invMod' :: (Integer, Integer, Integer, Integer) -> Integer
+        invMod' :: Numeral a => (Integer, Integer, Mod a, Mod a) -> Mod a
         divMod' (0,_,_,_) = divZeroError
         invMod' (u,v,x1,x2)
-          | u == 1     = x1 `mod` p
-          | otherwise = invMod' (v-q*u,u,x2-q*x1,x1)
+          | u == 1     = x1
+          | otherwise = invMod' (v-q*u,u,x2-fromInteger q*x1,x1)
             where q = v `div` u
 
 -- Möglicherweise besser aber noch nicht korrekt:
