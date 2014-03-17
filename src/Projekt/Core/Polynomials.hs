@@ -17,7 +17,7 @@ module Projekt.Core.Polynomials
   -- unär
   , negateP, reziprokP, deriveP
   -- binär
-  , addP, subP, multP, divP
+  , addP, subP, multP, divP, modByP
   -- weiteres
   , evalP
   ) where
@@ -58,8 +58,8 @@ unP (P ms) = ms
 -- zusammen.
 aggP :: (Num a, Eq a) => Polynom a -> Polynom a
 aggP f = P (remZeros [(i,sum [c | (j,c) <- unPf, j==i])
-             | i <- sortBy (flip compare) $ getDegrees f])
-  where unPf = unP f
+                       | i <- sortBy (flip compare) $ getDegrees f])
+  where unPf            = unP f
         remZeros []     = []
         remZeros (i:is) | snd i == 0 = remZeros is
                         | otherwise = i : remZeros is
@@ -127,13 +127,8 @@ multP (P (m:ms)) g = addP (multP (P ms) g) $ multWithMonom m g
 multWithMonom :: Num a => (Integer,a) -> Polynom a -> Polynom a
 multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
 
-
---------------------------------------------------------------------------------
---  Teilen mit Rest
---  durch erweitertem euklidischem Algorithmus
-
-
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
+--  Teilen mit Rest durch erweitertem euklidischem Algorithmus
 divP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
 divP a b | degDiff < 0 = (P [], a)
          | otherwise   = divP' (degDiff, lcQuot) $ divP newA b
@@ -144,9 +139,10 @@ divP a b | degDiff < 0 = (P [], a)
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
-modByP :: Num a => Polynom a -> Polynom a -> Polynom a
-modByP = undefined
-
+--
+-- mehr Performance durch andere Rechnung?
+modByP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+modByP f g = snd $ divP f g
 
 --------------------------------------------------------------------------------
 --  TODO
