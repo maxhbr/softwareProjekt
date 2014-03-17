@@ -95,7 +95,7 @@ instance (Numeral n) => Num (Mod n) where
 
 instance (Numeral n) => Fractional (Mod n) where
   recip        = invMod
-  fromRational = error ":("
+  fromRational = error "inappropriate abstraction"
 
 instance (Numeral n) => FiniteField (Mod n) where
   zero  = MkMod 0
