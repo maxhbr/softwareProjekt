@@ -52,8 +52,8 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   negate (FFKonst x)                      = FFKonst (negate x)
   negate (FFElem f p)                     = FFElem (negate f) p
 
-  abs _                                   = error "Prelude.Num.abs: inappropriate abstraction"
-  signum _                                = error "Prelude.Num.signum: inappropriate abstraction"
+  abs _    = error "Prelude.Num.abs: inappropriate abstraction"
+  signum _ = error "Prelude.Num.signum: inappropriate abstraction"
 
 instance (Eq a, Fractional a) => Fractional (FFElem a) where
   fromRational _     = error "inappropriate abstraction"
