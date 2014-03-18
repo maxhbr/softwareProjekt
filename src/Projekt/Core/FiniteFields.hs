@@ -40,9 +40,9 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   signum _                                = error "Prelude.Num.signum: inappropriate abstraction"
 
 instance (Eq a, Fractional a) => Fractional (FFElem a) where
-  recip (FFElem f p)  =  FFElem s p
+  fromRational _     = error "inappropriate abstraction"
+  recip (FFElem f p) = FFElem s p
     where (d,s,t) = eekP f p
-  fromRational _ = error "inappropriate abstraction"
 
 instance (FiniteField a) => FiniteField (FFElem a) where
   one  = FFKonst one
