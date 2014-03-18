@@ -8,18 +8,26 @@
 --------------------------------------------------------------------------------
 
 module Projekt.Core.FiniteField
-  -- Data
-  (-- FFElem
-  )
+  {-( FiniteField )-}
   where
 import Projekt.Core.Polynomials
+
+{-
+import Prelude hiding (fromInteger, negate, (+), (-), (*), (/))
+
+class (Eq a) => FiniteField a where
+  zero, one          :: a
+  characteristik     :: Integer
+  fromInteger        :: Integer -> a
+  negate             :: a -> a
+  (+), (-), (*), (/) :: a -> a -> a
+  elems, units       :: [a]
+ -}
 
 class (Eq a) => FiniteField a where
   zero, one    :: a
   elems, units :: [a]
-
-
---data FFElem a = FFElem (Polynom a) (Polynom a)
-
-
-
+{-
+ - TODO:
+ - * Erweiterungen von Körpern
+ -}
