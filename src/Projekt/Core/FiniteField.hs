@@ -47,3 +47,4 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
 instance (Eq a, Fractional a) => Fractional (FFElem a) where
   recip (FFElem f p)  =  FFElem s p
       where (d,s,t) = eekP f p
+  fromRational _ = error "inappropriate abstraction"
