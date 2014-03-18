@@ -28,13 +28,19 @@ instance (Show a, Eq a) => Show (FFElem a) where
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
+
   (FFKonst x) + (FFKonst y)               = FFKonst (x+y)
   (FFElem f p) + (FFKonst x)              = FFElem (modByP (f+P [(0,x)]) p) p
-  -- ...
+  (FFKonst x) + (FFElem f p)              = FFElem (modByP (f+P [(0,x)]) p) p
   (FFElem f p) + (FFElem g q) | p==q       = FFElem (modByP (f+g) p) p
                               | otherwise = error "Not the same mod"
+
+  (FFKonst x) * (FFKonst y)               = FFKonst (x*y)
+  (FFElem f p) * (FFKonst x)              = FFElem (modByP (f*P [(0,x)]) p) p
+  (FFKonst x) * (FFElem f p)              = FFElem (modByP (f*P [(0,x)]) p) p
   (FFElem f p) * (FFElem g q) | p==q       = FFElem (modByP (f*g) p) p
                               | otherwise = error "Not the same mod"
+
   negate (FFElem f p)                     = FFElem (negate f) p
   abs _                                   = error "Prelude.Num.abs: inappropriate abstraction"
   signum _                                = error "Prelude.Num.signum: inappropriate abstraction"
