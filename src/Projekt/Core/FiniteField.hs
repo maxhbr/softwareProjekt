@@ -29,13 +29,17 @@ class (Eq a) => FiniteField a where
   elems, units :: [a]
 
 
-data FFElem a = FFElem (Polynom a) (Polynom a)
+data FFElem a = FFElem (Polynom a) (Polynom a) | FFKonst a
 
 
 instance (Show a, Eq a) => Show (FFElem a) where
   show (FFElem x y) = show x ++ " mod " ++ show y
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
+  fromInteger                             = FFKonst fromInteger
+  (FFKonst x) + (FFKonst y)               = FFKonst (x+y)
+  (FFElem f p) + (FFKonst x)              = FFElem (modByP (f+P [(0,x)]) p) p
+  -- ...
   (FFElem f p) + (FFElem g q) | p==q       = FFElem (modByP (f+g) p) p
                               | otherwise = error "Not the same mod"
   (FFElem f p) * (FFElem g q) | p==q       = FFElem (modByP (f*g) p) p
@@ -46,5 +50,5 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
 
 instance (Eq a, Fractional a) => Fractional (FFElem a) where
   recip (FFElem f p)  =  FFElem s p
-      where (d,s,t) = eekP f p
+    where (d,s,t) = eekP f p
   fromRational _ = error "inappropriate abstraction"

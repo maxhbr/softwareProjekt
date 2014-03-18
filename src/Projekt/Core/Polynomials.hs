@@ -159,7 +159,7 @@ ggTP f g | degP r == 0 = g
 eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a 
                                           -> (Polynom a, Polynom a, Polynom a)
 eekP f g | g == 0      = (f,P[(1,0)],P[(0,0)])
-        | otherwise   = (d,t,s-t*q)
+         | otherwise  = (d,t,s-t*q)
   where (d,s,t) = eekP g r
         (q,r)   = divP f g
 
