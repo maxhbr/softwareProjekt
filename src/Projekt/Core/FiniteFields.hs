@@ -7,8 +7,8 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.FiniteFields
-  (
-  ) where
+  {-()-}
+  where
 import Projekt.Core.FiniteField
 import Projekt.Core.PrimeFields
 import Projekt.Core.Polynomials
