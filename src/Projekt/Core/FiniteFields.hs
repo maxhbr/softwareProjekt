@@ -28,8 +28,9 @@ instance Eq (FFElem a) where
   x == y = undefined
 
 instance (Show a, Eq a) => Show (FFElem a) where
-  show (FFKonst x)  = show x
-  show (FFElem f p) = show f ++ " mod " ++ show p
+  show (FFKonst x)       = show x
+  show (FFElem (P []) p) = "0 mod " ++ show p
+  show (FFElem f p)      = show f ++ " mod " ++ show p
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
@@ -46,7 +47,9 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   (FFElem f p) * (FFElem g q) | p==q       = aggF $ FFElem (f*g) p
                               | otherwise = error "Not the same mod"
 
+  negate (FFKonst x)                      = FFKonst (negate x)
   negate (FFElem f p)                     = FFElem (negate f) p
+
   abs _                                   = error "Prelude.Num.abs: inappropriate abstraction"
   signum _                                = error "Prelude.Num.signum: inappropriate abstraction"
 
