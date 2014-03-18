@@ -20,6 +20,10 @@ konstToElem (FFKonst a) q              = FFElem (P [(0,a)]) q
 konstToElem (FFElem f p) q | p==q       = FFElem f p
                            | otherwise = error "Not the same mod"
 
+aggF :: (Eq a, Fractional a) => FFElem a -> FFElem a
+aggF (FFKonst x)   = FFKonst x
+aggF (FFElem f p ) = FFElem (modByP f p) p
+
 instance Eq (FFElem a) where
   x == y = undefined
 
@@ -30,15 +34,15 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
 
   (FFKonst x) + (FFKonst y)               = FFKonst (x+y)
-  (FFElem f p) + (FFKonst x)              = FFElem (modByP (f+P [(0,x)]) p) p
-  (FFKonst x) + (FFElem f p)              = FFElem (modByP (f+P [(0,x)]) p) p
-  (FFElem f p) + (FFElem g q) | p==q       = FFElem (modByP (f+g) p) p
+  (FFElem f p) + (FFKonst x)              = FFElem (f+P [(0,x)]) p
+  (FFKonst x) + (FFElem f p)              = FFElem (f+P [(0,x)]) p
+  (FFElem f p) + (FFElem g q) | p==q       = aggF $ FFElem (f+g) p
                               | otherwise = error "Not the same mod"
 
   (FFKonst x) * (FFKonst y)               = FFKonst (x*y)
-  (FFElem f p) * (FFKonst x)              = FFElem (modByP (f*P [(0,x)]) p) p
-  (FFKonst x) * (FFElem f p)              = FFElem (modByP (f*P [(0,x)]) p) p
-  (FFElem f p) * (FFElem g q) | p==q       = FFElem (modByP (f*g) p) p
+  (FFElem f p) * (FFKonst x)              = FFElem (f*P [(0,x)]) p
+  (FFKonst x) * (FFElem f p)              = FFElem (f*P [(0,x)]) p
+  (FFElem f p) * (FFElem g q) | p==q       = aggF $ FFElem (f*g) p
                               | otherwise = error "Not the same mod"
 
   negate (FFElem f p)                     = FFElem (negate f) p
@@ -51,8 +55,8 @@ instance (Eq a, Fractional a) => Fractional (FFElem a) where
     where (d,s,t) = eekP f p
 
 instance (FiniteField a) => FiniteField (FFElem a) where
-  one  = FFKonst one
-  zero = FFKonst zero
+  one   = FFKonst one
+  zero  = FFKonst zero
   elems = undefined
   units = undefined
 
