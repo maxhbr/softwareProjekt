@@ -13,15 +13,17 @@ module Projekt.Core.Polynomials
   -- getter
   , getDegrees
   -- Operationen auf Polynomen
-  , aggP
+  , aggP, degP
   -- unär
   , negateP, reziprokP, deriveP
+  , getLeadingCoeff
   -- binär
-  , addP, subP, multP, divP, modByP
+  , addP, subP, multP, divP, modByP, ggTP
   -- weiteres
   , evalP
   ) where
 import Data.List
+import Debug.Trace
 
 --------------------------------------------------------------------------------
 --  Data Definition
@@ -74,6 +76,9 @@ getDegrees f = getDegrees' [] [fst m | m <- unP f]
         getDegrees' distinct (i:is)
           | i `elem` distinct = getDegrees' distinct is
           | otherwise         = getDegrees' (distinct ++ [i]) is
+
+degP :: Num a => Polynom a -> Integer
+degP = maximum . getDegrees
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen
@@ -131,23 +136,24 @@ multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
 --  Teilen mit Rest durch erweitertem euklidischem Algorithmus
 divP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
 divP a b | degDiff < 0 = (P [], a)
-         | otherwise   = divP' (degDiff, lcQuot) $ divP newA b
-  where degDiff       = maximum (getDegrees a) - maximum (getDegrees b)
-        lcQuot        = getLeadingCoeff a / getLeadingCoeff b
-        newA          = subP a $ multWithMonom (degDiff,lcQuot) b
-        divP' m (q,r) = (P $ m : unP q, r)
+         | otherwise   = divP' $ divP newA b
+  where divP' (q,r) = (P $ (degDiff, lcQuot) : unP q, r)
+        degDiff     = degP a - degP b
+        lcQuot      = getLeadingCoeff a / getLeadingCoeff b
+        newA        = subP a $ multWithMonom (degDiff,lcQuot) b
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
 --
 -- mehr Performance durch andere Rechnung?
 modByP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
-modByP f g = snd $ divP f g
-
---------------------------------------------------------------------------------
---  TODO
+modByP f p = snd $ divP f p
 
 -- |Algorithmus für ggT
+ggTP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+ggTP f g | degP r == 0 = g
+         | otherwise  = ggTP g r
+  where (q,r) = divP f g
 
 --------------------------------------------------------------------------------
 --  Weiteres
@@ -156,7 +162,5 @@ modByP f g = snd $ divP f g
 evalP :: Num a => a -> Polynom a -> a
 evalP x f = sum [evalMonom m | m <- unP f]
   where evalMonom (i,c) = product [x | j <- [1..i]] * c
-
-
 
 shiftP (P ms) j = P [(fst m + j, snd m) | m <- ms]
