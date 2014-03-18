@@ -28,7 +28,8 @@ instance Eq (FFElem a) where
   x == y = undefined
 
 instance (Show a, Eq a) => Show (FFElem a) where
-  show (FFElem x y) = show x ++ " mod " ++ show y
+  show (FFKonst x)  = show x
+  show (FFElem f p) = show f ++ " mod " ++ show p
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)

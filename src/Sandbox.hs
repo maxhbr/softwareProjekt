@@ -29,7 +29,7 @@ charakteristik = 101
 data PeanoNumber
 instance Numeral PeanoNumber where numValue x = charakteristik
 instance Show PeanoNumber    where show       = show
-type FF = Mod PeanoNumber
+type PF = Mod PeanoNumber
 
-exmpPolyMod = aggP $ P [(10,5::FF),(10,4::FF),(3,2::FF),(0,5::FF)]
-exmpPolyMod' = aggP $ P [(8,5::FF),(9,4::FF),(3,2::FF),(0,5::FF)]
+exmpPolyMod = aggP $ P [(10,5::PF),(10,4::PF),(3,2::PF),(0,5::PF)]
+exmpPolyMod' = aggP $ P [(8,5::PF),(9,4::PF),(3,2::PF),(0,5::PF)]
