@@ -15,3 +15,5 @@ import Projekt.Core.Polynomials
 class (Eq a) => FiniteField a where
   zero, one    :: a
   elems, units :: [a]
+
+  units = [e | e <- elems, e /= zero]

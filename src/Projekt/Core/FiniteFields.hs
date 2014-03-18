@@ -58,7 +58,6 @@ instance (FiniteField a) => FiniteField (FFElem a) where
   one   = FFKonst one
   zero  = FFKonst zero
   elems = undefined
-  units = undefined
 
 --------------------------------------------------------------------------------
 --  Beispiel
