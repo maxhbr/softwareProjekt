@@ -7,8 +7,10 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.FiniteFields
-  {-()-}
-  where
+  ( FFElem (..)
+  , konstToElem
+  , aggF
+  ) where
 import Projekt.Core.FiniteField
 import Projekt.Core.PrimeFields
 import Projekt.Core.Polynomials
