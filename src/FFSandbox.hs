@@ -49,3 +49,19 @@ type PF = Mod PeanoNumber
 
 ff1 = FFKonst (1::PF)
 ffV = FFElem (P[(1,1::PF)]) (P [(2,1::PF),(1,1::PF),(0,1::PF)])
+
+--------------------------------------------------------------------------------
+--  Weiteres
+
+{- F8=E4 als Grad 4 Erweiterung von Z2
+ - durch MPol x⁴+x²+1
+ -
+ - oder
+ - als Grad 2 Erweiterung con E2 durch MPol x²+x+1
+ -}
+
+{-
+ - Z[X,Y,Z]/
+ -        /                                  = GF(3²⁷) = F3^27
+ -       /ideal(3,x³-x-1,y³-y+x²,z³-z+x²y²)
+ -}

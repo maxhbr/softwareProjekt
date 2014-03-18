@@ -27,12 +27,11 @@ aggF (FFKonst x)  = FFKonst x
 aggF (FFElem f p) = FFElem (modByP f p) p
 
 instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
-  (FFKonst x)  == (FFKonst y)  = x == y
+  (FFKonst x)  == (FFKonst y)  = x==y
   (FFElem f p) == (FFKonst y)  = FFElem f p == konstToElem (FFKonst y) p
   (FFKonst x)  == (FFElem g p) = konstToElem (FFKonst x) p == FFElem g p
-  (FFElem f p) == (FFElem g q)
-    | p==q       = null $ unP $ aggP (modByP (f - g) p)
-    | otherwise = error "Not the same mod"
+  (FFElem f p) == (FFElem g q) | p==q       = null $ unP $ aggP (f - g)
+                              | otherwise = error "Not the same mod"
 
 instance (Show a, Eq a) => Show (FFElem a) where
   show (FFKonst x)       = show x
@@ -69,44 +68,3 @@ instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   one   = FFKonst one
   zero  = FFKonst zero
   elems = undefined
-
---------------------------------------------------------------------------------
---  Beispiel
-
-{- F4=E2 als Grad 2 Erweiterung von Z2
- -
- - Irreduzibles Polynom von Grad 2 über Z2:
- -           x²+x+1
- - Mit einer Nullstelle:
- -           v
- -
- - Also ist F4=Z2(v)
- -
- - Tabellen:
- -           +   | 0   | 1   | v   | v+1                 *   | 1   | v   | v+1
- -           ----+-----+-----+-----+-----                ----+-----+-----+-----
- -           0   | 0   | 1   | v   | v+1                 1   | 1   | v   | v+1
- -           ----+-----+-----+-----+-----                ----+-----+-----+-----
- -           1   | 1   | 0   | v+1 | v                   v   | v   | v+1 | 1
- -           ----+-----+-----+-----+-----                ----+-----+-----+-----
- -           v   | v   | v+1 | 0   | 1                   v+1 | v+1 | 1   | v
- -           ----+-----+-----+-----+-----
- -           v+1 | v+1 | v   | 1   | 0
- -}
-
-{- F8=E4 als Grad 4 Erweiterung von Z2
- - durch MPol x⁴+x²+1
- -
- - oder
- - als Grad 2 Erweiterung con E2 durch MPol x²+x+1
- -}
-
-
---------------------------------------------------------------------------------
---  Weiteres Beispiel
-
-{-
- - Z[X,Y,Z]/
- -        /                                  = GF(3²⁷) = F3^27
- -       /ideal(3,x³-x-1,y³-y+x²,z³-z+x²y²)
- -}
