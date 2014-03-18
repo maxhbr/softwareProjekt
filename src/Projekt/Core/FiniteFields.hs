@@ -95,7 +95,7 @@ instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
  -}
 
 {- F8=E4 als Grad 4 Erweiterung von Z2
- - durck MPol x⁴+x²+1
+ - durch MPol x⁴+x²+1
  -
  - oder
  - als Grad 2 Erweiterung con E2 durch MPol x²+x+1
