@@ -1,0 +1,79 @@
+\xdef\myDevelopVariable{1}
+
+\documentclass[ngerman
+  ,fontsize=11pt % TODO
+  ,numbers=noenddot % obsolete
+  %,headsepline
+  ,parskip=half*
+  ,openany
+  ,DIV=10
+  ,fleqn % mv align to left
+  ,oneside
+  %,titelpage % unused
+  %,biblography=totoc  % unused
+  %,landscape,twocolumn
+]{./myClass}
+
+\bibliography{main.bib}
+
+\input{commands.sty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\DeclareMathOperator{\Gl}{GL}
+\DeclareMathOperator{\GL}{GL}
+\DeclareMathOperator{\Ad}{Ad}
+\DeclareMathOperator{\ad}{ad}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\Proj}{Proj}
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\codim}{codim}
+\DeclareMathOperator{\Lie}{Lie}
+\DeclareMathOperator{\Res}{Res}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\diag}{diag}
+
+\let\tilde\widetilde
+
+\begin{document}
+
+\ifnum\myDevelopVariable=0
+  \frontmatter
+  \input{titel.tex}
+  \newpage \thispagestyle{empty} \mbox{}
+\else
+  \mainmatter
+\fi
+
+\tableofcontents{}
+
+%\ifnum\myDevelopVariable=0
+  %\input{einleitung.tex}
+%\if
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifnum\myDevelopVariable=0
+  \mainmatter
+\fi
+
+\chapter{Implementierung}
+\input{impl.tex}
+
+\chapter{Algorithmen}
+\input{alg.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\addcontentsline{toc}{chapter}{Schluss}
+%\input{schluss.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+\appendix
+\addcontentsline{toc}{chapter}{Anhang}
+
+
+\input{github.tex}
+
+\end{document}
+% vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:
