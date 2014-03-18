@@ -140,7 +140,7 @@ divP a b | degDiff < 0 = (P [], a)
   where divP' (q,r) = (P $ (degDiff, lcQuot) : unP q, r)
         degDiff     = degP a - degP b
         lcQuot      = getLeadingCoeff a / getLeadingCoeff b
-        newA        = subP a $ multWithMonom (degDiff,lcQuot) b
+        newA        = aggP $ subP a $ multWithMonom (degDiff,lcQuot) b
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
