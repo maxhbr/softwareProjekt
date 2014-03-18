@@ -16,7 +16,6 @@ module Projekt.Core.Polynomials
   , aggP, degP
   -- unär
   , negateP, reziprokP, deriveP
-  , getLeadingCoeff
   -- binär
   , addP, subP, multP, divP, modByP, ggTP
   -- weiteres
