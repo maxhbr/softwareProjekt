@@ -17,7 +17,7 @@ module Projekt.Core.Polynomials
   -- unär
   , negateP, reziprokP, deriveP
   -- binär
-  , addP, subP, multP, divP, modByP, ggTP
+  , addP, subP, multP, divP, modByP, ggTP, eekP
   -- weiteres
   , evalP
   ) where
@@ -153,6 +153,16 @@ ggTP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 ggTP f g | degP r == 0 = g
          | otherwise  = ggTP g r
   where (q,r) = divP f g
+
+-- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit
+--  ggT(a,b) = d = s*a + t*b
+eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a 
+                                          -> (Polynom a, Polynom a, Polynom a)
+eekP f g | g == 0      = (f,P[(1,0)],P[(0,0)])
+        | otherwise   = (d,t,s-t*q)
+  where (d,s,t) = eekP g r
+        (q,r)   = divP f g
+
 
 --------------------------------------------------------------------------------
 --  Weiteres
