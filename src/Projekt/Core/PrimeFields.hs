@@ -102,10 +102,8 @@ instance (Numeral n) => FiniteField (Mod n) where
   one   = MkMod 1
   -- TODO
   elems = undefined
-  units = undefined
 {-
   elems = elems' zero
-  units = tail $ units' zero
 
 elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map fromInteger [0.. (numValue (modulus' x) - 1)]

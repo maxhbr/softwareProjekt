@@ -134,6 +134,7 @@ multWithMonom (i,c) (P g) = P [(i+j,c*c') | (j,c') <- g]
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
 --  Teilen mit Rest durch erweitertem euklidischem Algorithmus
 divP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
+divP (P []) b = (P [], P [])
 divP a b | degDiff < 0 = (P [], a)
          | otherwise   = divP' $ divP newA b
   where divP' (q,r) = (P $ (degDiff, lcQuot) : unP q, r)
@@ -159,7 +160,7 @@ ggTP f g | degP r == 0 = g
 eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a 
                                           -> (Polynom a, Polynom a, Polynom a)
 eekP f g | g == 0      = (f,P[(1,0)],P[(0,0)])
-        | otherwise   = (d,t,s-t*q)
+         | otherwise  = (d,t,s-t*q)
   where (d,s,t) = eekP g r
         (q,r)   = divP f g
 
