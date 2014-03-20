@@ -150,6 +150,8 @@ modByP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 modByP f p = snd $ divP f p
 
 -- |Algorithmus für ggT
+--
+-- TODO: Ersetzen durch eekP?
 ggTP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 ggTP f g | degP r == 0 = g
          | otherwise  = ggTP g r
