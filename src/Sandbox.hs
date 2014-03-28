@@ -9,6 +9,7 @@
 
 module Sandbox where
 import Projekt.Core hiding (examplePoly, examplePoly')
+import Projekt.Algorithmen
 
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen

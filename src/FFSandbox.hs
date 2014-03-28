@@ -9,6 +9,9 @@
 
 module Sandbox where
 import Projekt.Core hiding (examplePoly, examplePoly')
+import Projekt.Algorithmen
+
+
 
 --------------------------------------------------------------------------------
 --  Globale Charakteristik
