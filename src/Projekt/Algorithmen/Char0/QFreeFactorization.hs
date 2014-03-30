@@ -1,5 +1,5 @@
 
-module Projekt.Algorithmen.QFreeFactorization
+module Projekt.Algorithmen.Char0.QFreeFactorization
   (qFreeFact
   )where
 import Projekt.Core
