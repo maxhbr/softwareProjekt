@@ -19,7 +19,6 @@ module Projekt.Core.PrimeFields
   -- Beispiele
   , Z2 , Z3 , Z5 , Z7, Z101
   ) where
-{-import Prelude hiding ( (/) )-}
 import GHC.Err (divZeroError)
 --import Data.Bits (shift)
 --
@@ -100,14 +99,10 @@ instance (Numeral n) => Fractional (Mod n) where
 instance (Numeral n) => FiniteField (Mod n) where
   zero  = MkMod 0
   one   = MkMod 1
-  -- TODO
-  elems = undefined
-{-
-  elems = elems' zero
+  elems = elems' one
 
 elems' :: (Numeral n) => Mod n -> [Mod n]
-elems' x = map fromInteger [0.. (numValue (modulus' x) - 1)]
- -}
+elems' x = map fromInteger [0.. (modulus x - 1)]
 
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
@@ -159,10 +154,3 @@ data Peano101
 instance Numeral Peano101 where numValue x = 101
 instance Show Peano101    where show       = show
 type Z101 = Mod Peano101
-
---------------------------------------------------------------------------------
---  Some small Tests
-
-testInvMod = do
-  print $ show $ invMod (1 :: Z7) == (1::Z7)
-  print $ show $ all (\x -> invMod x * x == (1::Z7)) units
