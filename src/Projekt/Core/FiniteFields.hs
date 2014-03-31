@@ -65,6 +65,12 @@ instance (Eq a, Fractional a) => Fractional (FFElem a) where
     where (d,s,t) = eekP f p
 
 instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
-  one   = FFKonst one
   zero  = FFKonst zero
-  elems = undefined
+  one   = FFKonst one
+  elems = elems' one
+
+elems' :: (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a)
+                                                    -> [FiniteField (FFElem a)]
+elems' (FFKonst x) = undefined
+elems' (FFElem f p)= undefined
+  where deg = undefined
