@@ -22,7 +22,7 @@ module Projekt.Core.Polynomials
   , evalP
   ) where
 import Data.List
-import Debug.Trace
+--import Debug.Trace
 
 --------------------------------------------------------------------------------
 --  Data Definition
@@ -159,12 +159,12 @@ ggTP f g | degP r == 0 = g
 
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit
 --  ggT(a,b) = d = s*a + t*b
-eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a 
+eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a
                                           -> (Polynom a, Polynom a, Polynom a)
-eekP f g | g == 0      = (f,P[(1,0)],P[(0,0)])
+eekP f g | g == 0      = (f,P[(0,1)],P[(0,0)])
          | otherwise  = (d,t,s-t*q)
-  where (d,s,t) = eekP g r
-        (q,r)   = divP f g
+  where (q,r)   = divP f g
+        (d,s,t) = eekP g r
 
 
 --------------------------------------------------------------------------------
