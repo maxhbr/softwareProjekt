@@ -71,7 +71,7 @@ newtype Mod n = MkMod { unMod :: Integer }
   --deriving (Show)
 
 instance (Numeral n, Show n) => Show (Mod n) where
-  show x = "[\x1B[01;32m" ++ show (unMod x) ++ "\x1B[00m%" ++ show (modulus x) ++ "]"
+  show x = "[\x1B[01;33m" ++ show (unMod x) ++ "\x1B[00m%" ++ show (modulus x) ++ "]"
 
 modulus :: Numeral a => Mod a -> Integer
 modulus x = numValue $ modulus' x
