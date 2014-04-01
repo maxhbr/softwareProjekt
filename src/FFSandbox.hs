@@ -60,7 +60,7 @@ ff1' = FFElem (P[(0,1::PF)]) (P [(2,1::PF),(1,1::PF),(0,1::PF)])
  -}
 
 fff1 = FFKonst (1::PF)
-fffV = FFElem (P [(1,ff1)]) (P [(2,ff1),(1,ff1),(0,ff1)])
+fffV = FFElem (P [(1,ff1)]) (P [(2,ff1),(1,ff1),(0,ffV)])
 
 {-
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
