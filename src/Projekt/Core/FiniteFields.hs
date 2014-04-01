@@ -67,10 +67,31 @@ instance (Eq a, Fractional a) => Fractional (FFElem a) where
 instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   zero  = FFKonst zero
   one   = FFKonst one
-  elems = elems' one
+  elems = undefined
 
+--------------------------------------------------------------------------------
+--  TODO:
+--  * elems
+
+{-
+ - Versuch 1
 elems' :: (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a)
                                                     -> [FiniteField (FFElem a)]
 elems' (FFKonst x) = undefined
 elems' (FFElem f p)= undefined
-  where deg = undefined
+  where deg = degP p
+
+elems'' d = undefined
+ -}
+
+{-
+ - Versuch 2
+elems' :: (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a)
+                                                    -> [FiniteField (FFElem a)]
+elems' (FFKonst x) = error "Not enougth information in FFKonst"
+elems' (FFElem f p)= elems'' (elems' (getLeadingCoeffP  f)) (degP p)
+
+elems'' :: (Num a, Fractional a, FiniteField a) => [a] -> Integer 
+                                                    -> [FiniteField (FFElem a)]
+elems'' e d = undefined
+ -}

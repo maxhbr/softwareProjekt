@@ -11,7 +11,7 @@ module Projekt.Core.Polynomials
   ( Polynom (P)
   , unP
   -- getter
-  , getDegrees
+  , getDegrees, getLeadingCoeffP
   -- Operationen auf Polynomen
   , aggP, degP
   -- unär
@@ -65,8 +65,8 @@ aggP f = P (remZeros [(i,sum [c | (j,c) <- unPf, j==i])
         remZeros (i:is) | snd i == 0 = remZeros is
                         | otherwise = i : remZeros is
 
-getLeadingCoeff :: (Num a, Eq a) => Polynom a -> a
-getLeadingCoeff = snd . head . unP . aggP
+getLeadingCoeffP :: (Num a, Eq a) => Polynom a -> a
+getLeadingCoeffP = snd . head . unP . aggP
 
 -- |Nimmt ein Polynom und gibt eine unsortierte liste der Gräder zurrück.
 getDegrees :: Num a => Polynom a -> [Integer]
@@ -139,7 +139,7 @@ divP a b | degDiff < 0 = (P [], a)
          | otherwise   = divP' $ divP newA b
   where divP' (q,r) = (P $ (degDiff, lcQuot) : unP q, r)
         degDiff     = degP a - degP b
-        lcQuot      = getLeadingCoeff a / getLeadingCoeff b
+        lcQuot      = getLeadingCoeffP a / getLeadingCoeffP b
         newA        = aggP $ subP a $ multWithMonom (degDiff,lcQuot) b
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
