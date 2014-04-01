@@ -1,13 +1,10 @@
 module Projekt.Core
-  ( module Projekt.Core.FiniteField
-  , module Projekt.Core.PrimeFields
-  , module Projekt.Core.Polynomials
-  , module Projekt.Core.FiniteFields
+  ( module X
   ) where
 
-import Projekt.Core.FiniteField
-import Projekt.Core.PrimeFields
-import Projekt.Core.Polynomials
-import Projekt.Core.FiniteFields
+import Projekt.Core.FiniteField as X
+import Projekt.Core.PrimeFields as X
+import Projekt.Core.Polynomials as X
+import Projekt.Core.FiniteFields as X
 
 {-examplePolyOnZ5 =  P [ (3, 3::Z5), (5, 2::Z5) ]-}
