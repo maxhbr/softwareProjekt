@@ -10,7 +10,7 @@
 module Sandbox where
 import Projekt.Core hiding (examplePoly, examplePoly')
 import Projekt.Algorithmen
-
+import Projekt.Core.Matrix
 
 
 --------------------------------------------------------------------------------
