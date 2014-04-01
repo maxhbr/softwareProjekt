@@ -10,9 +10,10 @@ module Projekt.Core.FiniteFields
   ( FFElem (..)
   , konstToElem
   , aggF
+  , module X
   ) where
-import Projekt.Core.FiniteField
-import Projekt.Core.PrimeFields
+import Projekt.Core.FiniteField as X
+import Projekt.Core.PrimeFields as X
 import Projekt.Core.Polynomials
 
 data FFElem a = FFElem (Polynom a) (Polynom a) | FFKonst a
