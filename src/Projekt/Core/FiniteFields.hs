@@ -15,6 +15,7 @@ module Projekt.Core.FiniteFields
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
 import Projekt.Core.Polynomials
+--import Debug.Trace
 
 data FFElem a = FFElem (Polynom a) (Polynom a) | FFKonst a
 
@@ -60,9 +61,9 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   abs _    = error "Prelude.Num.abs: inappropriate abstraction"
   signum _ = error "Prelude.Num.signum: inappropriate abstraction"
 
-instance (Eq a, Fractional a) => Fractional (FFElem a) where
+instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
   fromRational _     = error "inappropriate abstraction"
-  recip (FFKonst x) = FFKonst (recip x)
+  recip (FFKonst x)  = FFKonst (recip x)
   recip (FFElem f p) = FFElem s p
     where (d,s,t) = eekP f p
 
