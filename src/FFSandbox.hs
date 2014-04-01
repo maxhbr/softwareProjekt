@@ -59,8 +59,10 @@ ff1' = FFElem (P[(0,1::PF)]) (P [(2,1::PF),(1,1::PF),(0,1::PF)])
  - als Grad 2 Erweiterung con E2 durch MPol x²+x+1
  -}
 
-fff1 = FFKonst ff1
-fffV = FFElem (P [(1,ff1')]) (P [(2,ff1'),(1,ff1'),(0,ff1')])
+fff1 = FFKonst (1::PF)
+fffV = FFElem (P [(1,ff1)]) (P [(2,ff1),(1,ff1),(0,ff1)])
+
+ffW = FFElem (P[(1,1::PF),(0,1::PF)]) (P[(4,1::PF),(2,1::PF),(0,1::PF)])
 
 --------------------------------------------------------------------------------
 --  Weiteres
