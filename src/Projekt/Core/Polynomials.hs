@@ -7,9 +7,7 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.Polynomials
-  -- Data
-  ( Polynom (P)
-  , unP
+  ( Polynom (P), unP
   -- getter
   , getDegrees, getLeadingCoeffP
   -- Operationen auf Polynomen
@@ -19,7 +17,7 @@ module Projekt.Core.Polynomials
   -- binär
   , addP, subP, multP, divP, modByP, ggTP, eekP
   -- weiteres
-  , evalP
+  , evalP, getAllP
   ) where
 import Data.List
 --import Debug.Trace
@@ -161,8 +159,8 @@ ggTP f g | degP r == 0 = g
 --  ggT(a,b) = d = s*a + t*b
 eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a
                                           -> (Polynom a, Polynom a, Polynom a)
-eekP f g | g == 0      = (f,P[(0,1)],P[(0,0)])
-         | otherwise  = (d,t,s-t*q)
+eekP f g | g == 0     = (f,P[(0,1)],P[(0,0)])
+         | otherwise = (d,t,s-t*q)
   where (q,r)   = divP f g
         (d,s,t) = eekP g r
 
@@ -176,3 +174,10 @@ evalP x f = sum [evalMonom m | m <- unP f]
   where evalMonom (i,c) = product [x | j <- [1..i]] * c
 
 shiftP (P ms) j = P [(fst m + j, snd m) | m <- ms]
+
+-- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome bis zu diesem
+-- Grad.
+getAllP :: [a] -> Integer -> [Polynom a]
+getAllP cs d = map (P .zip [0..]) (css d)
+  where css n | n == 1     = [[y] | y <- cs]
+              | otherwise = [y:ys | y <- cs, ys <- css (n-1) ]
