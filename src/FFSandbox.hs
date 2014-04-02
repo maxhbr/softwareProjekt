@@ -47,9 +47,6 @@ type PF = Mod PeanoNumber
  -           v+1 | v+1 |  v  |  1  |  0
  -}
 
---------------------------------------------------------------------------------
---  Erzeuger des Erweiterungskörpers F4=E2
-
 ffVMipo = P [(2,1::PF),(1,1::PF),(0,1::PF)]
 
 ff1 = FFKonst (1::PF)
@@ -61,17 +58,20 @@ ffVElems = map (`FFElem` ffVMipo) (getAllP (elems :: [PF]) 2)
 
 {- F16=E4
  - als Grad 2 Erweiterung con E2 durch MPol x²+x+1
+ - Mit einer Nullstelle dargestellt durch fffV
  -}
 
 fffVMipo = P [(2,ff1),(1,ff1),(0,ffV)]
 
-fff1 = FFKonst (1::PF)
+fff1 = FFKonst $ FFKonst (1::PF)
 fffV = FFElem (P [(1,ff1)]) fffVMipo
 
 fffVElems = map (`FFElem` fffVMipo) (getAllP ffVElems 2)
 
 {- F16
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
+ - Mit einer Nullstelle:
+ -           w dargestellt durch ffW
  -}
 ffWMipo = P[(4,1::PF),(1,1::PF),(0,1::PF)]
 
@@ -79,6 +79,7 @@ ffWMipo = P[(4,1::PF),(1,1::PF),(0,1::PF)]
 ffW = FFElem (P[(1,1::PF)]) ffWMipo
 
 ffWElems = map (`FFElem` ffWMipo) (getAllP (elems :: [PF]) 4)
+
 --------------------------------------------------------------------------------
 --  Weiteres
 
