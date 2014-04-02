@@ -21,6 +21,9 @@ import System.Process
 class ShowLatex a where
   showLatex :: a -> String
 
+instance ShowLatex Integer where
+  showLatex = show
+
 --------------------------------------------------------------------------------
 --  Nutze latex und dvipng um Latex schnipsel in ein PNG zu rendern
 

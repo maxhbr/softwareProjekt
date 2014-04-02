@@ -7,6 +7,8 @@ module Projekt.Core.Matrix
   ) where
 import Data.List
 
+import Projekt.Core.ShowLatex
+
 --------------------------------------------------------------------------------
 --  Data Definition
 
@@ -20,7 +22,16 @@ isValidM (M m) = and [n == head ns | n <- tail ns]
   where ns = map length m
 
 instance Show a => Show (Matrix a) where
-  show m = concatMap ((++ "\n") . concatMap( (' ':) . show) ) $ unM m
+  show m = concatMap ((++ "\n") . show') $ unM m
+    where show' (x:xs) = (show x ++) $ concatMap ((' ':) . show) xs
+
+instance (ShowLatex a,Eq a) => ShowLatex (Matrix a) where
+  showLatex (M [])    = ""
+  showLatex (M [[]])  = ""
+  showLatex (Mdiag a) = "[" ++ showLatex a ++ "]"
+  showLatex (M m)     = "\\begin{pmatrix}" ++ showLatex' m ++ "\\end{pmatrix}"
+    where showLatex'         = concatMap ((++ "\\\\") . showLatex'')
+          showLatex'' (x:xs) = (showLatex x ++) $ concatMap (('&':) . showLatex) xs
 
 genDiagM :: (Num a) => a -> Int -> Matrix a
 genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
