@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+#define LATEXFORMAT
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Project.Core.FiniteFields
@@ -35,8 +37,13 @@ instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
 
 instance (Show a, Eq a) => Show (FFElem a) where
   show (FFKonst x)       = show x
-  show (FFElem (P []) p) = "(\x1B[01m0\x1B[00m mod " ++ show p ++ ")"
-  show (FFElem f p)      = "(\x1B[01m" ++ show f ++ "\x1B[22m mod " ++ show p ++")"
+#ifdef LATEXFORMAT
+  show (FFElem (P []) p) = "\\left(\\underline{0}~mod~" ++ show p ++ "\\right)"
+  show (FFElem f p)      = "\\left(\\underline{" ++ show f ++ "}~mod~" ++ show p ++"\\right)"
+#else 
+  show (FFElem (P []) p) = "(0 mod " ++ show p ++ ")"
+  show (FFElem f p)      = "(" ++ show f ++ " mod " ++ show p ++")"
+#endif
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)

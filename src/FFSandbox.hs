@@ -66,6 +66,8 @@ fffVMipo = P [(2,ff1),(1,ff1),(0,ffV)]
 fff1 = FFKonst $ FFKonst (1::PF)
 fffV = FFElem (P [(1,ff1)]) fffVMipo
 
+fffElems = elems fffV
+
 {- F16
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
  - Mit einer Nullstelle:

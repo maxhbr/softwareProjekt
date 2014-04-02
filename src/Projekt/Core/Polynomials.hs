@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+#define LATEXFORMAT
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.Polynomials
@@ -35,10 +37,15 @@ instance (Eq a, Num a) => Eq (Polynom a) where
 
 instance (Show a,Eq a) => Show (Polynom a) where
   show (P []) = ""
+#ifdef LATEXFORMAT
+  show (P ((i,c):ms))
+    | null ms   = show c ++ "\\cdot{}X^{" ++ show i ++ "}"
+    | otherwise = show c ++ "\\cdot{}X^{" ++ show i ++ "} + " ++ show (P ms)
+#else 
   show (P ((i,c):ms))
     | null ms   = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m"
-    | otherwise = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m + "
-        ++ show (P ms)
+    | otherwise = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m + " ++ show (P ms)
+#endif
 
 instance (Num a, Eq a) => Num (Polynom a) where
   x + y         = aggP $ addP x y
