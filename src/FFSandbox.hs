@@ -92,16 +92,16 @@ fffElems = elems fffV
 -- render latex exmp:
 fffElemsTestAdd i j = renderRawLatex
   (showLatex (fffElems!!i)
-  ++ " \\\\\\\\+ "
+  ++ " \\\\+ "
   ++ showLatex (fffElems!!j)
-  ++ " \\\\\\\\= "
+  ++ " \\\\= "
   ++ showLatex (fffElems!!i + fffElems!!j))
 
 fffElemsTestMult i j = renderRawLatex
   (showLatex (fffElems!!i)
-  ++ " \\\\\\\\ \\cdot "
+  ++ " \\\\ \\cdot "
   ++ showLatex (fffElems!!j)
-  ++ " \\\\\\\\= "
+  ++ " \\\\= "
   ++ showLatex (fffElems!!i * fffElems!!j))
 
 {- F16
