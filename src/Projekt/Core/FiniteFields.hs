@@ -8,21 +8,19 @@
 --------------------------------------------------------------------------------
 module Projekt.Core.FiniteFields
   ( FFElem (..)
-  , konstToElem
   , aggF
   , module X
   ) where
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
 import Projekt.Core.Polynomials
---import Debug.Trace
 
+-- Ein Element im Körper ist repräsentiert durch ein Paar von Polynomen. Das
+-- erste beschreibt das Element und das zweite beschreibt das Minimalpolynom
+-- und damit den Erweiterungskörper.
+-- Zusätzlich ist auch die kanonische Inklusion aus dem Grundkörper durch
+-- FFKonst implementiert.
 data FFElem a = FFElem (Polynom a) (Polynom a) | FFKonst a
-
-konstToElem :: (Num a, Eq a) => FFElem a -> Polynom a -> FFElem a
-konstToElem (FFKonst a) q              = FFElem (P [(0,a)]) q
-konstToElem (FFElem f p) q | p==q       = FFElem f p
-                           | otherwise = error "Not the same mod"
 
 aggF :: (Eq a, Fractional a) => FFElem a -> FFElem a
 aggF (FFKonst x)  = FFKonst x
@@ -30,8 +28,8 @@ aggF (FFElem f p) = FFElem (modByP f p) p
 
 instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
   (FFKonst x)  == (FFKonst y)  = x==y
-  (FFElem f p) == (FFKonst y)  = FFElem f p == konstToElem (FFKonst y) p
-  (FFKonst x)  == (FFElem g p) = konstToElem (FFKonst x) p == FFElem g p
+  (FFElem f p) == (FFKonst y)  = null $ unP $ aggP (f - P [(0,y)])
+  (FFKonst x)  == (FFElem g p) = null $ unP $ aggP (P [(0,x)] - g)
   (FFElem f p) == (FFElem g q) | p==q       = null $ unP $ aggP (f - g)
                               | otherwise = error "Not the same mod"
 
@@ -72,12 +70,12 @@ instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   one   = FFKonst one
   elems = elems'
 
---------------------------------------------------------------------------------
---  TODO:
---  * elems
-
+-- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
+-- anderen Elemente zurrück.
+-- Diese Funktion benötigt ein FFElem, ein FFKonst ist zu universell und
+-- enthält deswegen zu wenig Information, über den Körper in dem es lebt.
 elems' :: (Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
-elems' (FFKonst x)  = error "Not enougth information in FFKonst"
+elems' (FFKonst x)  = error "Insufficient information in FFKonst"
 elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems exmp) deg)
   where deg  = degP p
         exmp = product (map snd (unP f)) * product (map snd (unP p))
