@@ -10,7 +10,7 @@ import Data.List
 --------------------------------------------------------------------------------
 --  Data Definition
 
-data Matrix a = M [[a]] | Mdiag a -- | Meye Int
+data Matrix a = M [[a]] | Mdiag a
 
 unM :: Matrix a -> [[a]]
 unM (M m) = m
@@ -27,8 +27,8 @@ genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
   where genEyeM' i = [0 | j <- [0..(i-2)]] ++ (x:[0 | j <- [i..(n-1)]])
 
 instance (Eq a, Num a) => Eq (Matrix a) where
-  Mdiag a == m = genDiagM a (getNumRowsM m) == m
-  m == Mdiag a = m == genDiagM a (getNumRowsM m)
+  Mdiag x == m = genDiagM x (getNumRowsM m) == m
+  m == Mdiag x = m == genDiagM x (getNumRowsM m)
   M a == M b   = a == b
 
 instance (Num a, Eq a) => Num (Matrix a) where
@@ -42,17 +42,16 @@ instance (Num a, Eq a) => Num (Matrix a) where
 -- TODO:
 addM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 addM (Mdiag x) (Mdiag y) = Mdiag (x+y)
-addM (Mdiag x) m         = undefined
-addM m         (Mdiag y) = undefined
-addM (M m)     (M n)     | test      = undefined
+addM (Mdiag x) m         = addM m (genDiagM x (getNumRowsM m))
+addM (M x)     (M y)     | test      = addM' (length x) (length (head x))
                          | otherwise = error "not the same Dimensions"
-  where test = (length m == length n) && (length (head m) == length (head n))
+  where test = (length x == length y) && (length (head x) == length (head y))
+        addM' n m = M [[x!!i!!j + y!!i!!j | j <- [0..(m-1)]] | i <- [0..(n-1)]]
 
 -- TODO:
 multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 multM (Mdiag x) (Mdiag y) = Mdiag (x*y)
-multM (Mdiag x) m         = undefined
-multM m         (Mdiag y) = undefined
+multM (Mdiag x) m         = multM m (genDiagM x (getNumRowsM m))
 multM (M m)     (M n)     | test      = undefined
                           | otherwise = error "not the same Dimensions"
   where test = length (head m) == length n
