@@ -11,6 +11,7 @@ module Sandbox where
 import Projekt.Core hiding (examplePoly, examplePoly')
 import Projekt.Algorithmen
 import Projekt.Core.Matrix
+import Projekt.Core.LatexShow
 
 pp :: (Show a) => [a] -> IO()
 pp =  mapM_ print

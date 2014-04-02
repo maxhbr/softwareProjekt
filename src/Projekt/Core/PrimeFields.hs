@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-#define LATEXFORMAT
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.PrimeFields
@@ -25,6 +23,7 @@ import GHC.Err (divZeroError)
 --import Data.Bits (shift)
 --
 import Projekt.Core.FiniteField
+import Projekt.Core.LatexShow
 
 --------------------------------------------------------------------------------
 --  Peano numbers
@@ -73,11 +72,10 @@ newtype Mod n = MkMod { unMod :: Integer }
   --deriving (Show)
 
 instance (Numeral n, Show n) => Show (Mod n) where
-#ifdef LATEXFORMAT
-  show x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
-#else 
   show x = "[\x1B[33m" ++ show (unMod x) ++ "\x1B[39m%" ++ show (modulus x) ++ "]"
-#endif
+
+instance (Numeral n, Show n) => LatexShow (Mod n) where
+  latexShow x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
 
 modulus :: Numeral a => Mod a -> Integer
 modulus x = numValue $ modulus' x

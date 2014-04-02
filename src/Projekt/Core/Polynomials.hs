@@ -24,6 +24,8 @@ module Projekt.Core.Polynomials
 import Data.List
 --import Debug.Trace
 
+import Projekt.Core.LatexShow
+
 --------------------------------------------------------------------------------
 --  Data Definition
 
@@ -37,15 +39,15 @@ instance (Eq a, Num a) => Eq (Polynom a) where
 
 instance (Show a,Eq a) => Show (Polynom a) where
   show (P []) = ""
-#ifdef LATEXFORMAT
-  show (P ((i,c):ms))
-    | null ms   = show c ++ "\\cdot{}X^{" ++ show i ++ "}"
-    | otherwise = show c ++ "\\cdot{}X^{" ++ show i ++ "} + " ++ show (P ms)
-#else 
   show (P ((i,c):ms))
     | null ms   = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m"
     | otherwise = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m + " ++ show (P ms)
-#endif
+
+instance (LatexShow a,Eq a) => LatexShow (Polynom a) where
+  latexShow (P []) = ""
+  latexShow (P ((i,c):ms))
+    | null ms   = latexShow c ++ "\\cdot{}X^{" ++ show i ++ "}"
+    | otherwise = latexShow c ++ "\\cdot{}X^{" ++ show i ++ "} + " ++ latexShow (P ms)
 
 instance (Num a, Eq a) => Num (Polynom a) where
   x + y         = aggP $ addP x y
