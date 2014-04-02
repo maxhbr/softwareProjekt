@@ -11,7 +11,6 @@ module Projekt.Core.FiniteField
   ( FiniteField(..)
   ) where
 
-
 class (Eq a) => FiniteField a where
   zero, one    :: a
   elems, units :: a -> [a]
