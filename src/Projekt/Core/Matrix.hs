@@ -14,12 +14,22 @@ import Projekt.Core.ShowLatex
 
 data Matrix a = M [[a]] | Mdiag a
 
+--------------------------------------------------------------------------------
+--  Basics
+
 unM :: Matrix a -> [[a]]
 unM (M m) = m
 
 isValidM :: Matrix a -> Bool
 isValidM (M m) = and [n == head ns | n <- tail ns]
   where ns = map length m
+
+genDiagM :: (Num a) => a -> Int -> Matrix a
+genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
+  where genEyeM' i = [0 | j <- [0..(i-2)]] ++ (x:[0 | j <- [i..(n-1)]])
+
+--------------------------------------------------------------------------------
+--  Instanzen
 
 instance Show a => Show (Matrix a) where
   show m = concatMap ((++ "\n") . show') $ unM m
@@ -32,10 +42,6 @@ instance (ShowLatex a,Eq a) => ShowLatex (Matrix a) where
   showLatex (M m)     = "\\begin{pmatrix}" ++ showLatex' m ++ "\\end{pmatrix}"
     where showLatex'         = concatMap ((++ "\\\\") . showLatex'')
           showLatex'' (x:xs) = (showLatex x ++) $ concatMap (('&':) . showLatex) xs
-
-genDiagM :: (Num a) => a -> Int -> Matrix a
-genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
-  where genEyeM' i = [0 | j <- [0..(i-2)]] ++ (x:[0 | j <- [i..(n-1)]])
 
 instance (Eq a, Num a) => Eq (Matrix a) where
   Mdiag x == m = genDiagM x (getNumRowsM m) == m
