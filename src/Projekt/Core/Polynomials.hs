@@ -36,8 +36,8 @@ instance (Eq a, Num a) => Eq (Polynom a) where
 instance (Show a,Eq a) => Show (Polynom a) where
   show (P []) = ""
   show (P ((i,c):ms))
-    | null ms   = show c ++ "·X^{\x1B[01m" ++ show i ++ "\x1B[00m}"
-    | otherwise = show c ++ "·X^{\x1B[01m" ++ show i ++ "\x1B[00m} + "
+    | null ms   = show c ++ "·X^{\x1B[04m" ++ show i ++ "\x1B[24m}"
+    | otherwise = show c ++ "·X^{\x1B[04m" ++ show i ++ "\x1B[24m} + "
         ++ show (P ms)
 
 instance (Num a, Eq a) => Num (Polynom a) where
