@@ -12,6 +12,7 @@ module Projekt.Core.FiniteField
   ) where
 import Projekt.Core.Polynomials
 
+
 class (Eq a) => FiniteField a where
   zero, one    :: a
   elems, units :: a -> [a]
