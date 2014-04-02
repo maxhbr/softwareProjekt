@@ -99,7 +99,7 @@ instance (Numeral n) => Fractional (Mod n) where
 instance (Numeral n) => FiniteField (Mod n) where
   zero  = MkMod 0
   one   = MkMod 1
-  elems = elems' one
+  elems = const $ elems' one
 
 elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map fromInteger [0.. (modulus x - 1)]

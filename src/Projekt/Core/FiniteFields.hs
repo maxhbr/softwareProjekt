@@ -70,35 +70,14 @@ instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
 instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   zero  = FFKonst zero
   one   = FFKonst one
-  elems = undefined
+  elems = elems'
 
 --------------------------------------------------------------------------------
 --  TODO:
 --  * elems
 
-{-
- - Versuch 1
-elems' :: (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a)
-                                                    -> [FiniteField (FFElem a)]
-elems' (FFKonst x) = undefined
-elems' (FFElem f p)= undefined
-  where deg = degP p
-
-elems'' d = undefined
- -}
-
-{-
- - Versuch 2
-elems' :: (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a)
-                                                    -> [FiniteField (FFElem a)]
-elems' (FFKonst x) = error "Not enougth information in FFKonst"
-elems' (FFElem f p)= elems'' (elems' (getLeadingCoeffP  f)) (degP p)
-
-elems'' :: (Num a, Fractional a, FiniteField a) => [a] -> Integer 
-                                                    -> [FiniteField (FFElem a)]
-elems'' e d = undefined
- -}
-
-elems' (FFKonst x) = error "Not enougth information in FFKonst"
-elems' (FFElem f p)= fffVElems = map (`FFElem` p) (getAllP () 2)
-
+elems' :: (Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
+elems' (FFKonst x)  = error "Not enougth information in FFKonst"
+elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems exmp) deg)
+  where deg  = degP p
+        exmp = product (map snd (unP f)) * product (map snd (unP p))

@@ -14,6 +14,6 @@ import Projekt.Core.Polynomials
 
 class (Eq a) => FiniteField a where
   zero, one    :: a
-  elems, units :: [a]
+  elems, units :: a -> [a]
 
-  units = [e | e <- elems, e /= zero]
+  units x = [e | e <- elems x, e /= zero]

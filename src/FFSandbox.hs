@@ -52,7 +52,7 @@ ffVMipo = P [(2,1::PF),(1,1::PF),(0,1::PF)]
 ff1 = FFKonst (1::PF)
 ffV = FFElem (P[(1,1::PF)]) ffVMipo
 
-ffVElems = map (`FFElem` ffVMipo) (getAllP (elems :: [PF]) 2)
+ffVElems = map (`FFElem` ffVMipo) (getAllP (elems undefined :: [PF]) 2)
 
 --ff1' = FFElem (P[(0,1::PF)]) ffVMipo
 
@@ -78,7 +78,7 @@ ffWMipo = P[(4,1::PF),(1,1::PF),(0,1::PF)]
 --ffW = FFElem (P[(1,1::PF),(0,1::PF)]) ffWMipo
 ffW = FFElem (P[(1,1::PF)]) ffWMipo
 
-ffWElems = map (`FFElem` ffWMipo) (getAllP (elems :: [PF]) 4)
+ffWElems = map (`FFElem` ffWMipo) (getAllP (elems undefined :: [PF]) 4)
 
 --------------------------------------------------------------------------------
 --  Weiteres
