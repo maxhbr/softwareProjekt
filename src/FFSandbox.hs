@@ -58,6 +58,23 @@ ffVMipo = P [(2,1::PF),(1,1::PF),(0,1::PF)]
 ff1 = FFKonst (1::PF)
 ffV = FFElem (P[(1,1::PF)]) ffVMipo
 
+ffElems = elems ffV
+
+-- render latex exmp:
+ffElemsTestAdd i j = renderRawLatex
+  (showLatex (ffElems!!i)
+  ++ " \\\\\\\\+ "
+  ++ showLatex (ffElems!!j)
+  ++ " \\\\\\\\= "
+  ++ showLatex (ffElems!!i + ffElems!!j))
+
+ffElemsTestMult i j = renderRawLatex
+  (showLatex (ffElems!!i)
+  ++ " \\\\\\\\ \\cdot "
+  ++ showLatex (ffElems!!j)
+  ++ " \\\\\\\\= "
+  ++ showLatex (ffElems!!i * ffElems!!j))
+
 --ff1' = FFElem (P[(0,1::PF)]) ffVMipo
 
 {- F16=E4
@@ -73,12 +90,19 @@ fffV = FFElem (P [(1,ff1)]) fffVMipo
 fffElems = elems fffV
 
 -- render latex exmp:
-fffElemsTest i j = renderRawLatex
+fffElemsTestAdd i j = renderRawLatex
   (showLatex (fffElems!!i)
   ++ " \\\\\\\\+ "
   ++ showLatex (fffElems!!j)
   ++ " \\\\\\\\= "
   ++ showLatex (fffElems!!i + fffElems!!j))
+
+fffElemsTestMult i j = renderRawLatex
+  (showLatex (fffElems!!i)
+  ++ " \\\\\\\\ \\cdot "
+  ++ showLatex (fffElems!!j)
+  ++ " \\\\\\\\= "
+  ++ showLatex (fffElems!!i * fffElems!!j))
 
 {- F16
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1

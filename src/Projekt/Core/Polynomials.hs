@@ -186,7 +186,8 @@ shiftP (P ms) j = P [(fst m + j, snd m) | m <- ms]
 
 -- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome bis zu diesem
 -- Grad.
-getAllP :: [a] -> Integer -> [Polynom a]
-getAllP cs d = map (P . reverse . zip [0..]) (css d)
+getAllP :: (Num a, Eq a) => [a] -> Integer -> [Polynom a]
+getAllP cs d = map (P . resort . zip [0..]) (css d)
   where css n | n == 1     = [[y] | y <- cs]
               | otherwise = [y:ys | y <- cs, ys <- css (n-1) ]
+        resort ms         = reverse [m | m <- ms , snd m /= 0]
