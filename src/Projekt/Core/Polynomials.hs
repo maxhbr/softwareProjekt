@@ -36,8 +36,8 @@ instance (Eq a, Num a) => Eq (Polynom a) where
 instance (Show a,Eq a) => Show (Polynom a) where
   show (P []) = ""
   show (P ((i,c):ms))
-    | null ms   = show c ++ "·X^{\x1B[04m" ++ show i ++ "\x1B[24m}"
-    | otherwise = show c ++ "·X^{\x1B[04m" ++ show i ++ "\x1B[24m} + "
+    | null ms   = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m"
+    | otherwise = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m + "
         ++ show (P ms)
 
 instance (Num a, Eq a) => Num (Polynom a) where
@@ -178,6 +178,6 @@ shiftP (P ms) j = P [(fst m + j, snd m) | m <- ms]
 -- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome bis zu diesem
 -- Grad.
 getAllP :: [a] -> Integer -> [Polynom a]
-getAllP cs d = map (P .zip [0..]) (css d)
+getAllP cs d = map (P . reverse . zip [0..]) (css d)
   where css n | n == 1     = [[y] | y <- cs]
               | otherwise = [y:ys | y <- cs, ys <- css (n-1) ]

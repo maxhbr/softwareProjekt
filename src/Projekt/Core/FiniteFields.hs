@@ -37,8 +37,8 @@ instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
 
 instance (Show a, Eq a) => Show (FFElem a) where
   show (FFKonst x)       = show x
-  show (FFElem (P []) p) = "\x1B[01m0\x1B[00m mod " ++ show p
-  show (FFElem f p)      = "\x1B[01m" ++ show f ++ "\x1B[22m mod " ++ show p
+  show (FFElem (P []) p) = "(\x1B[01m0\x1B[00m mod " ++ show p ++ ")"
+  show (FFElem f p)      = "(\x1B[01m" ++ show f ++ "\x1B[22m mod " ++ show p ++")"
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
