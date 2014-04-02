@@ -7,7 +7,7 @@ module Projekt.Core.Matrix
   ) where
 import Data.List
 
-import Projekt.Core.ShowLatex
+import Projekt.Core.ShowTex
 
 --------------------------------------------------------------------------------
 --  Data Definition
@@ -35,13 +35,13 @@ instance Show a => Show (Matrix a) where
   show m = concatMap ((++ "\n") . show') $ unM m
     where show' (x:xs) = (show x ++) $ concatMap ((' ':) . show) xs
 
-instance (ShowLatex a,Eq a) => ShowLatex (Matrix a) where
-  showLatex (M [])    = ""
-  showLatex (M [[]])  = ""
-  showLatex (Mdiag a) = "[" ++ showLatex a ++ "]"
-  showLatex (M m)     = "\\begin{pmatrix}" ++ showLatex' m ++ "\\end{pmatrix}"
-    where showLatex'         = concatMap ((++ "\\\\") . showLatex'')
-          showLatex'' (x:xs) = (showLatex x ++) $ concatMap (('&':) . showLatex) xs
+instance (ShowTex a,Eq a) => ShowTex (Matrix a) where
+  showTex (M [])    = ""
+  showTex (M [[]])  = ""
+  showTex (Mdiag a) = "[" ++ showTex a ++ "]"
+  showTex (M m)     = "\\begin{pmatrix}" ++ showTex' m ++ "\\end{pmatrix}"
+    where showTex'         = concatMap ((++ "\\\\") . showTex'')
+          showTex'' (x:xs) = (showTex x ++) $ concatMap (('&':) . showTex) xs
 
 instance (Eq a, Num a) => Eq (Matrix a) where
   Mdiag x == m = genDiagM x (getNumRowsM m) == m
@@ -62,7 +62,7 @@ addM (Mdiag x) (Mdiag y) = Mdiag (x+y)
 addM (Mdiag x) m         = addM m (genDiagM x (getNumRowsM m))
 addM (M x)     (M y)     | test      = addM' (length x) (length (head x))
                          | otherwise = error "not the same Dimensions"
-  where test = (length x == length y) && (length (head x) == length (head y))
+  where test      = (length x == length y) && (length (head x) == length (head y))
         addM' n m = M [[x!!i!!j + y!!i!!j | j <- [0..(m-1)]] | i <- [0..(n-1)]]
 
 -- TODO:
