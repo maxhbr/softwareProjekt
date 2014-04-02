@@ -11,10 +11,13 @@ module Sandbox where
 import Projekt.Core hiding (examplePoly, examplePoly')
 import Projekt.Algorithmen
 import Projekt.Core.Matrix
-import Projekt.Core.LatexShow
+import Projekt.Core.ShowLatex
 
 pp :: (Show a) => [a] -> IO()
 pp =  mapM_ print
+
+ppLatex :: (ShowLatex a) => [a] -> IO()
+ppLatex = mapM_ (putStrLn . showLatex)
 
 --------------------------------------------------------------------------------
 --  Globale Charakteristik
@@ -68,6 +71,14 @@ fff1 = FFKonst $ FFKonst (1::PF)
 fffV = FFElem (P [(1,ff1)]) fffVMipo
 
 fffElems = elems fffV
+
+-- render latex exmp:
+fffElemsTest i j = renderRawLatex
+  (showLatex (fffElems!!i)
+  ++ " \\\\\\\\+ "
+  ++ showLatex (fffElems!!j)
+  ++ " \\\\\\\\= "
+  ++ showLatex (fffElems!!i + fffElems!!j))
 
 {- F16
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1

@@ -16,7 +16,7 @@ module Projekt.Core.FiniteFields
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
 import Projekt.Core.Polynomials
-import Projekt.Core.LatexShow
+import Projekt.Core.ShowLatex
 
 -- Ein Element im Körper ist repräsentiert durch ein Paar von Polynomen. Das
 -- erste beschreibt das Element und das zweite beschreibt das Minimalpolynom
@@ -41,12 +41,12 @@ instance (Show a, Eq a) => Show (FFElem a) where
   show (FFElem (P []) p) = "(0 mod " ++ show p ++ ")"
   show (FFElem f p)      = "(" ++ show f ++ " mod " ++ show p ++")"
 
-instance (LatexShow a,Eq a) => LatexShow (FFElem a) where
-  latexShow (FFKonst x)       = latexShow x
-  latexShow (FFElem (P []) p) =
-    "\\left(\\underline{0}~mod~" ++ latexShow p ++ "\\right)"
-  latexShow (FFElem f p)      =
-    "\\left(\\underline{" ++ latexShow f ++ "}~mod~" ++ latexShow p ++"\\right)"
+instance (ShowLatex a,Eq a) => ShowLatex (FFElem a) where
+  showLatex (FFKonst x)       = showLatex x
+  showLatex (FFElem (P []) p) =
+    "\\left(\\underline{0}~mod~" ++ showLatex p ++ "\\right)"
+  showLatex (FFElem f p)      =
+    "\\left(\\underline{" ++ showLatex f ++ "}~mod~" ++ showLatex p ++"\\right)"
 
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
