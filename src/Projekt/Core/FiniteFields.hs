@@ -98,3 +98,7 @@ elems'' :: (Num a, Fractional a, FiniteField a) => [a] -> Integer
                                                     -> [FiniteField (FFElem a)]
 elems'' e d = undefined
  -}
+
+elems' (FFKonst x) = error "Not enougth information in FFKonst"
+elems' (FFElem f p)= fffVElems = map (`FFElem` p) (getAllP () 2)
+
