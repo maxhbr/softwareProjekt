@@ -62,17 +62,13 @@ ffElems = elems ffV
 
 -- render latex exmp:
 ffElemsTestAdd i j = renderRawLatex
-  (showLatex (ffElems!!i)
-  ++ " \\\\\\\\+ "
-  ++ showLatex (ffElems!!j)
-  ++ " \\\\\\\\= "
+  (showLatex (ffElems!!i) ++ " \\\\+ "
+  ++ showLatex (ffElems!!j) ++ " \\\\= "
   ++ showLatex (ffElems!!i + ffElems!!j))
 
 ffElemsTestMult i j = renderRawLatex
-  (showLatex (ffElems!!i)
-  ++ " \\\\\\\\ \\cdot "
-  ++ showLatex (ffElems!!j)
-  ++ " \\\\\\\\= "
+  (showLatex (ffElems!!i) ++ " \\\\ \\cdot "
+  ++ showLatex (ffElems!!j) ++ " \\\\= "
   ++ showLatex (ffElems!!i * ffElems!!j))
 
 --ff1' = FFElem (P[(0,1::PF)]) ffVMipo
@@ -91,17 +87,13 @@ fffElems = elems fffV
 
 -- render latex exmp:
 fffElemsTestAdd i j = renderRawLatex
-  (showLatex (fffElems!!i)
-  ++ " \\\\+ "
-  ++ showLatex (fffElems!!j)
-  ++ " \\\\= "
+  (showLatex (fffElems!!i) ++ " \\\\+ "
+  ++ showLatex (fffElems!!j) ++ " \\\\= "
   ++ showLatex (fffElems!!i + fffElems!!j))
 
 fffElemsTestMult i j = renderRawLatex
-  (showLatex (fffElems!!i)
-  ++ " \\\\ \\cdot "
-  ++ showLatex (fffElems!!j)
-  ++ " \\\\= "
+  (showLatex (fffElems!!i) ++ " \\\\ \\cdot "
+  ++ showLatex (fffElems!!j) ++ " \\\\= "
   ++ showLatex (fffElems!!i * fffElems!!j))
 
 {- F16
