@@ -12,6 +12,8 @@ import Projekt.Core hiding (examplePoly, examplePoly')
 import Projekt.Algorithmen
 import Projekt.Core.Matrix
 
+pp :: (Show a) => [a] -> IO()
+pp =  mapM_ print
 
 --------------------------------------------------------------------------------
 --  Globale Charakteristik
@@ -52,8 +54,6 @@ ffVMipo = P [(2,1::PF),(1,1::PF),(0,1::PF)]
 ff1 = FFKonst (1::PF)
 ffV = FFElem (P[(1,1::PF)]) ffVMipo
 
-ffVElems = map (`FFElem` ffVMipo) (getAllP (elems undefined :: [PF]) 2)
-
 --ff1' = FFElem (P[(0,1::PF)]) ffVMipo
 
 {- F16=E4
@@ -66,8 +66,6 @@ fffVMipo = P [(2,ff1),(1,ff1),(0,ffV)]
 fff1 = FFKonst $ FFKonst (1::PF)
 fffV = FFElem (P [(1,ff1)]) fffVMipo
 
-fffVElems = map (`FFElem` fffVMipo) (getAllP ffVElems 2)
-
 {- F16
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
  - Mit einer Nullstelle:
@@ -77,8 +75,6 @@ ffWMipo = P[(4,1::PF),(1,1::PF),(0,1::PF)]
 
 --ffW = FFElem (P[(1,1::PF),(0,1::PF)]) ffWMipo
 ffW = FFElem (P[(1,1::PF)]) ffWMipo
-
-ffWElems = map (`FFElem` ffWMipo) (getAllP (elems undefined :: [PF]) 4)
 
 --------------------------------------------------------------------------------
 --  Weiteres
