@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-#define LATEXFORMAT
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.Polynomials
@@ -37,11 +35,37 @@ data Polynom a = P [(Integer,a)] deriving ()
 instance (Eq a, Num a) => Eq (Polynom a) where
   f == g = unP (aggP f) == unP (aggP g)
 
+if' :: Bool -> a -> a -> a
+if' True  x _ = x
+if' False _ y = y
+
 instance (Show a,Eq a) => Show (Polynom a) where
   show (P []) = ""
-  show (P ((i,c):ms))
-    | null ms   = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m"
-    | otherwise = show c ++ "·X^\x1B[04m" ++ show i ++ "\x1B[24m + " ++ show (P ms)
+  show (P ((i,c):ms)) | null ms   = show c ++ showExp i
+                      | otherwise = show c ++ showExp i ++ " + " ++ show (P ms)
+    where showExp :: Integer -> String
+          showExp 0 = ""
+          showExp 1 = "·\x1B[04mX\x1B[24m"
+          showExp i = "·\x1B[04mX" ++ showExp' (show i) ++ "\x1B[24m"
+          -- Wähle Formatierung:
+          showExp' = if' True showExp'a showExp'b
+          -- Formatieren ohne UTF8
+          showExp'a :: String -> String
+          showExp'a s = '^' : s
+          -- Formatieren mit UTF8
+          showExp'b :: String -> String
+          showExp'b ""     = []
+          showExp'b (c:cs) = newC : showExp'b cs
+            where newC | c == '0' = '⁰'
+                       | c == '1' = '¹'
+                       | c == '2' = '²'
+                       | c == '3' = '³'
+                       | c == '4' = '⁴'
+                       | c == '5' = '⁵'
+                       | c == '6' = '⁶'
+                       | c == '7' = '⁷'
+                       | c == '8' = '⁸'
+                       | c == '9' = '⁹'
 
 instance (ShowTex a,Eq a) => ShowTex (Polynom a) where
   showTex (P []) = ""

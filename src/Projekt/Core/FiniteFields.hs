@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-#define LATEXFORMAT
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Project.Core.FiniteFields
