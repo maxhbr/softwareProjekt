@@ -11,7 +11,6 @@ module Sandbox where
 import Projekt.Core hiding (examplePoly, examplePoly')
 import Projekt.Algorithmen
 import Projekt.Core.Matrix
-import Projekt.Core.ShowTex
 
 pp :: (Show a) => [a] -> IO()
 pp =  mapM_ print
@@ -114,10 +113,3 @@ ffW = FFElem (P[(1,1::PF)]) ffWMipo
  -        /                                  = GF(3²⁷) = F3^27
  -       /ideal(3,x³-x-1,y³-y+x²,z³-z+x²y²)
  -}
-
-
-
---------------------------------------------------------------------------------
---  Matrizen
-
-m = M $ [[7::PF, 8::PF, 9::PF], [4::PF, 5::PF, 6::PF], [1::PF, 2::PF, 3::PF]]

@@ -64,9 +64,11 @@ instance (Num a, Eq a) => Num (Matrix a) where
   signum _      = error "Prelude.Num.signum: inappropriate abstraction"
   negate        = negateM
 
+-- TODO: non exahstive patterns
 addM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 addM (Mdiag x) (Mdiag y) = Mdiag (x+y)
-addM (Mdiag x) m         = addM m (genDiagM x (getNumRowsM m))
+addM (Mdiag x) m         = addM (genDiagM x (getNumRowsM m)) m
+addM m         (Mdiag y) = addM m (genDiagM y (getNumRowsM m))
 addM (M x)     (M y)     | test      = addM' (length x) (length (head x))
                          | otherwise = error "not the same Dimensions"
   where test      = (length x == length y) && (length (head x) == length (head y))
@@ -141,13 +143,6 @@ swapItems ls r1 r2 = [get k x | (x,k) <- zip ls [0..]]
                   | k == r1 = ls !! r2
                   | otherwise = x
 
-pivotAndSwap :: (Eq a, Num a) => Int -> [[a]] -> [[a]]
-pivotAndSwap n (row:rows)
-  | (row !! n) /= 0
-    || null rows
-    || all (==True) (map (all (==0)) rows) = row:rows
-  | otherwise                            = pivotAndSwap n (rows ++ [row])
-
 triangularM :: (Eq a, Fractional a) => Matrix a -> Matrix a
 triangularM m  = M $ triangular' 0 $ unM m
   where triangular' n [] = []
@@ -157,6 +152,13 @@ triangularM m  = M $ triangular' 0 $ unM m
                 eval rs    | (rs !! n) == 0 = rs
                            | otherwise     = zipWith (-) (map (*c) rs) row
                   where c = (row !! n) / (rs !! n)
+
+        pivotAndSwap :: (Eq a, Num a) => Int -> [[a]] -> [[a]]
+        pivotAndSwap n (row:rows)
+          | (row !! n) /= 0
+            || null rows
+            || all (==True) (map (all (==0)) rows) = row:rows
+          | otherwise                            = pivotAndSwap n (rows ++ [row])
 
 detM :: (Eq a, Fractional a) => Matrix a -> a
 detM m | isQuadraticM m = sum [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
