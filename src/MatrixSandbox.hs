@@ -15,7 +15,7 @@ import Projekt.Core.Matrix
 --------------------------------------------------------------------------------
 --  Globale Charakteristik
 charakteristik :: Integer
-charakteristik = 2
+charakteristik = 5
 
 --------------------------------------------------------------------------------
 --  Definiere Endlichen Körper
@@ -32,3 +32,4 @@ m = M [[7::PF, 8::PF, 9::PF], [4::PF, 5::PF, 6::PF], [1::PF, 2::PF, 3::PF]]
 
 eye2 = M [[1::PF, 0], [0, 1::PF]]
 eye3 = M [[1::PF, 0, 0], [0, 1::PF, 0], [0, 0, 1::PF]]
+eye = genDiagM (1::PF)
