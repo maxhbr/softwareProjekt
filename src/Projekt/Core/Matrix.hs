@@ -64,7 +64,6 @@ instance (Num a, Eq a) => Num (Matrix a) where
   signum _      = error "Prelude.Num.signum: inappropriate abstraction"
   negate        = negateM
 
--- TODO:
 addM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 addM (Mdiag x) (Mdiag y) = Mdiag (x+y)
 addM (Mdiag x) m         = addM m (genDiagM x (getNumRowsM m))
@@ -73,7 +72,7 @@ addM (M x)     (M y)     | test      = addM' (length x) (length (head x))
   where test      = (length x == length y) && (length (head x) == length (head y))
         addM' n m = M [[x!!i!!j + y!!i!!j | j <- [0..(m-1)]] | i <- [0..(n-1)]]
 
--- TODO:
+-- TODO: replace the undefined
 multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 multM (Mdiag x) (Mdiag y) = Mdiag (x*y)
 multM (Mdiag x) m         = multM m (genDiagM x (getNumRowsM m))
