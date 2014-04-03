@@ -1,5 +1,5 @@
 module Projekt.Core.Matrix
-  ( Matrix (..), unM
+  ( Matrix (..), unM, genDiagM
   -- tests
   , isQuadraticM, isValidM
   -- getter
@@ -34,7 +34,7 @@ isQuadraticM m = getNumColsM m == getNumRowsM m
 
 genDiagM :: (Num a) => a -> Int -> Matrix a
 genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
-  where genEyeM' i = [0 | j <- [0..(i-2)]] ++ (x:[0 | j <- [i..(n-1)]])
+  where genEyeM' i = [0 | j <- [0..(i-1)]] ++ (x:[0 | j <- [(i+1)..(n-1)]])
 
 --------------------------------------------------------------------------------
 --  Instanzen
