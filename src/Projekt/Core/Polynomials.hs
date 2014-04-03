@@ -73,8 +73,12 @@ instance (Show a,Eq a) => Show (Polynom a) where
 instance (ShowTex a,Eq a) => ShowTex (Polynom a) where
   showTex (P []) = ""
   showTex (P ((i,c):ms))
-    | null ms   = showTex c ++ "\\cdot{}X^{" ++ show i ++ "}"
-    | otherwise = showTex c ++ "\\cdot{}X^{" ++ show i ++ "} + " ++ showTex (P ms)
+    | null ms   = showTex c ++ showExp i
+    | otherwise = showTex c ++ showExp i ++ " + " ++ showTex (P ms)
+    where showExp :: Integer -> String
+          showExp 0 = ""
+          showExp 1 = "\\cdot{}X"
+          showExp i = "\\cdot{}X^{" ++ show i ++ "}"
 
 instance (Num a, Eq a) => Num (Polynom a) where
   x + y         = aggP $ addP x y
