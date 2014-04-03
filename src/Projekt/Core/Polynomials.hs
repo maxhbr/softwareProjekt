@@ -47,15 +47,15 @@ instance (Show a,Eq a) => Show (Polynom a) where
           showExp 0 = ""
           showExp 1 = "·\x1B[04mX\x1B[24m"
           showExp i = "·\x1B[04mX" ++ showExp' (show i) ++ "\x1B[24m"
-          -- Wähle Formatierung:
+          {- Wähle Formatierung:
+           -    True für mit UTF8
+           -    False für ohne UTF8
+           -}
           showExp' = if' True showExp'a showExp'b
-          -- Formatieren ohne UTF8
-          showExp'a :: String -> String
-          showExp'a s = '^' : s
           -- Formatieren mit UTF8
-          showExp'b :: String -> String
-          showExp'b ""     = []
-          showExp'b (c:cs) = newC : showExp'b cs
+          showExp'a :: String -> String
+          showExp'a ""     = []
+          showExp'a (c:cs) = newC : showExp'a cs
             where newC | c == '0' = '⁰'
                        | c == '1' = '¹'
                        | c == '2' = '²'
@@ -66,6 +66,9 @@ instance (Show a,Eq a) => Show (Polynom a) where
                        | c == '7' = '⁷'
                        | c == '8' = '⁸'
                        | c == '9' = '⁹'
+          -- Formatieren ohne UTF8
+          showExp'b :: String -> String
+          showExp'b s = '^' : s
 
 instance (ShowTex a,Eq a) => ShowTex (Polynom a) where
   showTex (P []) = ""
