@@ -1,10 +1,13 @@
 module Projekt.Core.Matrix
   ( Matrix (..), unM
+  -- tests
+  , isQuadraticM, isValidM
   -- getter
   , atM, getNumRowsM, getNumColsM
   -- operations
-  , swapRowsM, swapColsM
-  , triangular, triangular', pivotAndSwap
+  , swapRowsM, swapColsM, (<|>), (<-->), (!|), (!-)
+  -- linear algebra
+  , triangular, det
   ) where
 import Data.List
 
@@ -25,6 +28,9 @@ unM (M m) = m
 isValidM :: Matrix a -> Bool
 isValidM (M m) = and [n == head ns | n <- tail ns]
   where ns = map length m
+
+isQuadraticM :: Matrix a -> Bool
+isQuadraticM m = (getNumColsM m) == (getNumRowsM m)
 
 genDiagM :: (Num a) => a -> Int -> Matrix a
 genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
@@ -79,11 +85,35 @@ negateM :: (Num a) => Matrix a -> Matrix a
 negateM (Mdiag x) = Mdiag $ negate x
 negateM (M m)     = M $ map (map negate) m
 
+
+-- 'concat' matrices horizontally
+(<|>) :: Matrix a -> Matrix a -> Matrix a
+(<|>) (M m1) (M m2) | test      = M $ [ m1 !! i ++ m2 !! i | i <- [0..(n-1)] ]
+                    | otherwise = error "not same row count"
+  where test = getNumRowsM (M m1) == getNumRowsM (M m2)
+        n    = getNumRowsM (M m1)
+
+-- 'concat' matrices vertically
+(<-->) :: Matrix a -> Matrix a -> Matrix a
+(<-->) (M m1) (M m2) | test      = M $ m1 ++ m2
+                   | otherwise = error "not same column count"
+  where
+    test = getNumColsM (M m1) == getNumColsM (M m2)
+
 --------------------------------------------------------------------------------
 --  Getter
 
 atM :: Matrix a -> Int -> Int -> a
-atM m row col = unM m !! row !! col
+atM (M m) row col = m !! row !! col
+
+-- get column
+(!|) :: Matrix a -> Int -> [a]
+(!|) (M m) n  = [m !! i !! n | i <- [0..r-1]]
+  where r = getNumRowsM $ M m
+
+-- get row
+(!-) :: Matrix a -> Int -> [a]
+(M m) !- n  = m !! n
 
 getNumRowsM :: Matrix a -> Int
 getNumRowsM = length . unM
@@ -113,7 +143,7 @@ swapItems ls r1 r2 = [get k x | (x,k) <- zip ls [0..]]
                   | otherwise = x
 
 
-triangular :: (Eq a, Fractional a, Show a) => Matrix a -> Matrix a
+triangular :: (Eq a, Fractional a) => Matrix a -> Matrix a
 triangular m  = M $ triangular' 0 $ unM m
 
 triangular' n [] = []
@@ -134,3 +164,6 @@ pivotAndSwap n (row:rows) | (row !! n) /= 0
                         | otherwise       = pivotAndSwap n (rows ++ [row])
 
 
+det :: (Eq a, Fractional a) => Matrix a -> a
+det m | isQuadraticM m = sum [atM (triangular m) i i | i <- [0..(getNumRowsM m -1)]]
+      | otherwise      = error "Matrix not quadratic"
