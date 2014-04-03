@@ -3,11 +3,11 @@ module Projekt.Core.Matrix
   -- tests
   , isQuadraticM, isValidM
   -- getter
-  , atM, getNumRowsM, getNumColsM
+  , atM, getNumRowsM, getNumColsM, (!|), (!-)
   -- operations
-  , swapRowsM, swapColsM, (<|>), (<-->), (!|), (!-)
+  , swapRowsM, swapColsM, (<|>), (<-->)
   -- linear algebra
-  , triangular, det
+  , triangularM, detM
   ) where
 import Data.List
 
@@ -30,7 +30,7 @@ isValidM (M m) = and [n == head ns | n <- tail ns]
   where ns = map length m
 
 isQuadraticM :: Matrix a -> Bool
-isQuadraticM m = (getNumColsM m) == (getNumRowsM m)
+isQuadraticM m = getNumColsM m == getNumRowsM m
 
 genDiagM :: (Num a) => a -> Int -> Matrix a
 genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
@@ -88,7 +88,7 @@ negateM (M m)     = M $ map (map negate) m
 
 -- 'concat' matrices horizontally
 (<|>) :: Matrix a -> Matrix a -> Matrix a
-(<|>) (M m1) (M m2) | test      = M $ [ m1 !! i ++ m2 !! i | i <- [0..(n-1)] ]
+(<|>) (M m1) (M m2) | test      = M [ m1 !! i ++ m2 !! i | i <- [0..(n-1)] ]
                     | otherwise = error "not same row count"
   where test = getNumRowsM (M m1) == getNumRowsM (M m2)
         n    = getNumRowsM (M m1)
@@ -142,12 +142,11 @@ swapItems ls r1 r2 = [get k x | (x,k) <- zip ls [0..]]
                   | k == r1 = ls !! r2
                   | otherwise = x
 
-
-triangular :: (Eq a, Fractional a) => Matrix a -> Matrix a
-triangular m  = M $ triangular' 0 $ unM m
+triangularM :: (Eq a, Fractional a) => Matrix a -> Matrix a
+triangularM m  = M $ triangular' 0 $ unM m
 
 triangular' n [] = []
-triangular' n m' = row : (triangular' (n+1) rows')
+triangular' n m' = row : triangular' (n+1) rows'
   where
   (row:rows) = pivotAndSwap n m'
   rows'      = map eval rows
@@ -156,14 +155,13 @@ triangular' n m' = row : (triangular' (n+1) rows')
         | otherwise     = zipWith (-) (map (*c) rs) row
     where c = (row !! n) / (rs !! n)
 
-
 pivotAndSwap :: (Eq a, Num a) => Int -> [[a]] -> [[a]]
-pivotAndSwap n (row:rows) | (row !! n) /= 0 
-                          || length rows == 0
-                          || all (==True) (map (all (==0)) rows)  = (row:rows)
-                        | otherwise       = pivotAndSwap n (rows ++ [row])
+pivotAndSwap n (row:rows)
+  | (row !! n) /= 0
+    || null rows
+    || all (==True) (map (all (==0)) rows) = row:rows
+  | otherwise                            = pivotAndSwap n (rows ++ [row])
 
-
-det :: (Eq a, Fractional a) => Matrix a -> a
-det m | isQuadraticM m = sum [atM (triangular m) i i | i <- [0..(getNumRowsM m -1)]]
-      | otherwise      = error "Matrix not quadratic"
+detM :: (Eq a, Fractional a) => Matrix a -> a
+detM m | isQuadraticM m = sum [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
+       | otherwise      = error "Matrix not quadratic"
