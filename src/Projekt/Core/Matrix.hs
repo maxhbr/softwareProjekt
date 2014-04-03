@@ -153,13 +153,11 @@ triangularM :: (Eq a, Fractional a) => Matrix a -> Matrix a
 triangularM m  = M $ triangular' 0 $ unM m
   where triangular' n [] = []
         triangular' n m' = row : triangular' (n+1) rows'
-          where
-          (row:rows) = pivotAndSwap n m'
-          rows'      = map eval rows
-          eval rs
-                | (rs !! n) == 0 = rs
-                | otherwise     = zipWith (-) (map (*c) rs) row
-            where c = (row !! n) / (rs !! n)
+          where (row:rows) = pivotAndSwap n m'
+                rows'      = map eval rows
+                eval rs    | (rs !! n) == 0 = rs
+                           | otherwise     = zipWith (-) (map (*c) rs) row
+                  where c = (row !! n) / (rs !! n)
 
 detM :: (Eq a, Fractional a) => Matrix a -> a
 detM m | isQuadraticM m = sum [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
