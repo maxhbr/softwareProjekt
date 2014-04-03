@@ -101,7 +101,7 @@ getRepr :: (Numeral n) => Mod n -> Integer
 getRepr x = unMod x `mod` modulus x
 
 instance (Numeral n) => Eq (Mod n) where
-  x == y = unMod x - unMod y `mod` modulus x == 0
+  x == y = (unMod x - unMod y) `mod` modulus x == 0
 
 instance (Numeral n) => Num (Mod n) where
   x + y       = MkMod $ (unMod x + unMod y) `mod` modulus x
