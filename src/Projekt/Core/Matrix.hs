@@ -4,10 +4,12 @@ module Projekt.Core.Matrix
   , atM, getNumRowsM, getNumColsM
   -- operations
   , swapRowsM, swapColsM
+  , triangular
   ) where
 import Data.List
 
 import Projekt.Core.ShowTex
+import Debug.Trace
 
 --------------------------------------------------------------------------------
 --  Data Definition
@@ -109,3 +111,24 @@ swapItems ls r1 r2 = [get k x | (x,k) <- zip ls [0..]]
     where get k x | k == r1 = ls !! r1
                   | k == r1 = ls !! r2
                   | otherwise = x
+
+
+triangular :: (Eq a, Fractional a, Show a) => Matrix a -> Matrix a
+triangular m  = M $ triangular' $ unM m
+  where
+  triangular' :: (Eq a, Fractional a, Show a) => [[a]] -> [[a]]
+  triangular' m' = row : (triangular' rows')
+    where
+    (row:rows) = pivotAndSwap m'
+    rows'      = trace ("call map eval with " ++ show rows) map eval rows
+    eval rs
+            | (head rs) == 0 = drop 1 rs
+            | otherwise     = drop 1 $ zipWith (-) (map (*c) rs) row
+      where c = trace (show row ++ " " ++ show rs) ((head row) / (head rs))
+
+
+pivotAndSwap :: (Eq a, Num a) => [[a]] -> [[a]]
+pivotAndSwap (row:rows) | (head row) /= 0  = (row:rows)
+                        | otherwise       = pivotAndSwap (rows ++ [row])
+
+
