@@ -4,7 +4,7 @@ module Projekt.Core.Matrix
   , atM, getNumRowsM, getNumColsM
   -- operations
   , swapRowsM, swapColsM
-  , triangular
+  , triangular, triangular', pivotAndSwap
   ) where
 import Data.List
 
@@ -114,21 +114,23 @@ swapItems ls r1 r2 = [get k x | (x,k) <- zip ls [0..]]
 
 
 triangular :: (Eq a, Fractional a, Show a) => Matrix a -> Matrix a
-triangular m  = M $ triangular' $ unM m
+triangular m  = M $ triangular' 0 $ unM m
+
+triangular' n [] = []
+triangular' n m' = row : (triangular' (n+1) rows')
   where
-  triangular' :: (Eq a, Fractional a, Show a) => [[a]] -> [[a]]
-  triangular' m' = row : (triangular' rows')
-    where
-    (row:rows) = pivotAndSwap m'
-    rows'      = trace ("call map eval with " ++ show rows) map eval rows
-    eval rs
-            | (head rs) == 0 = drop 1 rs
-            | otherwise     = drop 1 $ zipWith (-) (map (*c) rs) row
-      where c = trace (show row ++ " " ++ show rs) ((head row) / (head rs))
+  (row:rows) = pivotAndSwap n m'
+  rows'      = map eval rows
+  eval rs
+        | (rs !! n) == 0 = rs
+        | otherwise     = zipWith (-) (map (*c) rs) row
+    where c = (row !! n) / (rs !! n)
 
 
-pivotAndSwap :: (Eq a, Num a) => [[a]] -> [[a]]
-pivotAndSwap (row:rows) | (head row) /= 0  = (row:rows)
-                        | otherwise       = pivotAndSwap (rows ++ [row])
+pivotAndSwap :: (Eq a, Num a) => Int -> [[a]] -> [[a]]
+pivotAndSwap n (row:rows) | (row !! n) /= 0 
+                          || length rows == 0
+                          || all (==True) (map (all (==0)) rows)  = (row:rows)
+                        | otherwise       = pivotAndSwap n (rows ++ [row])
 
 
