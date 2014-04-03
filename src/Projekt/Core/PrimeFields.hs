@@ -72,7 +72,22 @@ newtype Mod n = MkMod { unMod :: Integer }
   --deriving (Show)
 
 instance (Numeral n, Show n) => Show (Mod n) where
-  show x = "[\x1B[33m" ++ show (unMod x) ++ "\x1B[39m%" ++ show (modulus x) ++ "]"
+  show x = "\x1B[33m" ++ show (unMod x) ++ "\x1B[39m" ++ showModulus x ++ "]"
+    where showModulus :: (Numeral n) => Mod n -> String
+          showModulus = showModulus' . show . modulus
+          showModulus' :: String -> String
+          showModulus' "" = ""
+          showModulus' (c:cs) = newC : showModulus' cs
+            where newC | c == '0' = '₀'
+                       | c == '1' = '₁'
+                       | c == '2' = '₂'
+                       | c == '3' = '₃'
+                       | c == '4' = '₄'
+                       | c == '5' = '₅'
+                       | c == '6' = '₆'
+                       | c == '7' = '₇'
+                       | c == '8' = '₈'
+                       | c == '9' = '₀'
 
 instance (Numeral n, Show n) => ShowTex (Mod n) where
   showTex x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
