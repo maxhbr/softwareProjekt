@@ -7,7 +7,7 @@
 --
 --------------------------------------------------------------------------------
 
-module Sandbox where
+module FFSandbox where
 import Projekt.Core hiding (examplePoly, examplePoly')
 import Projekt.Algorithmen
 import Projekt.Core.Matrix
