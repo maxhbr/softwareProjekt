@@ -161,5 +161,5 @@ triangularM m  = M $ triangular' 0 $ unM m
           | otherwise                            = pivotAndSwap n (rows ++ [row])
 
 detM :: (Eq a, Fractional a) => Matrix a -> a
-detM m | isQuadraticM m = sum [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
+detM m | isQuadraticM m = product [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
        | otherwise      = error "Matrix not quadratic"
