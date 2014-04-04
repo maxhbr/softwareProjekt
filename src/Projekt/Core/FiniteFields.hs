@@ -37,7 +37,7 @@ instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
                               | otherwise = error "Not the same mod"
 
 instance (Show a, Eq a) => Show (FFElem a) where
-  show (FFKonst x)       = show x
+  show (FFKonst x)       = "(" ++ show x ++ " mod ...)"
   show (FFElem (P []) p) = "(0 mod " ++ show p ++ ")"
   show (FFElem f p)      = "(" ++ show f ++ " mod " ++ show p ++")"
 
@@ -74,8 +74,8 @@ instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
   fromRational _     = error "inappropriate abstraction"
   recip (FFKonst x)  = FFKonst (recip x)
   recip (FFElem f p) | FFElem f p == FFElem (P []) p = divZeroError
-                     | otherwise                        = FFElem s p
-    where (d,s,t) = eekP f p
+                     | otherwise                    = FFElem s p
+    where (_,s,_) = eekP f p
 
 instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   zero  = FFKonst zero

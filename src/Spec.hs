@@ -33,6 +33,11 @@ fffV = FFElem (P [(1,ff1)]) fffVMipo
 fffElems = elems fffV
 
 --------------------------------------------------------------------------------
+ffWMipo = P[(4,1::PF),(1,1::PF),(0,1::PF)]
+
+ffW = FFElem (P[(1,1::PF)]) ffWMipo
+
+--------------------------------------------------------------------------------
 -- TODO QuickCheck
 {-
 instance (FFElem a) => Arbitrary (FFElem a) where
@@ -60,6 +65,8 @@ main = hspec $ do
       evaluate ((3::Z101) / (0::Z101)) `shouldThrow` anyException
     it "0/0 throws exception" $
       evaluate ((0::Z101) / (0::Z101)) `shouldThrow` anyException
+    it "1^{-1} == 1" $
+      recip (1::Z101) `shouldBe` (1 ::Z101)
     it "test invMod (x/x=1) in Z101" $ mapM_
       (\ x -> x / x `shouldBe` (1 ::Z101))
       (units undefined ::[Z101])
@@ -82,11 +89,16 @@ main = hspec $ do
       evaluate (ffV / FFElem (P[]) ffVMipo) `shouldThrow` anyException
     it "0/0 throws exception" $
       evaluate (FFElem (P[]) ffVMipo / FFElem (P[]) ffVMipo) `shouldThrow` anyException
+    it "1^{-1} == 1" $
+      recip ff1 + FFElem (P []) ffVMipo `shouldBe` ff1
     it "test invMod (x/x=1)" $ mapM_
       (\ x -> x / x `shouldBe` ff1)
       (units ffV)
     it "test invMod (x/x*x=x)" $ mapM_
       (\ x -> x / x * x `shouldBe` x)
+      (units ffV)
+    it "test invMod (x*x/x=x)" $ mapM_
+      (\ x -> x * x / x `shouldBe` x)
       (units ffV)
 
   describe "Projekt.Core.FiniteFields @fffV" $ do
@@ -98,12 +110,33 @@ main = hspec $ do
       evaluate (fffV / FFElem (P[]) fffVMipo) `shouldThrow` anyException
     it "0/0 throws exception" $
       evaluate (FFElem (P[]) fffVMipo / FFElem (P[]) fffVMipo) `shouldThrow` anyException
+    it "1^{-1} == 1" $
+      recip fff1 + FFElem (P []) fffVMipo `shouldBe` fff1
     it "test invMod (x/x=1)" $ mapM_
       (\ x -> x / x `shouldBe` fff1)
       (units fffV)
     it "test invMod (x/x*x=x)" $ mapM_
       (\ x -> x / x * x `shouldBe` x)
       (units fffV)
+    it "test invMod (x*x/x=x)" $ mapM_
+      (\ x -> x * x / x `shouldBe` x)
+      (units fffV)
+
+  describe "Projekt.Core.FiniteFields @ffW" $ do
+    it "test for neutral element" $ mapM_
+      (\ x -> x * ff1 `shouldBe` x)
+      (elems ffW)
+    it "x/0 throws exception" $ do
+      evaluate (ff1 / FFElem (P[]) ffWMipo) `shouldThrow` anyException
+      evaluate (ffW / FFElem (P[]) ffWMipo) `shouldThrow` anyException
+    it "0/0 throws exception" $
+      evaluate (FFElem (P[]) ffWMipo / FFElem (P[]) ffWMipo) `shouldThrow` anyException
+    it "test invMod (x/x=1)" $ mapM_
+      (\ x -> x / x `shouldBe` ff1)
+      (units ffW)
+    it "test invMod (x/x*x=x)" $ mapM_
+      (\ x -> x / x * x `shouldBe` x)
+      (units ffW)
 
     {-
     it "general inversion" $
