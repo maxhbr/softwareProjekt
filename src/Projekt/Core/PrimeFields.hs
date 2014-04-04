@@ -111,10 +111,6 @@ instance (Numeral n) => Num (Mod n) where
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate      = MkMod . negate . unMod
 
-instance (Numeral n) => Fractional (Mod n) where
-  recip          = invMod
-  fromRational _ = error "inappropriate abstraction"
-
 instance (Numeral n) => FiniteField (Mod n) where
   zero  = MkMod 0
   one   = MkMod 1
@@ -122,6 +118,10 @@ instance (Numeral n) => FiniteField (Mod n) where
 
 elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map fromInteger [0.. (modulus x - 1)]
+
+instance (Numeral n) => Fractional (Mod n) where
+  recip          = invMod
+  fromRational _ = error "inappropriate abstraction"
 
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography

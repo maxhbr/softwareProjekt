@@ -11,6 +11,8 @@ module Projekt.Core.FiniteFields
   , aggF
   , module X
   ) where
+import GHC.Err (divZeroError)
+
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
 import Projekt.Core.Polynomials
@@ -71,7 +73,8 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
 instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
   fromRational _     = error "inappropriate abstraction"
   recip (FFKonst x)  = FFKonst (recip x)
-  recip (FFElem f p) = FFElem s p
+  recip (FFElem f p) | FFElem f p == FFElem (P []) p = divZeroError
+                     | otherwise                        = FFElem s p
     where (d,s,t) = eekP f p
 
 instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
