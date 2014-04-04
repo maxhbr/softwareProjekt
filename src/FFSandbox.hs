@@ -25,7 +25,6 @@ charakteristik = 2
 
 --------------------------------------------------------------------------------
 --  Definiere Endlichen Körper
-
 data PeanoNumber
 instance Numeral PeanoNumber where numValue x = charakteristik
 instance Show PeanoNumber    where show       = show
@@ -57,6 +56,8 @@ ffVMipo = P [(2,1::PF),(1,1::PF),(0,1::PF)]
 ff1 = FFKonst (1::PF)
 ffV = FFElem (P[(1,1::PF)]) ffVMipo
 
+ffVTestMult = ffV / ffV - FFElem (P[(0,1)]) ffVMipo == FFElem (P[]) ffVMipo
+
 ffElems = elems ffV
 
 -- render latex exmp:
@@ -81,6 +82,8 @@ fffVMipo = P [(2,ff1),(1,ff1),(0,ffV)]
 
 fff1 = FFKonst $ FFKonst (1::PF)
 fffV = FFElem (P [(1,ff1)]) fffVMipo
+
+fffVTestMult = fffV / fffV - FFElem (P[(0,1)]) fffVMipo == FFElem (P[]) fffVMipo
 
 fffElems = elems fffV
 
