@@ -1,0 +1,73 @@
+\section{Endliche Körper}
+\subsection{In Charakteristik 2}
+\begin{comment}
+Umformulieren, verschönern!
+\end{comment}
+
+\paragraph{Der Primkörper} in Charakteristik 2 ist $\F_2=\Z/(2)$. Die
+Additionstafel sieht also wie folgt aus:
+\begin{center}
+\begin{tabular}{|c||c|c|}
+\hline
+$+$ & $0$ & $1$\tabularnewline
+\hline
+\hline
+$0$ & $0$ & $1$\tabularnewline
+\hline
+$1$ & $1$ & $0$\tabularnewline
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Die Erweiterung $E_{\F_2}(2)$} ist definiert als
+$\F_2(X)/(X^2+X+1)$.
+Sei nun $u$ eine Nullstelle von $X^2+X+1\in\F_2(X)$.
+Damit können wir $F=\{0,1,u,1+u\}$ identifizieren und erhalten die Tabellen:
+\begin{center}
+\begin{tabular}{|c||c|c|c|c|}
+\hline
+$+$ & $0$ & $1$ & $u$ & $1+u$\tabularnewline
+\hline
+\hline
+$0$ & $0$ & $1$ & $u$ & $1+u$\tabularnewline
+\hline
+$1$ & $1$ & $0$ & $1+u$ & $u$\tabularnewline
+\hline
+$u$ & $u$ & $1+u$ & $0$ & $1$\tabularnewline
+\hline
+$1+u$ & $1+u$ & $u$ & $1$ & $0$\tabularnewline
+\hline
+\end{tabular}
+\end{center}
+\begin{center}
+\begin{tabular}{|c||c|c|c|}
+\hline 
+$\cdot$ & $1$ & $u$ & $1+u$\tabularnewline
+\hline 
+\hline 
+$1$ & $1$ & $u$ & $u+u$\tabularnewline
+\hline 
+$u$ & $u$ & $1+u$ & $1$\tabularnewline
+\hline 
+$1+u$ & $1+u$ & $1$ & $u$\tabularnewline
+\hline 
+\end{tabular}
+\end{center}
+
+\paragraph{Die Erweiterung $E_{E_{\F_2}(2)}(2)$} ist definiert als
+$E_{E_{\F_2}(2)}(2)(X)/(X^2+X+u)$.
+Sei nun $v$ eine Nullstelle von $X^2+X+u\in E_{\F_2}(2)(X)$.
+Damit können wir
+\begin{align*}
+F&=\{ 0        , 1        , u          , 1+u             , \\
+&\qquad v      , 1+v      , u+v        , 1+u+v           , \\
+&\qquad uv     , 1+uv     , u+uv       , 1+u+uv          , \\
+&\qquad (1+u)v , 1+(1+u)v , u + (1+u)v , 1+u + (1+u)v \}   \\
+&=\{ 0       , 1      , u        , 1+u           , \\
+&\qquad v    , 1+v    , u+v      , 1+u+v         , \\
+&\qquad uv   , 1+uv   , u+uv     , 1+u+uv        , \\
+&\qquad v+uv , 1+v+uv , u + v+uv , 1+u + v+uv \}
+\end{align*}
+identifizieren und erhalten die Tabellen: \TODO[Keine lust]
+
+% vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:
