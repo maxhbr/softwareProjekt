@@ -8,7 +8,7 @@
 --------------------------------------------------------------------------------
 
 module FFSandbox
-  ( PF
+  ( Z2
   , uMipo, u
   , vMipo, v
   , wMipo, w
@@ -24,18 +24,6 @@ pp =  mapM_ print
 
 ppTex :: (ShowTex a) => [a] -> IO()
 ppTex = mapM_ (putStrLn . showTex)
-
---------------------------------------------------------------------------------
---  Globale Charakteristik
-charakteristik :: Integer
-charakteristik = 2
-
---------------------------------------------------------------------------------
---  Definiere Endlichen Körper
-data PeanoNumber
-instance Numeral PeanoNumber where numValue x = charakteristik
-instance Show PeanoNumber    where show       = show
-type PF = Mod PeanoNumber
 
 {- F4=E2 als Grad 2 Erweiterung von Z2
  -
@@ -56,8 +44,8 @@ type PF = Mod PeanoNumber
  -          -----+-----+-----+-----+-----
  -           u+1 | u+1 |  u  |  1  |  0
  -}
-uMipo = P [(2,1::PF),(1,1::PF),(0,1::PF)]
-u = FFElem (P[(1,1::PF)]) uMipo
+uMipo = P [(2,1::Z2),(1,1::Z2),(0,1::Z2)]
+u = FFElem (P[(1,1::Z2)]) uMipo
 
 {- F16=E2(E2)
  - als Grad 2 Erweiterung von E2 durch MPol x²+x+u
@@ -70,8 +58,26 @@ v = FFElem (P [(1,one)]) vMipo
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
  - Mit einer Nullstelle: w
  -}
-wMipo = P[(4,1::PF),(1,1::PF),(0,1::PF)]
-w = FFElem (P[(1,1::PF)]) wMipo
+wMipo = P[(4,1::Z2),(1,1::Z2),(0,1::Z2)]
+w = FFElem (P[(1,1::Z2)]) wMipo
+
+--------------------------------------------------------------------------------
+-- grundlegende Rechnungen rendern
+uElemsTestAdd i j = renderRawTex
+  (showTex (elems u!!i) ++ " \\\\+ " ++ showTex (elems u!!j) ++ " \\\\= "
+  ++ showTex (elems u!!i + elems u!!j))
+
+uElemsTestMult i j = renderRawTex
+  (showTex (elems u!!i) ++ " \\\\\\cdot " ++ showTex (elems u!!j) ++ " \\\\= "
+  ++ showTex (elems u!!i * elems u!!j))
+
+vElemsTestAdd i j = renderRawTex
+  (showTex (elems v!!i) ++ " \\\\+ " ++ showTex (elems v!!j) ++ " \\\\= "
+  ++ showTex (elems v!!i + elems v!!j))
+
+vElemsTestMult i j = renderRawTex
+  (showTex (elems v!!i) ++ " \\\\\\cdot " ++ showTex (elems v!!j) ++ " \\\\= "
+  ++ showTex (elems v!!i * elems v!!j))
 
 --------------------------------------------------------------------------------
 main :: IO ()
@@ -122,36 +128,3 @@ main = hspec $ do
         (\ x -> x / x `shouldBe` one) (units w)
       it "test invMod (x/x*x=x)" $ mapM_
         (\ x -> x / x * x `shouldBe` x) (units w)
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- render latex exmp:
-{-
-ffElemsTestAdd i j = renderRawTex
-  (showTex (ffElems!!i) ++ " \\\\+ "
-  ++ showTex (ffElems!!j) ++ " \\\\= "
-  ++ showTex (ffElems!!i + ffElems!!j))
-
-ffElemsTestMult i j = renderRawTex
-  (showTex (ffElems!!i) ++ " \\\\ \\cdot "
-  ++ showTex (ffElems!!j) ++ " \\\\= "
-  ++ showTex (ffElems!!i * ffElems!!j))
- -}
-
---ff1' = FFElem (P[(0,1::PF)]) uMipo
-
-{-fffVTestMult = v / v - FFElem (P[(0,1)]) vMipo == FFElem (P[]) vMipo-}
-
-{-
--- render latex exmp:
-fffElemsTestAdd i j = renderRawTex
-  (showTex (fffElems!!i) ++ " \\\\+ "
-  ++ showTex (fffElems!!j) ++ " \\\\= "
-  ++ showTex (fffElems!!i + fffElems!!j))
-
-fffElemsTestMult i j = renderRawTex
-  (showTex (fffElems!!i) ++ " \\\\ \\cdot "
-  ++ showTex (fffElems!!j) ++ " \\\\= "
-  ++ showTex (fffElems!!i * fffElems!!j))
- -}
-
