@@ -44,9 +44,11 @@ instance (Show a, Eq a) => Show (FFElem a) where
 instance (ShowTex a,Eq a) => ShowTex (FFElem a) where
   showTex (FFKonst x)       = showTex x
   showTex (FFElem (P []) p) =
-    "\\left(\\underline{0}~mod~" ++ showTex p ++ "\\right)"
+    --"\\left(\\underline{0}_{mod~" ++ showTex p ++ "}\\right)"
+    "\\left(\\underline{0}_{mod~" ++ showTex p ++ "}\\right)"
   showTex (FFElem f p)      =
-    "\\left(\\underline{" ++ showTex f ++ "}~mod~" ++ showTex p ++"\\right)"
+    --"\\left(\\underline{" ++ showTex f ++ "}_{mod~" ++ showTex p ++"}\\right)"
+    "\\frac{" ++ showTex f ++ "}{mod~" ++ showTex p ++"}"
 
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where

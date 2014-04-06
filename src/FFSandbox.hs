@@ -44,15 +44,15 @@ ppTex = mapM_ (putStrLn . showTex)
  -          -----+-----+-----+-----+-----
  -           u+1 | u+1 |  u  |  1  |  0
  -}
-uMipo = P [(2,1::Z2),(1,1::Z2),(0,1::Z2)]
+uMipo = P[(2,1::Z2),(1,1::Z2),(0,1::Z2)]
 u = FFElem (P[(1,1::Z2)]) uMipo
 
 {- F16=E2(E2)
  - als Grad 2 Erweiterung von E2 durch MPol x²+x+u
  - Mit einer Nullstelle: v
  -}
-vMipo = P [(2,one),(1,one),(0,u)]
-v = FFElem (P [(1,one)]) vMipo
+vMipo = P[(2,one),(1,one),(0,u)]
+v = FFElem (P[(1,one)]) vMipo
 
 {- F16=E4
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
@@ -64,67 +64,71 @@ w = FFElem (P[(1,1::Z2)]) wMipo
 --------------------------------------------------------------------------------
 -- grundlegende Rechnungen rendern
 uElemsTestAdd i j = renderRawTex
-  (showTex (elems u!!i) ++ " \\\\+ " ++ showTex (elems u!!j) ++ " \\\\= "
+  (showTex (elems u!!i) ++ " \\\\\\qquad+ " 
+  ++ showTex (elems u!!j) ++ " \\\\\\qquad\\qquad= "
   ++ showTex (elems u!!i + elems u!!j))
 
 uElemsTestMult i j = renderRawTex
-  (showTex (elems u!!i) ++ " \\\\\\cdot " ++ showTex (elems u!!j) ++ " \\\\= "
+  (showTex (elems u!!i) ++ " \\\\\\qquad\\cdot "
+  ++ showTex (elems u!!j) ++ " \\\\\\qquad\\qquad= "
   ++ showTex (elems u!!i * elems u!!j))
 
 vElemsTestAdd i j = renderRawTex
-  (showTex (elems v!!i) ++ " \\\\+ " ++ showTex (elems v!!j) ++ " \\\\= "
+  (showTex (elems v!!i) ++ " \\\\\\qquad+ "
+  ++ showTex (elems v!!j) ++ " \\\\\\qquad\\qquad= "
   ++ showTex (elems v!!i + elems v!!j))
 
 vElemsTestMult i j = renderRawTex
-  (showTex (elems v!!i) ++ " \\\\\\cdot " ++ showTex (elems v!!j) ++ " \\\\= "
+  (showTex (elems v!!i) ++ " \\\\\\qquad\\cdot "
+  ++ showTex (elems v!!j) ++ " \\\\\\qquad\\qquad= "
   ++ showTex (elems v!!i * elems v!!j))
 
 --------------------------------------------------------------------------------
 main :: IO ()
 main = hspec $ do
-    describe "Projekt.Core.FiniteFields @u" $ do
-      it "test for neutral element" $ mapM_
-        (\ x -> x * one `shouldBe` x) (elems u)
-      it "x/0 throws exception" $ do
-        evaluate (one / FFElem (P[]) uMipo) `shouldThrow` anyException
-        evaluate (u / FFElem (P[]) uMipo) `shouldThrow` anyException
-      it "0/0 throws exception" $
-        evaluate (FFElem (P[]) uMipo / FFElem (P[]) uMipo) `shouldThrow` anyException
-      it "1^{-1} == 1" $
-        recip one + FFElem (P []) uMipo `shouldBe` one
-      it "test invMod (x/x=1)" $ mapM_
-        (\ x -> x / x `shouldBe` one) (units u)
-      it "test invMod (x/x*x=x)" $ mapM_
-        (\ x -> x / x * x `shouldBe` x) (units u)
-      it "test invMod (x*x/x=x)" $ mapM_
-        (\ x -> x * x / x `shouldBe` x) (units u)
+  describe "Projekt.Core.FiniteFields @u" $ do
+    it "test for neutral element" $ mapM_
+      (\ x -> x * one `shouldBe` x) (elems u)
+    it "x/0 throws exception" $ do
+      evaluate (one / FFElem (P[]) uMipo) `shouldThrow` anyException
+      evaluate (u / FFElem (P[]) uMipo) `shouldThrow` anyException
+    it "0/0 throws exception" $
+      evaluate (FFElem (P[]) uMipo / FFElem (P[]) uMipo) `shouldThrow` anyException
+    it "1^{-1} == 1" $
+      recip one + FFElem (P []) uMipo `shouldBe` one
+    it "test invMod (x/x=1)" $ mapM_
+      (\ x -> x / x `shouldBe` one) (units u)
+    it "test invMod (x/x*x=x)" $ mapM_
+      (\ x -> x / x * x `shouldBe` x) (units u)
+    it "test invMod (x*x/x=x)" $ mapM_
+      (\ x -> x * x / x `shouldBe` x) (units u)
 
-    describe "Projekt.Core.FiniteFields @v" $ do
-      it "test for neutral element" $ mapM_
-        (\ x -> x * one `shouldBe` x) (elems v)
-      it "x/0 throws exception" $ do
-        evaluate (one / FFElem (P[]) vMipo) `shouldThrow` anyException
-        evaluate (v / FFElem (P[]) vMipo) `shouldThrow` anyException
-      it "0/0 throws exception" $
-        evaluate (FFElem (P[]) vMipo / FFElem (P[]) vMipo) `shouldThrow` anyException
-      it "1^{-1} == 1" $
-        recip one + FFElem (P []) vMipo `shouldBe` one
-      it "test invMod (x/x=1)" $ mapM_
-        (\ x -> x / x `shouldBe` one) (units v)
-      it "test invMod (x/x*x=x)" $ mapM_
-        (\ x -> x / x * x `shouldBe` x) (units v)
-      it "test invMod (x*x/x=x)" $ mapM_
-        (\ x -> x * x / x `shouldBe` x) (units v)
+  describe "Projekt.Core.FiniteFields @v" $ do
+    it "test for neutral element" $ mapM_
+      (\ x -> x * one `shouldBe` x) (elems v)
+    it "x/0 throws exception" $ do
+      evaluate (one / FFElem (P[]) vMipo) `shouldThrow` anyException
+      evaluate (v / FFElem (P[]) vMipo) `shouldThrow` anyException
+    it "0/0 throws exception" $
+      evaluate (FFElem (P[]) vMipo / FFElem (P[]) vMipo) `shouldThrow` anyException
+    it "1^{-1} == 1" $
+      recip one + FFElem (P[]) vMipo `shouldBe` one
+    it "test invMod (x/x=1)" $ mapM_
+      (\ x -> x / x `shouldBe` one) (units v)
+    it "test invMod (x/x*x=x)" $ mapM_
+      (\ x -> x / x * x `shouldBe` x) (units v)
+    it "test invMod (x*x/x=x)" $ mapM_
+      (\ x -> x * x / x `shouldBe` x) (units v)
 
-    describe "Projekt.Core.FiniteFields @w" $ do
-      it "test for neutral element" $ mapM_
-        (\ x -> x * one `shouldBe` x) (elems w)
-      it "x/0 throws exception" $ do
-        evaluate (one / FFElem (P[]) wMipo) `shouldThrow` anyException
-        evaluate (w / FFElem (P[]) wMipo) `shouldThrow` anyException
-      it "0/0 throws exception" $
-        evaluate (FFElem (P[]) wMipo / FFElem (P[]) wMipo) `shouldThrow` anyException
-      it "test invMod (x/x=1)" $ mapM_
-        (\ x -> x / x `shouldBe` one) (units w)
-      it "test invMod (x/x*x=x)" $ mapM_
-        (\ x -> x / x * x `shouldBe` x) (units w)
+  describe "Projekt.Core.FiniteFields @w" $ do
+    it "test for neutral element" $ mapM_
+      (\ x -> x * one `shouldBe` x) (elems w)
+    it "x/0 throws exception" $ do
+      evaluate (one / FFElem (P[]) wMipo) `shouldThrow` anyException
+      evaluate (w / FFElem (P[]) wMipo) `shouldThrow` anyException
+    it "0/0 throws exception" $
+      evaluate (FFElem (P[]) wMipo / FFElem (P[]) wMipo) `shouldThrow` anyException
+    it "test invMod (x/x=1)" $ mapM_
+      (\ x -> x / x `shouldBe` one) (units w)
+    it "test invMod (x/x*x=x)" $ mapM_
+      (\ x -> x / x * x `shouldBe` x) (units w)
