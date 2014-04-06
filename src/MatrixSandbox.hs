@@ -1,13 +1,13 @@
 --------------------------------------------------------------------------------
 -- |
--- Module      : Sandbox
+-- Module      : MatrixSandbox
 -- Note        : Beispiele und Platz zum Spielen und Probieren
 --
 --
 --
 --------------------------------------------------------------------------------
 
-module Sandbox where
+module MatrixSandbox where
 import Projekt.Core hiding (examplePoly, examplePoly')
 import Projekt.Algorithmen
 import Projekt.Core.Matrix
