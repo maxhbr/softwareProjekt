@@ -53,10 +53,10 @@ subroutine l = do
   it "test eekP" $
     mapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
           zip (take testSize l) (drop testSize l)
-  it "test eekP is equv to ggtP" $
+  it "test eekP is equiv to ggtP" $
     mapM_ (\ (x, y) -> fstOf3 (eekP x y) `shouldBe` ggTP x y) $
           zip (take testSize l) (reverse l)
-      where fstOf3 (a,_,_) = a
+      where fstOf3 (a,_,_) = a -- TODO: Bessere funktion?
 
 main :: IO ()
 main = do
