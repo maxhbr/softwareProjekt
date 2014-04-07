@@ -34,28 +34,29 @@ exmpPolyInt' = aggP $ P[(8,5),(9,4),(3,2),(0,5)]
 exmpPolyMod = aggP $ P[(10,5::Z101),(10,4::Z101),(3,2::Z101),(0,5::Z101)]
 exmpPolyMod' = aggP $ P[(8,5::Z101),(9,4::Z101),(3,2::Z101),(0,5::Z101)]
 
-unEekP (d,s,t) a b = d == s*a + t*b
-unDivP (q,r) a b = a == q * b + r
-
 --------------------------------------------------------------------------------
 testSize = 10
 
+unEekP (d,s,t) a b = d == s*a + t*b
+unDivP (q,r) a b = a == q * b + r
+
 subroutine l = do
-  it "test divP (x*1=x)" $ mapM_
-    (\ x -> multP x (P[(0,1)]) == x `shouldBe` True)
-    l
-  it "test divP (x/x=1)" $ mapM_
-    (\ x -> divP x x == (P[(0,1)], P[]) `shouldBe` True)
-    l
-  it "test divP generally" $ mapM_
-    (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
-    zip (take testSize l) (drop testSize l)
-  it "x/0 throws exception" $ mapM_
-    (\x -> evaluate (divP x (P[])) `shouldThrow` anyException)
-    l
-  it "test eekP" $ mapM_
-    (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
-    zip (take testSize l) (drop testSize l)
+  it "test divP (x*1=x)" $
+    mapM_ (\ x -> multP x (P[(0,1)]) `shouldBe` x) l
+  it "test divP (x/x=1)" $
+    mapM_ (\ x -> divP x x `shouldBe` (P[(0,1)], P[])) l
+  it "test divP generally" $
+    mapM_ (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
+          zip (take testSize l) (drop testSize l)
+  it "x/0 throws exception" $
+    mapM_ (\x -> evaluate (divP x (P[])) `shouldThrow` anyException) l
+  it "test eekP" $
+    mapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
+          zip (take testSize l) (drop testSize l)
+  it "test eekP is equv to ggtP" $
+    mapM_ (\ (x, y) -> fstOf3 (eekP x y) `shouldBe` ggTP x y) $
+          zip (take testSize l) (reverse l)
+      where fstOf3 (a,_,_) = a
 
 main :: IO ()
 main = do
@@ -66,5 +67,5 @@ main = do
   hspec $ do
     describe "Projekt.Core.Polynomials @Z101" $ subroutine list
     describe "Projekt.Core.Polynomials @u"    $ subroutine uList
-    describe "Projekt.Core.Polynomials @v"    $ subroutine vList
+    --describe "Projekt.Core.Polynomials @v"    $ subroutine vList
     describe "Projekt.Core.Polynomials @w"    $ subroutine wList
