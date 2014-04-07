@@ -84,7 +84,31 @@ vElemsTestMult i j = renderRawTex
   ++ showTex (elems v!!i * elems v!!j))
 
 --------------------------------------------------------------------------------
-subroutine a = do 
+--  Char 3
+{- Irred vom grad 3 öber Z3:
+ - x³ + 2x + 1 
+ - x³ + 2x + 2                  <- ausgewählt
+ - x³ + x² + 2 
+ - x³ + x² + x + 2 
+ - x³ + x² + 2x + 1 
+ - x³ + 2x² + 1 
+ - x³ + 2x² + x + 1 
+ - x³ + 2x² + 2x + 2
+ -}
+aMipo = P[(3,1::Z3),(1,2::Z3),(0,2::Z3)]
+a = FFElem (P[(1,1::Z3)]) aMipo
+
+--------------------------------------------------------------------------------
+subroutine a aMipo = do 
+  it "test for neutral element" $ mapM_
+    (\ x -> x * one `shouldBe` x) (elems a)
+  it "x/0 throws exception" $ do
+    evaluate (one / FFElem (P[]) aMipo) `shouldThrow` anyException
+    evaluate (a / FFElem (P[]) aMipo) `shouldThrow` anyException
+  it "0/0 throws exception" $
+    evaluate (FFElem (P[]) aMipo / FFElem (P[]) aMipo) `shouldThrow` anyException
+  it "1^{-1} == 1" $
+    recip one + FFElem (P []) aMipo `shouldBe` one
   it "test (x-x=0)" $ mapM_
     (\ x -> x - x `shouldBe` zero) (elems a)
   it "test (x+x=2*x)" $ mapM_
@@ -101,39 +125,18 @@ allUnique xs = not $ or [allUnique' (reverse $ take i xs) | i <- [2..(length xs 
 
 main :: IO ()
 main = hspec $ do
-  describe "Projekt.Core.FiniteFields @u" $ do
-    it "test for neutral element" $ mapM_
-      (\ x -> x * one `shouldBe` x) (elems u)
-    it "x/0 throws exception" $ do
-      evaluate (one / FFElem (P[]) uMipo) `shouldThrow` anyException
-      evaluate (u / FFElem (P[]) uMipo) `shouldThrow` anyException
-    it "0/0 throws exception" $
-      evaluate (FFElem (P[]) uMipo / FFElem (P[]) uMipo) `shouldThrow` anyException
-    it "1^{-1} == 1" $
-      recip one + FFElem (P []) uMipo `shouldBe` one
-    subroutine u
-    it "u^i erzeugt alle Elemente" $ allUnique [u^i | i <- [0..3]]
+  describe "Projekt.Core.FiniteFields @u: E2 over Z2" $ do
+    subroutine u uMipo
+    --it "u^i erzeugt alle Elemente" $ allUnique [u^i | i <- [0..3]]
 
-  describe "Projekt.Core.FiniteFields @v" $ do
-    it "test for neutral element" $ mapM_
-      (\ x -> x * one `shouldBe` x) (elems v)
-    it "x/0 throws exception" $ do
-      evaluate (one / FFElem (P[]) vMipo) `shouldThrow` anyException
-      evaluate (v / FFElem (P[]) vMipo) `shouldThrow` anyException
-    it "0/0 throws exception" $
-      evaluate (FFElem (P[]) vMipo / FFElem (P[]) vMipo) `shouldThrow` anyException
-    it "1^{-1} == 1" $
-      recip one + FFElem (P[]) vMipo `shouldBe` one
-    subroutine v
-    it "v^i erzeugt alle Elemente" $ allUnique [v^i | i <- [0..15]]
+  describe "Projekt.Core.FiniteFields @v: E2 over E2 over Z2" $ do
+    subroutine v vMipo
+    --it "v^i erzeugt alle Elemente" $ allUnique [v^i | i <- [0..15]]
 
-  describe "Projekt.Core.FiniteFields @w" $ do
-    it "test for neutral element" $ mapM_
-      (\ x -> x * one `shouldBe` x) (elems w)
-    it "x/0 throws exception" $ do
-      evaluate (one / FFElem (P[]) wMipo) `shouldThrow` anyException
-      evaluate (w / FFElem (P[]) wMipo) `shouldThrow` anyException
-    it "0/0 throws exception" $
-      evaluate (FFElem (P[]) wMipo / FFElem (P[]) wMipo) `shouldThrow` anyException
-    subroutine w
-    it "w^i erzeugt alle Elemente" $ allUnique [w^i | i <- [0..15]]
+  describe "Projekt.Core.FiniteFields @w: E4 over Z2" $ do
+    subroutine w wMipo
+    --it "w^i erzeugt alle Elemente" $ allUnique [w^i | i <- [0..15]]
+
+  describe "Projekt.Core.FiniteFields @a: E3 over Z3" $ do
+    subroutine a aMipo
+    --it "a^i erzeugt alle Elemente" $ allUnique [a^i | i <- [0..26]]
