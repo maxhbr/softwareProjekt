@@ -40,7 +40,7 @@ unDivP (q,r) a b = a == q * b + r
 --------------------------------------------------------------------------------
 testSize = 10
 
-subroutine l= do
+subroutine l = do
   it "test divP (x*1=x)" $ mapM_
     (\ x -> multP x (P[(0,1)]) == x `shouldBe` True)
     l
@@ -48,20 +48,20 @@ subroutine l= do
     (\ x -> divP x x == (P[(0,1)], P[]) `shouldBe` True)
     l
   it "test divP generally" $ mapM_
-    (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True)
-    (zip (take testSize l) (drop testSize l))
+    (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
+    zip (take testSize l) (drop testSize l)
   it "test eekP" $ mapM_
-    (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True)
-    (zip (take testSize l) (drop testSize l))
+    (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
+    zip (take testSize l) (drop testSize l)
 
 main :: IO ()
 main = do
-  list <- rndSelect (getAllP (elems undefined ::[Z5]) 4) (2*testSize)
-  uList <- rndSelect (getAllP (elems u) 4) (2*testSize)
-  vList <- rndSelect (getAllP (elems v) 2) (2*testSize)
-  wList <- rndSelect (getAllP (elems w) 4) (2*testSize)
+  list  <- rndSelect (getAllP (elems undefined ::[Z5]) 4) (2*testSize)
+  uList <- rndSelect (getAllP (elems u) 4)               (2*testSize)
+  vList <- rndSelect (getAllP (elems v) 2)               (2*testSize)
+  wList <- rndSelect (getAllP (elems w) 4)               (2*testSize)
   hspec $ do
     describe "Projekt.Core.Polynomials @Z101" $ subroutine list
-    describe "Projekt.Core.Polynomials @u" $ subroutine uList
-    describe "Projekt.Core.Polynomials @v" $ subroutine vList
-    describe "Projekt.Core.Polynomials @w" $ subroutine wList
+    describe "Projekt.Core.Polynomials @u"    $ subroutine uList
+    describe "Projekt.Core.Polynomials @v"    $ subroutine vList
+    describe "Projekt.Core.Polynomials @w"    $ subroutine wList
