@@ -48,7 +48,7 @@ instance (ShowTex a,Eq a) => ShowTex (FFElem a) where
     "\\left(\\underline{0}_{mod~" ++ showTex p ++ "}\\right)"
   showTex (FFElem f p)      =
     --"\\left(\\underline{" ++ showTex f ++ "}_{mod~" ++ showTex p ++"}\\right)"
-    "\\frac{" ++ showTex f ++ "}{mod~" ++ showTex p ++"}"
+    "\\left(\\underline{" ++ showTex f ++ "}_{mod~" ++ showTex p ++"}\\right)"
 
 
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where

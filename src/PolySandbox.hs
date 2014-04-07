@@ -10,10 +10,17 @@
 module PolySandbox where
 import Projekt.Core
 
-import FFSandbox
+import FFSandbox (u,v,w)
 
 import Test.Hspec
 import Control.Exception (evaluate)
+
+import System.Random
+import Control.Monad (replicateM)
+
+rndSelect xs n = do
+    gen <- getStdGen
+    return $ take n [ xs !! x | x <- randomRs (0, length xs - 1) gen]
 
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen
@@ -31,20 +38,25 @@ unEekP (d,s,t) a b = d == s*a + t*b
 
 --------------------------------------------------------------------------------
 main :: IO ()
-main = hspec $
+main = do
+  let testSize = 10
+  list <- rndSelect (getAllP (elems undefined ::[Z5]) 4) (2*testSize)
+  uList <- rndSelect (getAllP (elems u) 4) (2*testSize)
+  vList <- rndSelect (getAllP (elems v) 4) (2*testSize)
+  wList <- rndSelect (getAllP (elems w) 4) (2*testSize)
+  hspec $
     describe "Projekt.Core.Polynomials" $ do
       it "test eekP over Z101" $ mapM_
         (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True)
-        (zip (reverse $ getAllP (elems undefined ::[Z5]) 5) $
-             getAllP (elems undefined ::[Z5]) 3)
+        (zip (take testSize list) (drop testSize list))
       it "test eekP over u" $ mapM_
         (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True)
-        (zip (reverse $ getAllP (elems u) 4) $ getAllP (elems u) 3)
+        (zip (take testSize uList) (drop testSize uList))
       {-
       it "test eekP over v" $ mapM_
         (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True)
-        (take 3 (zip (reverse $ getAllP (elems v) 4) $ (getAllP (elems v) 2))
+        (zip (take testSize vList) (drop testSize vList))
        -}
       it "test eekP over w" $ mapM_
         (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True)
-        (zip (reverse $ getAllP (elems w) 4) $ getAllP (elems w) 2)
+        (zip (take testSize wList) (drop testSize wList))

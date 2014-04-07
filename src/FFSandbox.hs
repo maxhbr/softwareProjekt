@@ -84,6 +84,21 @@ vElemsTestMult i j = renderRawTex
   ++ showTex (elems v!!i * elems v!!j))
 
 --------------------------------------------------------------------------------
+subroutine a = do 
+  it "test (x-x=0)" $ mapM_
+    (\ x -> x - x `shouldBe` zero) (elems a)
+  it "test (x+x=2*x)" $ mapM_
+    (\ x -> x + x `shouldBe` x * 2) (elems a)
+  it "test invMod (x/x=1)" $ mapM_
+    (\ x -> x / x `shouldBe` one) (units a)
+  it "test invMod (x/x*x=x)" $ mapM_
+    (\ x -> x / x * x `shouldBe` x) (units a)
+  it "test invMod (x*x/x=x)" $ mapM_
+    (\ x -> x * x / x `shouldBe` x) (units a)
+
+allUnique xs = not $ or [allUnique' (reverse $ take i xs) | i <- [2..(length xs - 1)]]
+  where allUnique' (x:xs) = or [x == y | y <- xs]
+
 main :: IO ()
 main = hspec $ do
   describe "Projekt.Core.FiniteFields @u" $ do
@@ -96,12 +111,8 @@ main = hspec $ do
       evaluate (FFElem (P[]) uMipo / FFElem (P[]) uMipo) `shouldThrow` anyException
     it "1^{-1} == 1" $
       recip one + FFElem (P []) uMipo `shouldBe` one
-    it "test invMod (x/x=1)" $ mapM_
-      (\ x -> x / x `shouldBe` one) (units u)
-    it "test invMod (x/x*x=x)" $ mapM_
-      (\ x -> x / x * x `shouldBe` x) (units u)
-    it "test invMod (x*x/x=x)" $ mapM_
-      (\ x -> x * x / x `shouldBe` x) (units u)
+    subroutine u
+    it "u^i erzeugt alle Elemente" $ allUnique [u^i | i <- [0..3]]
 
   describe "Projekt.Core.FiniteFields @v" $ do
     it "test for neutral element" $ mapM_
@@ -113,12 +124,8 @@ main = hspec $ do
       evaluate (FFElem (P[]) vMipo / FFElem (P[]) vMipo) `shouldThrow` anyException
     it "1^{-1} == 1" $
       recip one + FFElem (P[]) vMipo `shouldBe` one
-    it "test invMod (x/x=1)" $ mapM_
-      (\ x -> x / x `shouldBe` one) (units v)
-    it "test invMod (x/x*x=x)" $ mapM_
-      (\ x -> x / x * x `shouldBe` x) (units v)
-    it "test invMod (x*x/x=x)" $ mapM_
-      (\ x -> x * x / x `shouldBe` x) (units v)
+    subroutine v
+    it "v^i erzeugt alle Elemente" $ allUnique [v^i | i <- [0..15]]
 
   describe "Projekt.Core.FiniteFields @w" $ do
     it "test for neutral element" $ mapM_
@@ -128,7 +135,5 @@ main = hspec $ do
       evaluate (w / FFElem (P[]) wMipo) `shouldThrow` anyException
     it "0/0 throws exception" $
       evaluate (FFElem (P[]) wMipo / FFElem (P[]) wMipo) `shouldThrow` anyException
-    it "test invMod (x/x=1)" $ mapM_
-      (\ x -> x / x `shouldBe` one) (units w)
-    it "test invMod (x/x*x=x)" $ mapM_
-      (\ x -> x / x * x `shouldBe` x) (units w)
+    subroutine w
+    it "w^i erzeugt alle Elemente" $ allUnique [w^i | i <- [0..15]]
