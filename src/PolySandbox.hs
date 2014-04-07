@@ -25,14 +25,14 @@ rndSelect xs n = do
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen
 exmpPolyInt :: Polynom Integer
-exmpPolyInt = aggP $ P [(10,5),(10,4),(3,2),(0,5)]
+exmpPolyInt = aggP $ P[(10,5),(10,4),(3,2),(0,5)]
 
 exmpPolyInt' :: Polynom Integer
-exmpPolyInt' = aggP $ P [(8,5),(9,4),(3,2),(0,5)]
+exmpPolyInt' = aggP $ P[(8,5),(9,4),(3,2),(0,5)]
 
 --------------------------------------------------------------------------------
-exmpPolyMod = aggP $ P [(10,5::Z101),(10,4::Z101),(3,2::Z101),(0,5::Z101)]
-exmpPolyMod' = aggP $ P [(8,5::Z101),(9,4::Z101),(3,2::Z101),(0,5::Z101)]
+exmpPolyMod = aggP $ P[(10,5::Z101),(10,4::Z101),(3,2::Z101),(0,5::Z101)]
+exmpPolyMod' = aggP $ P[(8,5::Z101),(9,4::Z101),(3,2::Z101),(0,5::Z101)]
 
 unEekP (d,s,t) a b = d == s*a + t*b
 unDivP (q,r) a b = a == q * b + r
@@ -50,6 +50,9 @@ subroutine l = do
   it "test divP generally" $ mapM_
     (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
     zip (take testSize l) (drop testSize l)
+  it "x/0 throws exception" $ mapM_
+    (\x -> evaluate (divP x (P[])) `shouldThrow` anyException)
+    l
   it "test eekP" $ mapM_
     (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
     zip (take testSize l) (drop testSize l)
