@@ -42,7 +42,7 @@ main = do
   let testSize = 10
   list <- rndSelect (getAllP (elems undefined ::[Z5]) 4) (2*testSize)
   uList <- rndSelect (getAllP (elems u) 4) (2*testSize)
-  vList <- rndSelect (getAllP (elems v) 4) (2*testSize)
+  vList <- rndSelect (getAllP (elems v) 3) (2*testSize)
   wList <- rndSelect (getAllP (elems w) 4) (2*testSize)
   hspec $
     describe "Projekt.Core.Polynomials" $ do
@@ -52,11 +52,9 @@ main = do
       it "test eekP over u" $ mapM_
         (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True)
         (zip (take testSize uList) (drop testSize uList))
-      {-
       it "test eekP over v" $ mapM_
         (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True)
         (zip (take testSize vList) (drop testSize vList))
-       -}
       it "test eekP over w" $ mapM_
         (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True)
         (zip (take testSize wList) (drop testSize wList))
