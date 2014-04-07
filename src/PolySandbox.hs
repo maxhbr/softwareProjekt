@@ -20,7 +20,7 @@ import Control.Monad (replicateM)
 
 rndSelect xs n = do
     gen <- getStdGen
-    return $ take n [ xs !! x | x <- randomRs (0, length xs - 1) gen]
+    return $ take n [xs!!x | x <- randomRs (0, length xs - 1) gen]
 
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen
