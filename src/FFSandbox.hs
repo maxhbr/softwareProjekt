@@ -12,6 +12,7 @@ module FFSandbox
   , uMipo, u
   , vMipo, v
   , wMipo, w
+  , lMipo, l
   , main
   )where
 import Projekt.Core
@@ -95,8 +96,8 @@ vElemsTestMult i j = renderRawTex
  - x³ + 2x² + x + 1 
  - x³ + 2x² + 2x + 2
  -}
-aMipo = P[(3,1::Z3),(1,2::Z3),(0,2::Z3)]
-a = FFElem (P[(1,1::Z3)]) aMipo
+lMipo = P[(3,1::Z3),(1,2::Z3),(0,2::Z3)]
+l = FFElem (P[(1,1::Z3)]) lMipo
 
 --------------------------------------------------------------------------------
 subroutine a aMipo = do 
@@ -137,6 +138,6 @@ main = hspec $ do
     subroutine w wMipo
     --it "w^i erzeugt alle Elemente" $ allUnique [w^i | i <- [0..15]]
 
-  describe "Projekt.Core.FiniteFields @a: E3 over Z3" $ do
-    subroutine a aMipo
+  describe "Projekt.Core.FiniteFields @l: E3 over Z3" $ do
+    subroutine l lMipo
     --it "a^i erzeugt alle Elemente" $ allUnique [a^i | i <- [0..26]]
