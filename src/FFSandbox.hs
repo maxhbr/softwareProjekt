@@ -122,14 +122,14 @@ subroutine a aMipo = do
     and [allUnique [x + y | y <- elems a] | x <- elems a]
   it "* is bijektiv" $ 
     and [allUnique [x * y | y <- elems a] | x <- units a]
-  it "test invMod (full)" $ mapM_
+  it "test recip (full)" $ mapM_
     (\ x -> recip x `shouldBe` head [y | y <- units a, x * y == one]) (units a)
   {-
-  it "test invMod (x/x=1)" $ mapM_
+  it "test recip (x/x=1)" $ mapM_
     (\ x -> x / x `shouldBe` one) (units a)
-  it "test invMod (x/x*x=x)" $ mapM_
+  it "test recip (x/x*x=x)" $ mapM_
     (\ x -> x / x * x `shouldBe` x) (units a)
-  it "test invMod (x*x/x=x)" $ mapM_
+  it "test recip (x*x/x=x)" $ mapM_
     (\ x -> x * x / x `shouldBe` x) (units a)
    -}
 
