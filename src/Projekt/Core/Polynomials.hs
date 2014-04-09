@@ -123,7 +123,7 @@ degP = maximum . getDegrees
 --  Unär:
 --
 
-moniP :: Fractional a => Polynom a -> Polynom a
+moniP :: (Eq a, Fractional a) => Polynom a -> Polynom a
 moniP f = f * P[(0,recip $ getLeadingCoeffP f)]
 
 -- |Gibt zu einem Polynom das Negative Polynom zurrück.
