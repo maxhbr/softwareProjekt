@@ -12,6 +12,7 @@ module FFSandbox
   , e2f2Mipo, e2f2
   , e2e2f2Mipo, e2e2f2
   , e4f2Mipo, e4f2
+  , e2f3Mipo, e2f3
   , e3f3Mipo, e3f3
   , main
   )where
@@ -87,6 +88,13 @@ vElemsTestMult i j = renderRawTex
 --------------------------------------------------------------------------------
 --  Char 3
 {- Irred vom grad 3 öber F3:
+ - x² + 1
+ - x² + x + 2
+ - x² + 2x + 2
+ -}
+e2f3Mipo = P[(2,1::F3),(0,1::F3)]
+e2f3 = FFElem (P[(1,1::F3)]) e2f3Mipo
+{- Irred vom grad 3 öber F3:
  - x³ + 2x + 1
  - x³ + 2x + 2                  <- ausgewählt
  - x³ + x² + 2
@@ -137,16 +145,12 @@ main :: IO ()
 main = hspec $ do
   describe "Projekt.Core.FiniteFields @e2f2: E2 over F2" $
     subroutine e2f2 e2f2Mipo
-    --it "e2f2^i erzeugt alle Elemente" $ allUnique [e2f2^i | i <- [0..3]]
-
   describe "Projekt.Core.FiniteFields @e2e2f2: E2 over E2 over F2" $
     subroutine e2e2f2 e2e2f2Mipo
-    --it "e2e2f2^i erzeugt alle Elemente" $ allUnique [e2e2f2^i | i <- [0..15]]
-
   describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $
     subroutine e4f2 e4f2Mipo
-    --it "e4f2^i erzeugt alle Elemente" $ allUnique [e4f2^i | i <- [0..15]]
 
+  describe "Projekt.Core.FiniteFields @e2f3: E2 over F3" $
+    subroutine e2f3 e2f3Mipo
   describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $
     subroutine e3f3 e3f3Mipo
-    --it "a^i erzeugt alle Elemente" $ allUnique [a^i | i <- [0..26]]

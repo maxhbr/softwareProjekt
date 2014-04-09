@@ -37,8 +37,8 @@ exmpPolyMod' = aggP $ P[(8,5::F101),(9,4::F101),(3,2::F101),(0,5::F101)]
 --------------------------------------------------------------------------------
 testSize = 10
 
-unEekP (d,s,t) a b = d == s*a + t*b
 unDivP (q,r) a b = a == q * b + r
+unEekP (d,s,t) a b = d == s*a + t*b
 
 subroutine e3f3 = do
   it "test divP (x*1=x)" $
