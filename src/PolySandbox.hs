@@ -10,7 +10,7 @@
 module PolySandbox where
 import Projekt.Core
 
-import FFSandbox (u,v,w)
+import FFSandbox (e2f2,e2e2f2,e4f2)
 
 import Test.Hspec
 import Control.Exception (evaluate)
@@ -31,8 +31,8 @@ exmpPolyInt' :: Polynom Integer
 exmpPolyInt' = aggP $ P[(8,5),(9,4),(3,2),(0,5)]
 
 --------------------------------------------------------------------------------
-exmpPolyMod = aggP $ P[(10,5::Z101),(10,4::Z101),(3,2::Z101),(0,5::Z101)]
-exmpPolyMod' = aggP $ P[(8,5::Z101),(9,4::Z101),(3,2::Z101),(0,5::Z101)]
+exmpPolyMod = aggP $ P[(10,5::F101),(10,4::F101),(3,2::F101),(0,5::F101)]
+exmpPolyMod' = aggP $ P[(8,5::F101),(9,4::F101),(3,2::F101),(0,5::F101)]
 
 --------------------------------------------------------------------------------
 testSize = 10
@@ -40,32 +40,32 @@ testSize = 10
 unEekP (d,s,t) a b = d == s*a + t*b
 unDivP (q,r) a b = a == q * b + r
 
-subroutine l = do
+subroutine e3f3 = do
   it "test divP (x*1=x)" $
-    mapM_ (\ x -> multP x (P[(0,1)]) `shouldBe` x) l
+    mapM_ (\ x -> multP x (P[(0,1)]) `shouldBe` x) e3f3
   it "test divP (x/x=1)" $
-    mapM_ (\ x -> divP x x `shouldBe` (P[(0,1)], P[])) l
+    mapM_ (\ x -> divP x x `shouldBe` (P[(0,1)], P[])) e3f3
   it "test divP generally" $
     mapM_ (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
-          zip (take testSize l) (drop testSize l)
+          zip (take testSize e3f3) (drop testSize e3f3)
   it "x/0 throws exception" $
-    mapM_ (\x -> evaluate (divP x (P[])) `shouldThrow` anyException) l
+    mapM_ (\x -> evaluate (divP x (P[])) `shouldThrow` anyException) e3f3
   it "test eekP" $
     mapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
-          zip (take testSize l) (drop testSize l)
+          zip (take testSize e3f3) (drop testSize e3f3)
   it "test eekP is equiv to ggtP" $
     mapM_ (\ (x, y) -> fstOf3 (eekP x y) `shouldBe` ggTP x y) $
-          zip (take testSize l) (reverse l)
+          zip (take testSize e3f3) (reverse e3f3)
       where fstOf3 (a,_,_) = a -- TODO: Bessere funktion?
 
 main :: IO ()
 main = do
-  list  <- rndSelect (getAllP (elems undefined ::[Z5]) 4) (2*testSize)
-  uList <- rndSelect (getAllP (elems u) 4)               (2*testSize)
-  vList <- rndSelect (getAllP (elems v) 2)               (2*testSize)
-  wList <- rndSelect (getAllP (elems w) 4)               (2*testSize)
+  list  <- rndSelect (getAllP (elems undefined ::[F5]) 4) (2*testSize)
+  uList <- rndSelect (getAllP (elems e2f2) 4)            (2*testSize)
+  vList <- rndSelect (getAllP (elems e2e2f2) 2)          (2*testSize)
+  wList <- rndSelect (getAllP (elems e4f2) 4)            (2*testSize)
   hspec $ do
-    describe "Projekt.Core.Polynomials @Z101" $ subroutine list
-    describe "Projekt.Core.Polynomials @u"    $ subroutine uList
-    --describe "Projekt.Core.Polynomials @v"    $ subroutine vList
-    describe "Projekt.Core.Polynomials @w"    $ subroutine wList
+    describe "Projekt.Core.Polynomials @F101" $ subroutine list
+    describe "Projekt.Core.Polynomials @e2f2"    $ subroutine uList
+    --describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList
+    describe "Projekt.Core.Polynomials @e4f2"    $ subroutine wList

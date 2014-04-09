@@ -17,7 +17,7 @@ module Projekt.Core.PrimeFields
   , Mod
   , modulus
   -- Beispiele
-  , Z2 , Z3 , Z5 , Z7, Z101
+  , F2 , F3 , F5 , F7, F101
   ) where
 import GHC.Err (divZeroError)
 --import Data.Bits (shift)
@@ -163,13 +163,13 @@ invMod x = divMod x 1
 --------------------------------------------------------------------------------
 --  Examples
 
-type Z2 = Mod Two
-type Z3 = Mod Three
-type Z5 = Mod Five
-type Z7 = Mod Seven
+type F2 = Mod Two
+type F3 = Mod Three
+type F5 = Mod Five
+type F7 = Mod Seven
 
 -- Größere Primzahlen
 data Peano101
 instance Numeral Peano101 where numValue x = 101
 instance Show Peano101    where show       = show
-type Z101 = Mod Peano101
+type F101 = Mod Peano101

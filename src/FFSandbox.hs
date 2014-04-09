@@ -8,11 +8,11 @@
 --------------------------------------------------------------------------------
 
 module FFSandbox
-  ( Z2
-  , uMipo, u
-  , vMipo, v
-  , wMipo, w
-  , lMipo, l
+  ( F2
+  , e2f2Mipo, e2f2
+  , e2e2f2Mipo, e2e2f2
+  , e4f2Mipo, e4f2
+  , e3f3Mipo, e3f3
   , main
   )where
 import Projekt.Core
@@ -26,13 +26,13 @@ pp =  mapM_ print
 ppTex :: (ShowTex a) => [a] -> IO()
 ppTex = mapM_ (putStrLn . showTex)
 
-{- F4=E2 als Grad 2 Erweiterung von Z2
+{- F4=E2 als Grad 2 Erweiterung von F2
  -
- - Irreduzibles Polynom von Grad 2 über Z2:
+ - Irreduzibles Polynom von Grad 2 über F2:
  -           x²+x+1
- - Mit einer Nullstelle: u
+ - Mit einer Nullstelle: u = e2f2
  -
- - Also ist F4=Z2(u)
+ - Also ist F4=F2(u)
  -
  - Tabellen:
  -            +  |  0  |  1  |  u  | u+1             *  |  1  |  u  | u+1
@@ -45,48 +45,48 @@ ppTex = mapM_ (putStrLn . showTex)
  -          -----+-----+-----+-----+-----
  -           u+1 | u+1 |  u  |  1  |  0
  -}
-uMipo = P[(2,1::Z2),(1,1::Z2),(0,1::Z2)]
-u = FFElem (P[(1,1::Z2)]) uMipo
+e2f2Mipo = P[(2,1::F2),(1,1::F2),(0,1::F2)]
+e2f2 = FFElem (P[(1,1::F2)]) e2f2Mipo
 
 {- F16=E2(E2)
- - als Grad 2 Erweiterung von E2 durch MPol x²+x+u
- - Mit einer Nullstelle: v
+ - als Grad 2 Erweiterung von E2 durch MPol x²+x+e2f2
+ - Mit einer Nullstelle: e2e2f2
  -}
-vMipo = P[(2,one),(1,one),(0,u)]
-v = FFElem (P[(1,one)]) vMipo
+e2e2f2Mipo = P[(2,one),(1,one),(0,e2f2)]
+e2e2f2 = FFElem (P[(1,one)]) e2e2f2Mipo
 
 {- F16=E4
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
- - Mit einer Nullstelle: w
+ - Mit einer Nullstelle: e4f2
  -}
-wMipo = P[(4,1::Z2),(1,1::Z2),(0,1::Z2)]
-w = FFElem (P[(1,1::Z2)]) wMipo
+e4f2Mipo = P[(4,1::F2),(1,1::F2),(0,1::F2)]
+e4f2 = FFElem (P[(1,1::F2)]) e4f2Mipo
 
 --------------------------------------------------------------------------------
 -- grundlegende Rechnungen rendern
 uElemsTestAdd i j = renderRawTex
-  (showTex (elems u!!i) ++ " \\\\\\qquad+ "
-  ++ showTex (elems u!!j) ++ " \\\\\\qquad\\qquad= "
-  ++ showTex (elems u!!i + elems u!!j))
+  (showTex (elems e2f2!!i) ++ " \\\\\\qquad+ "
+  ++ showTex (elems e2f2!!j) ++ " \\\\\\qquad\\qquad= "
+  ++ showTex (elems e2f2!!i + elems e2f2!!j))
 
 uElemsTestMult i j = renderRawTex
-  (showTex (elems u!!i) ++ " \\\\\\qquad\\cdot "
-  ++ showTex (elems u!!j) ++ " \\\\\\qquad\\qquad= "
-  ++ showTex (elems u!!i * elems u!!j))
+  (showTex (elems e2f2!!i) ++ " \\\\\\qquad\\cdot "
+  ++ showTex (elems e2f2!!j) ++ " \\\\\\qquad\\qquad= "
+  ++ showTex (elems e2f2!!i * elems e2f2!!j))
 
 vElemsTestAdd i j = renderRawTex
-  (showTex (elems v!!i) ++ " \\\\\\qquad+ "
-  ++ showTex (elems v!!j) ++ " \\\\\\qquad\\qquad= "
-  ++ showTex (elems v!!i + elems v!!j))
+  (showTex (elems e2e2f2!!i) ++ " \\\\\\qquad+ "
+  ++ showTex (elems e2e2f2!!j) ++ " \\\\\\qquad\\qquad= "
+  ++ showTex (elems e2e2f2!!i + elems e2e2f2!!j))
 
 vElemsTestMult i j = renderRawTex
-  (showTex (elems v!!i) ++ " \\\\\\qquad\\cdot "
-  ++ showTex (elems v!!j) ++ " \\\\\\qquad\\qquad= "
-  ++ showTex (elems v!!i * elems v!!j))
+  (showTex (elems e2e2f2!!i) ++ " \\\\\\qquad\\cdot "
+  ++ showTex (elems e2e2f2!!j) ++ " \\\\\\qquad\\qquad= "
+  ++ showTex (elems e2e2f2!!i * elems e2e2f2!!j))
 
 --------------------------------------------------------------------------------
 --  Char 3
-{- Irred vom grad 3 öber Z3:
+{- Irred vom grad 3 öber F3:
  - x³ + 2x + 1
  - x³ + 2x + 2                  <- ausgewählt
  - x³ + x² + 2
@@ -96,8 +96,8 @@ vElemsTestMult i j = renderRawTex
  - x³ + 2x² + x + 1
  - x³ + 2x² + 2x + 2
  -}
-lMipo = P[(3,1::Z3),(1,2::Z3),(0,2::Z3)]
-l = FFElem (P[(1,1::Z3)]) lMipo
+e3f3Mipo = P[(3,1::F3),(1,2::F3),(0,2::F3)]
+e3f3 = FFElem (P[(1,1::F3)]) e3f3Mipo
 
 --------------------------------------------------------------------------------
 allUnique xs = not $
@@ -135,18 +135,18 @@ subroutine a aMipo = do
 
 main :: IO ()
 main = hspec $ do
-  describe "Projekt.Core.FiniteFields @u: E2 over Z2" $
-    subroutine u uMipo
-    --it "u^i erzeugt alle Elemente" $ allUnique [u^i | i <- [0..3]]
+  describe "Projekt.Core.FiniteFields @e2f2: E2 over F2" $
+    subroutine e2f2 e2f2Mipo
+    --it "e2f2^i erzeugt alle Elemente" $ allUnique [e2f2^i | i <- [0..3]]
 
-  describe "Projekt.Core.FiniteFields @v: E2 over E2 over Z2" $
-    subroutine v vMipo
-    --it "v^i erzeugt alle Elemente" $ allUnique [v^i | i <- [0..15]]
+  describe "Projekt.Core.FiniteFields @e2e2f2: E2 over E2 over F2" $
+    subroutine e2e2f2 e2e2f2Mipo
+    --it "e2e2f2^i erzeugt alle Elemente" $ allUnique [e2e2f2^i | i <- [0..15]]
 
-  describe "Projekt.Core.FiniteFields @w: E4 over Z2" $
-    subroutine w wMipo
-    --it "w^i erzeugt alle Elemente" $ allUnique [w^i | i <- [0..15]]
+  describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $
+    subroutine e4f2 e4f2Mipo
+    --it "e4f2^i erzeugt alle Elemente" $ allUnique [e4f2^i | i <- [0..15]]
 
-  describe "Projekt.Core.FiniteFields @l: E3 over Z3" $
-    subroutine l lMipo
+  describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $
+    subroutine e3f3 e3f3Mipo
     --it "a^i erzeugt alle Elemente" $ allUnique [a^i | i <- [0..26]]
