@@ -13,14 +13,14 @@ module Projekt.Core.Polynomials
   -- Operationen auf Polynomen
   , aggP, degP
   -- unär
-  , negateP, reziprokP, deriveP
+  , moniP, negateP, reziprokP, deriveP
   -- binär
   , addP, subP, multP, divP, modByP, ggTP, eekP
   -- weiteres
   , evalP, getAllP
   ) where
 import Data.List
---import Debug.Trace
+import Debug.Trace
 
 import Projekt.Core.ShowTex
 
@@ -40,7 +40,7 @@ if' True  x _ = x
 if' False _ y = y
 
 instance (Show a,Eq a) => Show (Polynom a) where
-  show (P []) = ""
+  show (P []) = "0"
   show (P ((i,c):ms)) | null ms   = show c ++ showExp i
                       | otherwise = show c ++ showExp i ++ " + " ++ show (P ms)
     where showExp :: Integer -> String
@@ -123,6 +123,9 @@ degP = maximum . getDegrees
 --  Unär:
 --
 
+moniP :: Fractional a => Polynom a -> Polynom a
+moniP f = f * P[(0,recip $ getLeadingCoeffP f)]
+
 -- |Gibt zu einem Polynom das Negative Polynom zurrück.
 negateP :: Num a => Polynom a -> Polynom a
 negateP f = P (negateP' $ unP f)
@@ -197,9 +200,11 @@ ggTP f g | degP r == 0 = g
 
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit
 --  ggT(a,b) = d = s*a + t*b
-eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a
+eekP :: (Eq a, Fractional a, Show a) => Polynom a -> Polynom a
                                           -> (Polynom a, Polynom a, Polynom a)
-eekP f g | g == 0     = (f,P[(0,1)],P[(0,0)])
+eekP f g | g == 0     = (moniP f
+                       ,P[(0,recip $ getLeadingCoeffP f)]
+                       ,P[(0,0)])
          | otherwise = (d,t,s-t*q)
   where (q,r)   = divP f g
         (d,s,t) = eekP g r
