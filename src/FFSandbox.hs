@@ -162,7 +162,5 @@ main = hspec $ do
     subroutine e2f3 e2f3Mipo
   describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $
     subroutine e3f3 e3f3Mipo
-    {-
   describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over F3" $
     subroutine e3e3f3 e3e3f3Mipo
-     -}
