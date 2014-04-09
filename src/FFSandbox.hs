@@ -65,7 +65,7 @@ w = FFElem (P[(1,1::Z2)]) wMipo
 --------------------------------------------------------------------------------
 -- grundlegende Rechnungen rendern
 uElemsTestAdd i j = renderRawTex
-  (showTex (elems u!!i) ++ " \\\\\\qquad+ " 
+  (showTex (elems u!!i) ++ " \\\\\\qquad+ "
   ++ showTex (elems u!!j) ++ " \\\\\\qquad\\qquad= "
   ++ showTex (elems u!!i + elems u!!j))
 
@@ -87,20 +87,24 @@ vElemsTestMult i j = renderRawTex
 --------------------------------------------------------------------------------
 --  Char 3
 {- Irred vom grad 3 öber Z3:
- - x³ + 2x + 1 
+ - x³ + 2x + 1
  - x³ + 2x + 2                  <- ausgewählt
- - x³ + x² + 2 
- - x³ + x² + x + 2 
- - x³ + x² + 2x + 1 
- - x³ + 2x² + 1 
- - x³ + 2x² + x + 1 
+ - x³ + x² + 2
+ - x³ + x² + x + 2
+ - x³ + x² + 2x + 1
+ - x³ + 2x² + 1
+ - x³ + 2x² + x + 1
  - x³ + 2x² + 2x + 2
  -}
 lMipo = P[(3,1::Z3),(1,2::Z3),(0,2::Z3)]
 l = FFElem (P[(1,1::Z3)]) lMipo
 
 --------------------------------------------------------------------------------
-subroutine a aMipo = do 
+allUnique xs = not $
+  or [allUnique' (reverse $ take i xs) | i <- [2..(length xs - 1)]]
+    where allUnique' (x:xs) = or [x == y | y <- xs]
+
+subroutine a aMipo = do
   it "test for neutral element" $ mapM_
     (\ x -> x * one `shouldBe` x) (elems a)
   it "x/0 throws exception" $ do
@@ -114,30 +118,35 @@ subroutine a aMipo = do
     (\ x -> x - x `shouldBe` zero) (elems a)
   it "test (x+x=2*x)" $ mapM_
     (\ x -> x + x `shouldBe` x * 2) (elems a)
+  it "+ is bijektiv" $ 
+    and [allUnique [x + y | y <- elems a] | x <- elems a]
+  it "* is bijektiv" $ 
+    and [allUnique [x * y | y <- elems a] | x <- units a]
+  it "test invMod (full)" $ mapM_
+    (\ x -> recip x `shouldBe` head [y | y <- units a, x * y == one]) (units a)
+  {-
   it "test invMod (x/x=1)" $ mapM_
     (\ x -> x / x `shouldBe` one) (units a)
   it "test invMod (x/x*x=x)" $ mapM_
     (\ x -> x / x * x `shouldBe` x) (units a)
   it "test invMod (x*x/x=x)" $ mapM_
     (\ x -> x * x / x `shouldBe` x) (units a)
-
-allUnique xs = not $ or [allUnique' (reverse $ take i xs) | i <- [2..(length xs - 1)]]
-  where allUnique' (x:xs) = or [x == y | y <- xs]
+   -}
 
 main :: IO ()
 main = hspec $ do
-  describe "Projekt.Core.FiniteFields @u: E2 over Z2" $ do
+  describe "Projekt.Core.FiniteFields @u: E2 over Z2" $
     subroutine u uMipo
     --it "u^i erzeugt alle Elemente" $ allUnique [u^i | i <- [0..3]]
 
-  describe "Projekt.Core.FiniteFields @v: E2 over E2 over Z2" $ do
+  describe "Projekt.Core.FiniteFields @v: E2 over E2 over Z2" $
     subroutine v vMipo
     --it "v^i erzeugt alle Elemente" $ allUnique [v^i | i <- [0..15]]
 
-  describe "Projekt.Core.FiniteFields @w: E4 over Z2" $ do
+  describe "Projekt.Core.FiniteFields @w: E4 over Z2" $
     subroutine w wMipo
     --it "w^i erzeugt alle Elemente" $ allUnique [w^i | i <- [0..15]]
 
-  describe "Projekt.Core.FiniteFields @l: E3 over Z3" $ do
+  describe "Projekt.Core.FiniteFields @l: E3 over Z3" $
     subroutine l lMipo
     --it "a^i erzeugt alle Elemente" $ allUnique [a^i | i <- [0..26]]
