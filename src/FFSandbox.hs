@@ -18,8 +18,12 @@ module FFSandbox
   )where
 import Projekt.Core
 
+-- from hspec
 import Test.Hspec
 import Control.Exception (evaluate)
+
+-- from monad-parallel
+import qualified Control.Monad.Parallel as P
 
 pp :: (Show a) => [a] -> IO()
 pp =  mapM_ print
@@ -107,13 +111,23 @@ e2f3 = FFElem (P[(1,1::F3)]) e2f3Mipo
 e3f3Mipo = P[(3,1::F3),(1,2::F3),(0,2::F3)]
 e3f3 = FFElem (P[(1,1::F3)]) e3f3Mipo
 
+{-
+ - Z[X,Y,Z]/
+ -        /                                  = GF(3²⁷) = F3^27
+ -       /ideal(3,x³-x-1,y³-y+x²,z³-z+x²y²)
+ -}
+e3e3f3Mipo = P[(3,one),(1,one * 2),(0,e2f2^2)]
+e3e3f3 = FFElem (P[(1,one)]) e3e3f3Mipo
+
 --------------------------------------------------------------------------------
 allUnique xs = not $
   or [allUnique' (reverse $ take i xs) | i <- [2..(length xs - 1)]]
     where allUnique' (x:xs) = or [x == y | y <- xs]
 
+pMapM_  f = P.sequence_ . map f
+
 subroutine a aMipo = do
-  it "test for neutral element" $ mapM_
+  it "test for neutral element" $ pMapM_
     (\ x -> x * one `shouldBe` x) (elems a)
   it "x/0 throws exception" $ do
     evaluate (one / FFElem (P[]) aMipo) `shouldThrow` anyException
@@ -122,24 +136,18 @@ subroutine a aMipo = do
     evaluate (FFElem (P[]) aMipo / FFElem (P[]) aMipo) `shouldThrow` anyException
   it "1^{-1} == 1" $
     recip one + FFElem (P []) aMipo `shouldBe` one
-  it "test (x-x=0)" $ mapM_
+  it "test (x-x=0)" $ pMapM_
     (\ x -> x - x `shouldBe` zero) (elems a)
-  it "test (x+x=2*x)" $ mapM_
+  it "test (x+x=2*x)" $ pMapM_
     (\ x -> x + x `shouldBe` x * 2) (elems a)
-  it "+ is bijektiv" $ 
-    and [allUnique [x + y | y <- elems a] | x <- elems a]
-  it "* is bijektiv" $ 
-    and [allUnique [x * y | y <- elems a] | x <- units a]
-  it "test recip (full)" $ mapM_
+  it "+ is bijektiv" $ pMapM_
+    (\ x -> allUnique [x + y | y <- elems a] `shouldBe` True)
+    (elems a)
+  it "* is bijektiv" $ pMapM_
+    (\ x -> allUnique [x * y | y <- elems a] `shouldBe` True)
+    (units a)
+  it "test recip (full)" $ pMapM_
     (\ x -> recip x `shouldBe` head [y | y <- units a, x * y == one]) (units a)
-  {-
-  it "test recip (x/x=1)" $ mapM_
-    (\ x -> x / x `shouldBe` one) (units a)
-  it "test recip (x/x*x=x)" $ mapM_
-    (\ x -> x / x * x `shouldBe` x) (units a)
-  it "test recip (x*x/x=x)" $ mapM_
-    (\ x -> x * x / x `shouldBe` x) (units a)
-   -}
 
 main :: IO ()
 main = hspec $ do
@@ -154,3 +162,7 @@ main = hspec $ do
     subroutine e2f3 e2f3Mipo
   describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $
     subroutine e3f3 e3f3Mipo
+    {-
+  describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over F3" $
+    subroutine e3e3f3 e3e3f3Mipo
+     -}
