@@ -9,7 +9,7 @@
 module Projekt.Core.Polynomials
   ( Polynom (P), unP
   -- getter
-  , getDegrees, getLeadingCoeffP
+  , getDegrees, getLCP
   -- Operationen auf Polynomen
   , aggP, degP
   -- unär
@@ -103,8 +103,8 @@ aggP f = P (remZeros [(i,sum [c | (j,c) <- unPf, j==i])
         remZeros (i:is) | snd i == 0 = remZeros is
                         | otherwise = i : remZeros is
 
-getLeadingCoeffP :: (Num a, Eq a) => Polynom a -> a
-getLeadingCoeffP = snd . head . unP . aggP
+getLCP :: (Num a, Eq a) => Polynom a -> a
+getLCP = snd . head . unP . aggP
 
 -- |Nimmt ein Polynom und gibt eine unsortierte liste der Gräder zurrück.
 getDegrees :: Num a => Polynom a -> [Integer]
@@ -124,7 +124,7 @@ degP = maximum . getDegrees
 --
 
 moniP :: (Eq a, Fractional a) => Polynom a -> Polynom a
-moniP f = f * P[(0,recip $ getLeadingCoeffP f)]
+moniP f = f * P[(0,recip $ getLCP f)]
 
 -- |Gibt zu einem Polynom das Negative Polynom zurrück.
 negateP :: Num a => Polynom a -> Polynom a
@@ -180,7 +180,7 @@ divP a b | degDiff < 0 = (P [], a)
          | otherwise   = divP' $ divP newA b
   where divP' (q,r) = (P $ (degDiff, lcQuot) : unP q, r)
         degDiff     = degP a - degP b
-        lcQuot      = getLeadingCoeffP a / getLeadingCoeffP b
+        lcQuot      = getLCP a / getLCP b
         newA        = aggP $ subP a $ multWithMonom (degDiff,lcQuot) b
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
@@ -194,17 +194,13 @@ modByP f p = snd $ divP f p
 --
 -- TODO: Ersetzen durch eekP?
 ggTP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
-ggTP f g | degP r == 0 = g
-         | otherwise  = ggTP g r
-  where (q,r) = divP f g
+ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit
 --  ggT(a,b) = d = s*a + t*b
-eekP :: (Eq a, Fractional a, Show a) => Polynom a -> Polynom a
+eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a
                                           -> (Polynom a, Polynom a, Polynom a)
-eekP f g | g == 0     = (moniP f
-                       ,P[(0,recip $ getLeadingCoeffP f)]
-                       ,P[(0,0)])
+eekP f g | g == 0     = (moniP f ,P[(0,recip $ getLCP f)] ,P[(0,0)])
          | otherwise = (d,t,s-t*q)
   where (q,r)   = divP f g
         (d,s,t) = eekP g r
