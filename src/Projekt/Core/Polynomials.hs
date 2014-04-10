@@ -22,6 +22,7 @@ module Projekt.Core.Polynomials
 import Data.List
 import GHC.Err (divZeroError)
 import qualified Control.Arrow as A
+import Data.Maybe
 
 import Projekt.Core.ShowTex
 
@@ -110,8 +111,10 @@ getLcP f     = (last . unP . aggP) f
 getDegrees :: (Num a, Eq a) => Polynom a -> [Int]
 getDegrees (P ms) = [i | i <- [0..(length ms - 1)] , ms!!i /= 0]
 
-degP :: (Num a, Eq a) => Polynom a -> Int
-degP f = (length . unP . aggP) f - 1 -- TODO: -∞ für das Null-Polynom
+degP :: (Num a, Eq a) => Polynom a -> Maybe Int
+degP f | deg >= 0   = Just deg
+       | otherwise = Nothing
+  where deg = (length . unP . aggP) f - 1
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen
@@ -139,7 +142,7 @@ divP a b | a == 0       = (P [], P [])
          | b == 0       = divZeroError
          | degDiff < 0 = (P [], a)
          | otherwise   = A.first (monom +) $ divP newA b
-  where degDiff   = degP a - degP b
+  where degDiff   = (fromJust . degP) a - (fromJust . degP) b
         lcQuot    = getLcP a / getLcP b
         monom     = shiftP degDiff (P[lcQuot])
         newA      = a - monom * b

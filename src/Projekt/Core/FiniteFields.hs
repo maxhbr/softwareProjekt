@@ -12,6 +12,7 @@ module Projekt.Core.FiniteFields
   , module X
   ) where
 import GHC.Err (divZeroError)
+import Data.Maybe
 
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
@@ -91,5 +92,5 @@ instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
 elems' :: (Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
 elems' (FFKonst x)  = error "Insufficient information in FFKonst"
 elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
-  where deg  = degP p
+  where deg  = fromJust $ degP p
         fieldElem = product (unP f) * product (unP p)
