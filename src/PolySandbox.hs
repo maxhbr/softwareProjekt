@@ -12,15 +12,7 @@ import Projekt.Core
 
 import FFSandbox (e2f2,e2e2f2,e4f2)
 
-import Test.Hspec
-import Control.Exception (evaluate)
-
-import System.Random
-import Control.Monad (replicateM)
-
-rndSelect xs n = do
-    gen <- getStdGen
-    return $ take n [xs!!x | x <- randomRs (0, length xs - 1) gen]
+import SpecCommon
 
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen
@@ -41,17 +33,17 @@ unDivP (q,r) a b = a == q * b + r
 unEekP (d,s,t) a b = d == s*a + t*b
 
 subroutine e3f3 = do
-  it "test divP (x*1=x)" $
-    mapM_ (\ x -> x * P[1] `shouldBe` x) e3f3
+  it "test * (x*1=x)" $
+    pMapM_ (\ x -> x * P[1] `shouldBe` x) e3f3
   it "test divP (x/x=1)" $
-    mapM_ (\ x -> divP x x `shouldBe` (P[1], P[])) e3f3
+    pMapM_ (\ x -> divP x x `shouldBe` (P[1], P[])) e3f3
   it "test divP generally" $
-    mapM_ (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
+    pMapM_ (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
           zip (take testSize e3f3) (drop testSize e3f3)
   it "x/0 throws exception" $
-    mapM_ (\x -> evaluate (divP x (P[])) `shouldThrow` anyException) e3f3
+    pMapM_ (\x -> evaluate (divP x (P[])) `shouldThrow` anyException) e3f3
   it "test eekP" $
-    mapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
+    pMapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
           zip (take testSize e3f3) (drop testSize e3f3)
 
 main :: IO ()

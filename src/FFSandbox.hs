@@ -18,12 +18,7 @@ module FFSandbox
   )where
 import Projekt.Core
 
--- from hspec
-import Test.Hspec
-import Control.Exception (evaluate)
-
--- from monad-parallel
-import qualified Control.Monad.Parallel as P
+import SpecCommon
 
 pp :: (Show a) => [a] -> IO()
 pp =  mapM_ print
@@ -125,11 +120,9 @@ allUnique xs = not $
   or [allUnique' (reverse $ take i xs) | i <- [2..(length xs - 1)]]
     where allUnique' (x:xs) = or [x == y | y <- xs]
 
-pMapM_  f = P.sequence_ . map f
-
 subroutine a aMipo = do
-  it "test for neutral element" $ pMapM_
-    (\ x -> x * one `shouldBe` x) (elems a)
+  it "test for neutral element" $ 
+    pMapM_ (\ x -> x * one `shouldBe` x) (elems a)
   it "x/0 throws exception" $ do
     evaluate (one / FFElem (P[]) aMipo) `shouldThrow` anyException
     evaluate (a / FFElem (P[]) aMipo) `shouldThrow` anyException
@@ -137,18 +130,17 @@ subroutine a aMipo = do
     evaluate (FFElem (P[]) aMipo / FFElem (P[]) aMipo) `shouldThrow` anyException
   it "1^{-1} == 1" $
     recip one + FFElem (P []) aMipo `shouldBe` one
-  it "test (x-x=0)" $ pMapM_
-    (\ x -> x - x `shouldBe` zero) (elems a)
-  it "test (x+x=2*x)" $ pMapM_
-    (\ x -> x + x `shouldBe` x * 2) (elems a)
-  it "+ is bijektiv" $ pMapM_
-    (\ x -> allUnique [x + y | y <- elems a] `shouldBe` True)
-    (elems a)
-  it "* is bijektiv" $ pMapM_
-    (\ x -> allUnique [x * y | y <- elems a] `shouldBe` True)
-    (units a)
-  it "test recip (full)" $ pMapM_
-    (\ x -> recip x `shouldBe` head [y | y <- units a, x * y == one]) (units a)
+  it "test (x-x=0)" $ 
+    pMapM_ (\ x -> x - x `shouldBe` zero) (elems a)
+  it "test (x+x=2*x)" $ 
+    pMapM_ (\ x -> x + x `shouldBe` x * 2) (elems a)
+  it "+ is bijektiv" $ 
+    pMapM_ (\ x -> allUnique [x + y | y <- elems a] `shouldBe` True) (elems a)
+  it "* is bijektiv" $ 
+    pMapM_ (\ x -> allUnique [x * y | y <- elems a] `shouldBe` True) (units a)
+  it "test recip (full)" $ 
+    pMapM_ (\ x -> recip x `shouldBe` head [y | y <- units a, x * y == one])
+           (units a)
 
 main :: IO ()
 main = hspec $ do
