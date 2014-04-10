@@ -114,6 +114,9 @@ e3f3 = FFElem (P[0,1::F3]) e3f3Mipo
 e3e3f3Mipo = P[e3f3^2,2,0,1]
 e3e3f3 = FFElem (P[0,one]) e3e3f3Mipo
 
+e3e3e3f3Mipo = P[konst,2,0,1]
+  where konst = FFKonst (e3f3^2) * (e3e3f3^2)
+e3e3e3f3 = FFElem (P[0,one]) e3e3e3f3Mipo
 
 --------------------------------------------------------------------------------
 allUnique xs = not $
