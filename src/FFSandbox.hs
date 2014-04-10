@@ -118,23 +118,6 @@ e3e3e3f3Mipo = P[FFKonst (e3f3^2) * (e3e3f3^2),2,0,1]
 e3e3e3f3 = FFElem (P[0,one]) e3e3e3f3Mipo
 
 --------------------------------------------------------------------------------
-testForField e = testForField' (elems e) (units e)
-testForField' es us = do
-  it "Assoziativität" $ do
-    pMapM_ (\z -> mapM_ (\ y -> mapM_ (\ x -> x+(y+z) `shouldBe` (x+y)+z) es) es) es
-    pMapM_ (\z -> mapM_ (\ y -> mapM_ (\ x -> x*(y*z) `shouldBe` (x*y)*z) us) us) us
-  it "Kommutativität" $ do
-    pMapM_ (\ y -> mapM_ (\ x -> x + y `shouldBe` y + x) es) es
-    pMapM_ (\ y -> mapM_ (\ x -> x * y `shouldBe` y * x) us) us
-  it "Einheiten" $ do
-    pMapM_ (\ x -> x + 0 `shouldBe` x) es
-    pMapM_ (\ x -> x * 1 `shouldBe` x) us
-  it "Inversen" $ do
-    pMapM_ (\ x -> x + (-x) `shouldBe` 0) es
-    pMapM_ (\ x -> x * recip x `shouldBe` 1) us
-  it "Distributivität" $
-    pMapM_ (\z -> mapM_ (\ y -> mapM_ (\ x -> x*(y+z) `shouldBe` (x*y)+(x*z)) us) es) es
-
 testForExceptions a aMipo = do
   it "x/0 throws exception" $ do
     evaluate (one / FFElem (P[]) aMipo) `shouldThrow` anyException
