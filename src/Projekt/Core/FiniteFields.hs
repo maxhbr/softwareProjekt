@@ -31,17 +31,17 @@ aggF (FFElem f p) = FFElem (modByP f p) p
 
 instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
   (FFKonst x)  == (FFKonst y)  = x==y
-  (FFElem f p) == (FFKonst y)  = null $ unP $ aggP (f - P [(0,y)])
-  (FFKonst x)  == (FFElem g p) = null $ unP $ aggP (P [(0,x)] - g)
+  (FFElem f p) == (FFKonst y)  = null $ unP $ aggP (f - P[y])
+  (FFKonst x)  == (FFElem g p) = null $ unP $ aggP (P[x] - g)
   (FFElem f p) == (FFElem g q) | p==q       = null $ unP $ aggP (f - g)
                               | otherwise = error "Not the same mod"
 
-instance (Show a, Eq a) => Show (FFElem a) where
+instance (Show a, Num a, Eq a) => Show (FFElem a) where
   show (FFKonst x)       = "(" ++ show x ++ " mod ...)"
   show (FFElem (P []) p) = "(0 mod " ++ show p ++ ")"
   show (FFElem f p)      = "(" ++ show f ++ " mod " ++ show p ++")"
 
-instance (ShowTex a,Eq a) => ShowTex (FFElem a) where
+instance (ShowTex a, Num a, Eq a) => ShowTex (FFElem a) where
   showTex (FFKonst x)       = showTex x
   showTex (FFElem (P []) p) =
     --"\\left(\\underline{0}_{mod~" ++ showTex p ++ "}\\right)"
@@ -55,14 +55,14 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
 
   (FFKonst x)  + (FFKonst y)              = FFKonst (x+y)
-  (FFElem f p) + (FFKonst x)              = FFElem (f+P [(0,x)]) p
-  (FFKonst x)  + (FFElem f p)             = FFElem (f+P [(0,x)]) p
+  (FFElem f p) + (FFKonst x)              = FFElem (f+P[x]) p
+  (FFKonst x)  + (FFElem f p)             = FFElem (f+P[x]) p
   (FFElem f p) + (FFElem g q) | p==q       = aggF $ FFElem (f+g) p
                               | otherwise = error "Not the same mod"
 
   (FFKonst x)  * (FFKonst y)              = FFKonst (x*y)
-  (FFElem f p) * (FFKonst x)              = FFElem (f*P [(0,x)]) p
-  (FFKonst x)  * (FFElem f p)             = FFElem (f*P [(0,x)]) p
+  (FFElem f p) * (FFKonst x)              = FFElem (f*P [x]) p
+  (FFKonst x)  * (FFElem f p)             = FFElem (f*P [x]) p
   (FFElem f p) * (FFElem g q) | p==q       = aggF $ FFElem (f*g) p
                               | otherwise = error "Not the same mod"
 
@@ -90,6 +90,6 @@ instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
 -- enthält deswegen zu wenig Information, über den Körper in dem es lebt.
 elems' :: (Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
 elems' (FFKonst x)  = error "Insufficient information in FFKonst"
-elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems exmp) deg)
+elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
   where deg  = degP p
-        exmp = product (map snd (unP f)) * product (map snd (unP p))
+        fieldElem = product (unP f) * product (unP p)

@@ -25,14 +25,14 @@ rndSelect xs n = do
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen
 exmpPolyInt :: Polynom Integer
-exmpPolyInt = aggP $ P[(10,5),(10,4),(3,2),(0,5)]
+exmpPolyInt = aggP $ P[3,2,15,3,345,3434,345,4]
 
 exmpPolyInt' :: Polynom Integer
-exmpPolyInt' = aggP $ P[(8,5),(9,4),(3,2),(0,5)]
+exmpPolyInt' = aggP $ P[2,5,2345,3,34,3453]
 
 --------------------------------------------------------------------------------
-exmpPolyMod = aggP $ P[(10,5::F101),(10,4::F101),(3,2::F101),(0,5::F101)]
-exmpPolyMod' = aggP $ P[(8,5::F101),(9,4::F101),(3,2::F101),(0,5::F101)]
+exmpPolyMod = aggP $ P[5::F101,0,0,04::F101,2::F101,5::F101]
+exmpPolyMod' = aggP $ P[5::F101,4::F101,0,0,0,0,0,2::F101,5::F101]
 
 --------------------------------------------------------------------------------
 testSize = 10
@@ -42,9 +42,9 @@ unEekP (d,s,t) a b = d == s*a + t*b
 
 subroutine e3f3 = do
   it "test divP (x*1=x)" $
-    mapM_ (\ x -> multP x (P[(0,1)]) `shouldBe` x) e3f3
+    mapM_ (\ x -> x * P[1] `shouldBe` x) e3f3
   it "test divP (x/x=1)" $
-    mapM_ (\ x -> divP x x `shouldBe` (P[(0,1)], P[])) e3f3
+    mapM_ (\ x -> divP x x `shouldBe` (P[1], P[])) e3f3
   it "test divP generally" $
     mapM_ (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
           zip (take testSize e3f3) (drop testSize e3f3)
