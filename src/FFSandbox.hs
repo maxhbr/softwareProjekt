@@ -8,12 +8,12 @@
 --------------------------------------------------------------------------------
 
 module FFSandbox
-  ( F2
-  , e2f2Mipo, e2f2
+  ( e2f2Mipo, e2f2
   , e2e2f2Mipo, e2e2f2
   , e4f2Mipo, e4f2
   , e2f3Mipo, e2f3
   , e3f3Mipo, e3f3
+  , e3e3f3Mipo, e3e3f3
   , main
   )where
 import Projekt.Core
@@ -116,8 +116,9 @@ e3f3 = FFElem (P[(1,1::F3)]) e3f3Mipo
  -        /                                  = GF(3²⁷) = F3^27
  -       /ideal(3,x³-x-1,y³-y+x²,z³-z+x²y²)
  -}
-e3e3f3Mipo = P[(3,one),(1,one * 2),(0,e2f2^2)]
+e3e3f3Mipo = P[(3,1),(1,2),(0,e3f3^2)]
 e3e3f3 = FFElem (P[(1,one)]) e3e3f3Mipo
+
 
 --------------------------------------------------------------------------------
 allUnique xs = not $
