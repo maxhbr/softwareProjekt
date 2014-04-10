@@ -72,8 +72,8 @@ instance (Show a, Eq a, Num a) => Show (Polynom a) where
 instance (ShowTex a, Num a, Eq a) => ShowTex (Polynom a) where
   showTex (P []) = "0"
   showTex (P ms) = intercalate "+" $
-                reverse $
-                zipWith (curry showTex') ms [0..]
+                   (\ss -> [s | s <- reverse ss , s /= ""]) $
+                   zipWith (curry showTex') ms [0..]
     where showTex' :: (ShowTex a, Eq a, Num a) => (a,Int) -> String
           showTex' (0,_) = ""
           showTex' (m,i) = showTex m ++ showExp i

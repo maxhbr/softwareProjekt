@@ -6,4 +6,4 @@ ghc --make \
   -outputdir out \
   -o out/Spec \
   -threaded $DIR/../Spec.hs
-$DIR/../out/Spec +RTS -N3
+$DIR/../out/Spec +RTS -N4
