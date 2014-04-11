@@ -42,10 +42,10 @@ main = hspec $ do
         (units undefined ::[F101])
        -}
     describe "Projekt.Core.PrimeFields @F2" $
-      testForField (1::F2)
+      testFieldSpec (1::F2)
     describe "Projekt.Core.PrimeFields @F3" $
-      testForField (1::F3)
+      testFieldSpec (1::F3)
     describe "Projekt.Core.PrimeFields @F5" $
-      testForField (1::F5)
+      testFieldSpec (1::F5)
     describe "Projekt.Core.PrimeFields @F101" $
-      testForField (1::F101)
+      testFieldSpec (1::F101)

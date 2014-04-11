@@ -141,26 +141,26 @@ furtherTests' es us = do
 main :: IO ()
 main = hspec $ do
   describe "Projekt.Core.FiniteFields @e2f2: E2 over F2" $ do
-    testForField e2f2
+    testFieldSpec e2f2
     furtherTests e2f2
     testForExceptions e2f2 e2f2Mipo
   describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $ do
-    testForField e4f2
+    testFieldSpec e4f2
     furtherTests e4f2
   describe "Projekt.Core.FiniteFields @e2e2f2: E2 over E2 over F2" $ do
-    testForField e2e2f2
+    testFieldSpec e2e2f2
     furtherTests e2e2f2
 
   describe "Projekt.Core.FiniteFields @e2f3: E2 over F3" $ do
-    testForField e2f3
+    testFieldSpec e2f3
     furtherTests e2f3
   describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $
-    testForField e3f3
+    testFieldSpec e3f3
   {-
   describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over F3" $
-    testForField e3e3f3
+    testFieldSpec e3e3f3
    -}
   {-
   describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over E3 over F3" $
-    testForField e3e3e3f3
+    testFieldSpec e3e3e3f3
    -}
