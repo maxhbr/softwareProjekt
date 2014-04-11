@@ -12,6 +12,7 @@ module Projekt.Core.FiniteField
   , testAsso, testKommu, testEinh, testInv, testDist
   , testForField
   ) where
+import Control.Monad
 -- from monad-parallel
 import qualified Control.Monad.Parallel as P
 
@@ -23,48 +24,44 @@ class (Eq a) => FiniteField a where
 
   units x = [e | e <- elems x, e /= zero]
 
-testHelper f s = do 
-  bs <- P.mapM f s
-  return (and bs)
+testHelper f s = liftM and (P.mapM f s)
 
 testAsso es = testHelper
   (\(x,y,z) -> return $ x+(y+z)==(x+y)+z && x*(y*z)==(x*y)*z)
   [(x,y,z) | x<-es, y<-es, z<-es]
+
 testKommu es = testHelper
   (\(x,y) -> return $ x+y==y+x && x*y==y*x)
   [(x,y) | x<-es, y<-es]
+
 testEinh es = testHelper
   (\x -> return $ x+zero==x && (x*one==x || x==zero))
   es
+
 testInv es = testHelper
   (\x -> return $ x+(-x)==zero && (x==zero || x*recip x==one))
   es
+
 testDist es = testHelper
   (\(x,y,z) -> return $ x*(y+z)==(x*y)+(x*z))
   [(x,y,z) | x<-es, y<-es, z<-es]
 
 testForField e = do
-  putStrLn "Teste Körper Axiome:"
+  putStrLn "teste Körper Axiome:"
   putStr "Assoziativität ist "
   t <- testAsso es
-  let r = t
   putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
   putStr "Kommutativität ist "
   t <- testKommu es
-  let r = r && t
   putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
   putStr "Einheiten sind "
   t <- testEinh es
-  let r = r && t
   putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
   putStr "Inversen sind "
   t <- testInv es
-  let r = r && t
   putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
   putStr "Distributivität ist "
   t <- testDist es
-  let r = r && t
   putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
-  return r
     where es = elems e
 
