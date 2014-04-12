@@ -45,21 +45,21 @@ ppTex = mapM_ (putStrLn . showTex)
  -          -----+-----+-----+-----+-----
  -           u+1 | u+1 |  u  |  1  |  0
  -}
-e2f2Mipo = P[1::F2,1,1]
+e2f2Mipo = P[1::F2,1,1] -- x²+x+1
 e2f2 = FFElem (P[0,1::F2]) e2f2Mipo
 
 {- F16=E2(E2)
  - als Grad 2 Erweiterung von E2 durch MPol x²+x+e2f2
  - Mit einer Nullstelle: e2e2f2
  -}
-e2e2f2Mipo = P[e2f2,one,one]
+e2e2f2Mipo = P[e2f2,one,one] -- x²+x+e2f2
 e2e2f2 = FFElem (P[0,one]) e2e2f2Mipo
 
 {- F16=E4
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
  - Mit einer Nullstelle: e4f2
  -}
-e4f2Mipo = P[1::F2,1::F2,0,0,1::F2]
+e4f2Mipo = P[1::F2,1::F2,0,0,1::F2] -- x⁴+x²+1
 e4f2 = FFElem (P[0,1::F2]) e4f2Mipo
 
 --------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ e2f3 = FFElem (P[0,1::F3]) e2f3Mipo
  - x³ + 2x² + x + 1
  - x³ + 2x² + 2x + 2
  -}
-e3f3Mipo = P[2::F3,2,0,1]
+e3f3Mipo = P[2::F3,2,0,1] -- x³+2x+2
 e3f3 = FFElem (P[0,1::F3]) e3f3Mipo
 
 {-
@@ -111,10 +111,10 @@ e3f3 = FFElem (P[0,1::F3]) e3f3Mipo
  -        /                                  = GF(3²⁷) = F3^27
  -       /ideal(3,x³-x-1,y³-y+x²,z³-z+x²y²)
  -}
-e3e3f3Mipo = P[e3f3^2,2,0,1]
+e3e3f3Mipo = P[e3f3^2,2,0,1] -- y³-y+x²
 e3e3f3 = FFElem (P[0,one]) e3e3f3Mipo
 
-e3e3e3f3Mipo = P[FFKonst (e3f3^2) * (e3e3f3^2),2,0,1]
+e3e3e3f3Mipo = P[FFKonst (e3f3^2) * (e3e3f3^2),2,0,1] -- z³-z+x²y²
 e3e3e3f3 = FFElem (P[0,one]) e3e3e3f3Mipo
 
 --------------------------------------------------------------------------------
