@@ -1,4 +1,4 @@
-module Projakt.Algorithmen.QFreeFactorization
+module Projekt.Algorithmen.SFreeFactorization
   (sff
   ) where
 import Projekt.Core.FiniteFields
@@ -31,14 +31,28 @@ import Projekt.Core.Polynomials
 sff :: FiniteField a => Polynom a -> [Polynom a]
 sff f = undefined
 
-sff' f | df == 0    = spreadByP $ sff (charRootP f)
+{-
+sff' f | df == 0    = pThPower $ sff (pThRoot f)
+       | c == 1     = undefined
        | otherwise = undefined
   where df = deriveP f
+        c  = ggTP f df -- Hier fehlt noch der Durchgang durch die While Schleife
+        w  = fst $ divP f c
+ -}
 
+pThPower :: FiniteField a => Polynom a -> Polynom a
+pThPower = undefined
+
+pThRoot :: FiniteField a => Polynom a -> Polynom a
+pThRoot = charRootP
 
 -- |simmuliert das '^p', indem in das Array manipuliert wird
-spreadByP :: [a] -> [a]
+spreadByP :: Mod a => [a] -> [a]
 spreadByP = undefined
+{-
+spreadByP []     = []
+spreadByP (m:ms) = m : [0|i<-[1..(modulus m - 1)]] ++ spreadByP ms
+ -}
 
 {-
  - Beispiel in F3[x]:
@@ -50,3 +64,5 @@ sqf=[P[1::F3,1]
     ,P[1::F3,0,1]
     ,P[]
     ,P[2::F3,1]]
+
+testSFF = sff f == sqf
