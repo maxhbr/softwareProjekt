@@ -44,10 +44,10 @@ if' :: Bool -> a -> a -> a
 if' True  x _ = x
 if' False _ y = y
 
+-- |Polonoe aus einer Liste von Monomen (dargestellt als Tuppel) erzeugen.
 fromMonomialsP :: (Num a, Eq a) => [(Int,a)] -> Polynom a
 fromMonomialsP []         = P[]
-fromMonomialsP ((i,m):ms) = f + fromMonomialsP ms
-  where f = P ([0 | j <- [1..i]] ++ [m])
+fromMonomialsP ((i,m):ms) = P ([0 | j <- [1..i]] ++ [m]) + fromMonomialsP ms
 
 instance (Show a, Eq a, Num a) => Show (Polynom a) where
   show (P []) = "0"
@@ -179,14 +179,13 @@ ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 --------------------------------------------------------------------------------
 --  Weiteres
 
-{-
 -- |Nimmt einen Wert und ein Polynom umd wertet das Polynom an dem Wert aus.
-evalP :: Num a => a -> Polynom a -> a
-evalP x f = sum [evalMonom m | m <- unP f]
-  where evalMonom (i,c) = product [x | j <- [1..i]] * c
- -}
-evalP = undefined
+-- Mittels Horner Schema
+evalP x f = evalP' x (unP f) 0
+evalP' x [] acc = acc
+evalP' x (m:ms) acc = evalP' x ms $ acc*x+m
 
+-- |Multipliziert ein Polynom P ms mit X^j
 shiftP :: Num a => Int -> Polynom a -> Polynom a
 shiftP j (P ms) = P ([0 | i <- [1..j]] ++ ms)
 
