@@ -150,7 +150,7 @@ divP a b | a == 0       = (P [], P [])
          | otherwise   = A.first (monom +) $ divP newA b
   where degDiff   = (fromJust . degP) a - (fromJust . degP) b
         lcQuot    = getLcP a / getLcP b
-        monom     = shiftP degDiff (P[lcQuot])
+        monom     = fromMonomialsP [(degDiff,lcQuot)]
         newA      = a - monom * b
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
