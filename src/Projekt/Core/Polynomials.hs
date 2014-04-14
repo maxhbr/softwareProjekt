@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 module Projekt.Core.Polynomials
   ( Polynom (P), unP
+  , fromMonomialsP
   -- getter
   , getDegrees, getLcP
   -- Operationen auf Polynomen
@@ -42,6 +43,11 @@ instance (Eq a, Num a) => Eq (Polynom a) where
 if' :: Bool -> a -> a -> a
 if' True  x _ = x
 if' False _ y = y
+
+fromMonomialsP :: (Num a, Eq a) => [(Int,a)] -> Polynom a
+fromMonomialsP []         = P[]
+fromMonomialsP ((i,m):ms) = f + fromMonomialsP ms
+  where f = P ([0 | j <- [1..i]] ++ [m])
 
 instance (Show a, Eq a, Num a) => Show (Polynom a) where
   show (P []) = "0"
