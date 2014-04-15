@@ -9,6 +9,7 @@
 module Projekt.Core.FiniteFields
   ( FFElem (..)
   , aggF
+  , charRootP
   , module X
   ) where
 import GHC.Err (divZeroError)
@@ -81,9 +82,11 @@ instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
     where (_,s,_) = eekP f p
 
 instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
-  zero  = FFKonst zero
-  one   = FFKonst one
-  elems = elems'
+  zero                             = FFKonst zero
+  one                              = FFKonst one
+  elems                            = elems'
+  charakteristik (FFElem (P ms) _) = charakteristik $ product ms
+  charakteristik (FFKonst x)       = charakteristik x
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
 -- anderen Elemente zurrück.
@@ -94,3 +97,8 @@ elems' (FFKonst x)  = error "Insufficient information in FFKonst"
 elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
   where deg  = fromJust $ degP p
         fieldElem = product (unP f) * product (unP p)
+
+-- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
+charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
+charRootP (P ms)= P[m | (m,i) <- zip ms [0..] , i `mod` fieldChar == 0]
+  where fieldChar = charakteristik $ product ms

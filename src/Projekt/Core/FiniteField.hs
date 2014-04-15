@@ -19,8 +19,9 @@ import qualified Control.Monad.Parallel as P
 pMapM_  f = P.sequence_ . map f
 
 class (Eq a) => FiniteField a where
-  zero, one    :: a
-  elems, units :: a -> [a]
+  zero, one      :: a
+  elems, units   :: a -> [a]
+  charakteristik :: a -> Integer
 
   units x = [e | e <- elems x, e /= zero]
 

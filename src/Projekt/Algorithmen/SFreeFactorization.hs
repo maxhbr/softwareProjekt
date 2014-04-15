@@ -31,6 +31,32 @@ import Projekt.Core.Polynomials
 sff :: FiniteField a => Polynom a -> [Polynom a]
 sff f = undefined
 
+sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff' f = undefined
+
+shiftTupple i (n,x) = (n+i,x)
+shiftTupples i = map (shiftTupple i)
+
+pThPower :: FiniteField a => [Polynom a] -> [Polynom a]
+pThPower = undefined
+
+pThRoot :: FiniteField a => Polynom a -> Polynom a
+pThRoot = charRootP
+
+{-
+sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff' f = undefined
+  where df = deriveP f
+        loop c r w i | w  /= 1    = loop (fst $ divP c y)
+                                        (shiftP i r)
+                                        y
+                                        (i+1)
+                     | otherwise = (r,c)
+          where y = ggTP w c
+        c          = ggTP f df
+        (r',c')    = loop c (P[1]) (fst $ divP f c) 1
+ -}
+
 {-
 sff' f | df == 0    = pThPower $ sff (pThRoot f)
        | c == 1     = undefined
@@ -39,12 +65,6 @@ sff' f | df == 0    = pThPower $ sff (pThRoot f)
         c  = ggTP f df -- Hier fehlt noch der Durchgang durch die While Schleife
         w  = fst $ divP f c
  -}
-
-pThPower :: FiniteField a => Polynom a -> Polynom a
-pThPower = undefined
-
-pThRoot :: FiniteField a => Polynom a -> Polynom a
-pThRoot = charRootP
 
 -- |simmuliert das '^p', indem in das Array manipuliert wird
 spreadByP :: Mod a => [a] -> [a]

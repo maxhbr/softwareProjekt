@@ -92,11 +92,6 @@ instance (Numeral n, Show n) => Show (Mod n) where
 instance (Numeral n, Show n) => ShowTex (Mod n) where
   showTex x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
 
-modulus :: Numeral a => Mod a -> Integer
-modulus x = numValue $ modulus' x
-  where modulus' :: Numeral a => Mod a -> a
-        modulus' = const undefined
-
 getRepr :: (Numeral n) => Mod n -> Integer
 getRepr x = unMod x `mod` modulus x
 
@@ -112,9 +107,15 @@ instance (Numeral n) => Num (Mod n) where
   negate      = MkMod . negate . unMod
 
 instance (Numeral n) => FiniteField (Mod n) where
-  zero  = MkMod 0
-  one   = MkMod 1
-  elems = const $ elems' one
+  zero           = MkMod 0
+  one            = MkMod 1
+  elems          = const $ elems' one
+  charakteristik = modulus
+
+modulus :: Numeral a => Mod a -> Integer
+modulus x = numValue $ modulus' x
+  where modulus' :: Numeral a => Mod a -> a
+        modulus' = const undefined
 
 elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map fromInteger [0.. (modulus x - 1)]

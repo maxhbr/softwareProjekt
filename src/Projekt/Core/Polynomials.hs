@@ -16,9 +16,9 @@ module Projekt.Core.Polynomials
   -- unär
   , moniP, reziprokP, deriveP
   -- binär
-  , divP, modByP, charRootP, ggTP, eekP
+  , divP, modByP, ggTP, eekP
   -- weiteres
-  , evalP, getAllP
+  , evalP, getAllP, shiftP
   ) where
 import Data.List
 import GHC.Err (divZeroError)
@@ -159,9 +159,6 @@ divP a b | a == 0       = (P [], P [])
 -- mehr Performance durch andere Rechnung?
 modByP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 modByP f p = snd $ divP f p
-
--- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
-charRootP = undefined
 
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit
 --  ggT(a,b) = d = s*a + t*b
