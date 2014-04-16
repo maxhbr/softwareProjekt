@@ -136,30 +136,6 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
           | otherwise = invMod' (v-q*u,u,x2-fromInteger q*x1,x1)
             where q = v `div` u
 
--- Möglicherweise besser aber noch nicht korrekt:
--- Algorithm 2.22 aus Guide to Elliptic Curve Cryptography
-{-
-divMod :: forall a. Numeral a => Mod a -> Mod a -> Mod a
-divMod x y = divMod' (unMod x `mod` p, p, unMod y `mod` p, 0)
-  where p = numValue (modulus' x)
-        divMod' :: (Integer, Integer, Integer, Integer) -> Mod a
-        divMod' (0,_,_,_)   = divZeroError -- 0 ist keine Einheit
-        divMod' (1,_,x1,_)  = MkMod x1
-        divMod' (_,1,_,x2)  = MkMod x2
-        divMod' (u,v,x1,x2)
-          | newU >= newV = divMod' (newU-newV,newV,newX1-newX2,newX2)
-          | otherwise   = divMod' (newU,newV-newU,newX1,newX1-newX2)
-            where loop :: (Integer, Integer) -> (Integer, Integer)
-                  loop (a,b)
-                    | even a && even p = (shift a (-1),shift b (-1))
-                    | even a           = (shift a (-1),shift (b+p) (-1))
-                    | otherwise        = (a,b)
-                  (newU,newX1) = loop (u,x1)
-                  (newV,newX2) = loop (v,x2)
-
-invMod :: Numeral a => Mod a -> Mod a
-invMod x = divMod x 1
- -}
 
 --------------------------------------------------------------------------------
 --  Examples

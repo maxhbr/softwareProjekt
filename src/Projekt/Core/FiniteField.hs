@@ -13,10 +13,13 @@ module Projekt.Core.FiniteField
   , testForField
   ) where
 import Control.Monad
+
 -- from monad-parallel
+-- TODO: remove?
 import qualified Control.Monad.Parallel as P
 
-pMapM_  f = P.sequence_ . map f
+--------------------------------------------------------------------------------
+--  Klassen Definition
 
 class (Eq a) => FiniteField a where
   zero, one      :: a
@@ -24,6 +27,11 @@ class (Eq a) => FiniteField a where
   charakteristik :: a -> Integer
 
   units x = [e | e <- elems x, e /= zero]
+
+--------------------------------------------------------------------------------
+--  Tests
+
+pMapM_  f = P.sequence_ . map f
 
 testHelper f s = liftM and (P.mapM f s)
 

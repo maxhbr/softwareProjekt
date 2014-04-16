@@ -27,21 +27,56 @@ import Projekt.Core.Polynomials
      f ← f^1/p;
      Output(SFF(f)^p) }
   end
+
+  Oder siehe:
+      Computer Algebra and Symbolic Computation: Mathematical Methods Volume 2
+      Kapitel 9
+
+
  -}
 sff :: FiniteField a => Polynom a -> [Polynom a]
 sff f = undefined
 
-sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
-sff' f = undefined
+sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
+sff' f | df /= 0    = undefined
+       | otherwise = map (\(n,x) -> (n*(charakteristik $ prodOfCoeffsP f),x))
+                         (sff' $ charRootP f)
+  where df = deriveP f
+        c  = ggTP f df
+
+--------------------------------------------------------------------------------
+--  Hilfsfunktionen
 
 shiftTupple i (n,x) = (n+i,x)
 shiftTupples i = map (shiftTupple i)
 
+--------------------------------------------------------------------------------
+--  Beispiele
+
+{-
+ - Beispiel in F3[x]:
+ -      f = X¹¹+2x⁹+2x⁸+x⁶+x⁵+2x³+2x²+1
+ -        = (x+1)(x²+1)³(x+2)⁴
+ -}
+f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
+sqf=[P[1::F3,1]
+    ,P[1::F3,0,1]
+    ,P[]
+    ,P[2::F3,1]]
+
+testSFF = sff f == sqf
+
+{- ----------------------------------------------------------------------------
+ --  Alt:  --------------------------------------------------------------------
+ -----------------------------------------------------------------------------}
+
+{-
 pThPower :: FiniteField a => [Polynom a] -> [Polynom a]
 pThPower = undefined
 
 pThRoot :: FiniteField a => Polynom a -> Polynom a
 pThRoot = charRootP
+ -}
 
 {-
 sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
@@ -66,23 +101,13 @@ sff' f | df == 0    = pThPower $ sff (pThRoot f)
         w  = fst $ divP f c
  -}
 
+{-
 -- |simmuliert das '^p', indem in das Array manipuliert wird
 spreadByP :: Mod a => [a] -> [a]
 spreadByP = undefined
+ -}
+
 {-
 spreadByP []     = []
 spreadByP (m:ms) = m : [0|i<-[1..(modulus m - 1)]] ++ spreadByP ms
  -}
-
-{-
- - Beispiel in F3[x]:
- -      f = X¹¹+2x⁹+2x⁸+x⁶+x⁵+2x³+2x²+1
- -        = (x+1)(x²+1)³(x+2)⁴
- -}
-f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
-sqf=[P[1::F3,1]
-    ,P[1::F3,0,1]
-    ,P[]
-    ,P[2::F3,1]]
-
-testSFF = sff f == sqf

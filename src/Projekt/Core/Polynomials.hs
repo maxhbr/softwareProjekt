@@ -12,7 +12,7 @@ module Projekt.Core.Polynomials
   -- getter
   , getDegrees, getLcP
   -- Operationen auf Polynomen
-  , aggP, degP
+  , aggP, degP, prodOfCoeffsP
   -- unär
   , moniP, reziprokP, deriveP
   -- binär
@@ -117,10 +117,15 @@ getLcP f     = (last . unP . aggP) f
 getDegrees :: (Num a, Eq a) => Polynom a -> [Int]
 getDegrees (P ms) = [i | i <- [0..(length ms - 1)] , ms!!i /= 0]
 
+-- |Gibt zu einem Polynom den Grad
 degP :: (Num a, Eq a) => Polynom a -> Maybe Int
 degP f | deg >= 0   = Just deg
        | otherwise = Nothing
   where deg = (length . unP . aggP) f - 1
+
+-- |Gibt zu einem Polynom das Produkt der Koeffizient
+prodOfCoeffsP :: Num a => Polynom a -> a
+prodOfCoeffsP = product . unP
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen

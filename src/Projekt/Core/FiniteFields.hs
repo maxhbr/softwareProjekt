@@ -9,16 +9,20 @@
 module Projekt.Core.FiniteFields
   ( FFElem (..)
   , aggF
-  , charRootP
+  , charOfP, charRootP
   , module X
   ) where
 import GHC.Err (divZeroError)
 import Data.Maybe
+import Control.Exception
 
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
 import Projekt.Core.Polynomials
 import Projekt.Core.ShowTex
+
+--------------------------------------------------------------------------------
+--  Definition
 
 -- Ein Element im Körper ist repräsentiert durch ein Paar von Polynomen. Das
 -- erste beschreibt das Element und das zweite beschreibt das Minimalpolynom
@@ -30,6 +34,9 @@ data FFElem a = FFElem (Polynom a) (Polynom a) | FFKonst a
 aggF :: (Eq a, Fractional a) => FFElem a -> FFElem a
 aggF (FFKonst x)  = FFKonst x
 aggF (FFElem f p) = FFElem (modByP f p) p
+
+--------------------------------------------------------------------------------
+--  Instanzen
 
 instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
   (FFKonst x)  == (FFKonst y)  = x==y
@@ -98,7 +105,16 @@ elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
   where deg  = fromJust $ degP p
         fieldElem = product (unP f) * product (unP p)
 
+--------------------------------------------------------------------------------
+--  Funktionen auf Polynomen über Endlichen Körpern
+
+-- |Gibt die Charakteristik der Koeffizienten eines Polynoms
+-- TODO: Product sollte nicht nötig sein!
+--       Möglicherweise mit Backtracking
+charOfP :: (FiniteField a, Num a) => Polynom a -> Integer
+charOfP (P ms) = charakteristik $ product ms 
+
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
 charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
 charRootP (P ms)= P[m | (m,i) <- zip ms [0..] , i `mod` fieldChar == 0]
-  where fieldChar = charakteristik $ product ms
+  where fieldChar = charOfP $ P ms
