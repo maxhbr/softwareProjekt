@@ -38,7 +38,7 @@ import Debug.Trace
 
  -}
 
-sff :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
+sff :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c) 
       | df /= 0 && c == 1  = r
       | otherwise = map (\(n,x) -> (n*p,x))
