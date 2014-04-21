@@ -116,5 +116,6 @@ charOfP (P ms) = charakteristik $ product ms
 
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
 charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
-charRootP (P ms)= P[m | (m,i) <- zip ms [0..] , i `mod` fieldChar == 0]
-  where fieldChar = charOfP $ P ms
+charRootP (P ms)= P[m^(q - p) | (m,i) <- zip ms [0..] , i `mod` p == 0]
+  where p = charOfP $ P ms
+        q = 5

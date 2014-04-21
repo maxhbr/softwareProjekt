@@ -116,6 +116,16 @@ atM (M m) row col = m !! row !! col
 (!-) :: Matrix a -> Int -> [a]
 (M m) !- n  = m !! n
 
+
+-- get rows
+(!!-) :: Matrix a -> [Int] -> Matrix a
+(M m) !!- ns  = M $ [m !! i | i <- ns]
+
+-- get columns
+(!!|) :: Matrix a -> [Int] -> Matrix a
+(!!|) (M m) ns  = M $ [[m !! i !! j | j <- ns] | i <- [0..r-1]]
+  where r = getNumRowsM $ M m
+
 getNumRowsM :: Matrix a -> Int
 getNumRowsM = length . unM
 
@@ -160,6 +170,29 @@ triangularM m  = M $ triangular' 0 $ unM m
             || all (==True) (map (all (==0)) rows) = row:rows
           | otherwise                            = pivotAndSwap n (rows ++ [row])
 
+fulltriangularM :: (Eq a, Fractional a) => Matrix a -> Matrix a
+fulltriangularM  = backtrackM . triangularM
+
+
+-- backtrack an upper triangular Matrix a
+backtrackM :: (Eq a, Fractional a) => Matrix a -> Matrix a
+backtrackM (M m)  = M $ backtrack' m
+  where backtrack' [] = []
+        backtrack' as = (backtrack' (init $ eval as)) ++ (last eval as)
+          where eval as = undefined -- | f == Nothing   =  as
+                        {-| otherwise     =  undefined map (zipWith (-) $ map (/f) l) as-}
+              {-where l = last as-}
+                {-f = find (/=0) l-}
+          
+
+subtrL :: (Num a) => [a] -> [a] -> [a]
+subtrL as bs = zipWith (-) as bs
+
+
 detM :: (Eq a, Fractional a) => Matrix a -> a
 detM m | isQuadraticM m = product [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
        | otherwise      = error "Matrix not quadratic"
+
+{-invM :: (Eq a, Fractional a) => Matrix a -> Matrix a-}
+  {-invM m | !isQuadraticM m  = error "Matrix not quadratic"-}
+         {-| -}

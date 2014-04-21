@@ -9,6 +9,7 @@
 
 module PolySandbox where
 import Projekt.Core
+import Projekt.Algorithmen.SFreeFactorization
 
 import FFSandbox (e2f2,e2e2f2,e4f2)
 
@@ -25,6 +26,9 @@ exmpPolyInt' = aggP $ P[2,5,2345,3,34,3453]
 --------------------------------------------------------------------------------
 exmpPolyMod = aggP $ P[5::F101,0,0,04::F101,2::F101,5::F101]
 exmpPolyMod' = aggP $ P[5::F101,4::F101,0,0,0,0,0,2::F101,5::F101]
+
+--------------------------------------------------------------------------------
+exmpPolyMod3  = fromMonomialsP [(0,2::F3), (3,1::F3), (9,1::F3)]
 
 --------------------------------------------------------------------------------
 testSize = 10

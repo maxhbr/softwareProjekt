@@ -4,6 +4,9 @@ module Projekt.Algorithmen.SFreeFactorization
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 
+import Debug.Trace
+
+
 {-
  - from: http://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
 
@@ -34,15 +37,21 @@ import Projekt.Core.Polynomials
 
 
  -}
-sff :: FiniteField a => Polynom a -> [Polynom a]
-sff f = undefined
 
-sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
-sff' f | df /= 0    = undefined
-       | otherwise = map (\(n,x) -> (n*(charakteristik $ prodOfCoeffsP f),x))
-                         (sff' $ charRootP f)
+sff :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
+sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c) 
+      | df /= 0 && c == 1  = r
+      | otherwise = map (\(n,x) -> (n*p,x))
+                         (sff $ charRootP f)
   where df = deriveP f
-        c  = ggTP f df
+        c'  = ggTP f df
+        p  = charakteristik $ prodOfCoeffsP f
+        (r,c)  = eval 1 (f @/ c') c'
+        eval i w c    | w == 1     = ([(1,1)], c)
+                      | otherwise = ([(i,z)] ++ r, c')
+            where y      = ggTP w c
+                  z      = w @/ y
+                  (r,c') = eval (i+1) y (c@/y)
 
 --------------------------------------------------------------------------------
 --  Hilfsfunktionen
@@ -58,13 +67,13 @@ shiftTupples i = map (shiftTupple i)
  -      f = X¹¹+2x⁹+2x⁸+x⁶+x⁵+2x³+2x²+1
  -        = (x+1)(x²+1)³(x+2)⁴
  -}
-f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
-sqf=[P[1::F3,1]
-    ,P[1::F3,0,1]
-    ,P[]
-    ,P[2::F3,1]]
+{-f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]-}
+{-sqf=[P[1::F3,1]-}
+    {-,P[1::F3,0,1]-}
+    {-,P[]-}
+    {-,P[2::F3,1]]-}
 
-testSFF = sff f == sqf
+{-testSFF = sff f == sqf-}
 
 {- ----------------------------------------------------------------------------
  --  Alt:  --------------------------------------------------------------------

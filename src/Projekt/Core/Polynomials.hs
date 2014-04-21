@@ -16,7 +16,7 @@ module Projekt.Core.Polynomials
   -- unär
   , moniP, reziprokP, deriveP
   -- binär
-  , divP, modByP, ggTP, eekP
+  , divP, divP', (@/), modByP, ggTP, eekP
   -- weiteres
   , evalP, getAllP, shiftP
   ) where
@@ -157,6 +157,12 @@ divP a b | a == 0       = (P [], P [])
         lcQuot    = getLcP a / getLcP b
         monom     = fromMonomialsP [(degDiff,lcQuot)]
         newA      = a - monom * b
+
+divP' :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+divP' a b = fst $ divP a b
+
+(@/) :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+(@/) = divP'
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
