@@ -1,5 +1,5 @@
 module Projekt.Algorithmen.SFreeFactorization
-  (sff
+  (sff, unSff
   ) where
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
@@ -31,24 +31,26 @@ import Projekt.Core.Polynomials
   Oder siehe:
       Computer Algebra and Symbolic Computation: Mathematical Methods Volume 2
       Kapitel 9
-
-
  -}
-sff :: FiniteField a => Polynom a -> [Polynom a]
-sff f = undefined
 
-sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
-sff' f | df /= 0    = undefined
-       | otherwise = map (\(n,x) -> (n*(charakteristik $ prodOfCoeffsP f),x))
-                         (sff' $ charRootP f)
+-- |Liefert zu einem Polynom die quadratfreie Faktorisierung
+-- TODO: Geht noch nicht!
+sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [Polynom a]
+sff f | f  == 1    = []
+      | df /= 0    = fst (divP f c) : sff c
+      | otherwise = spreadByP $ sff $ charRootP f
   where df = deriveP f
         c  = ggTP f df
 
---------------------------------------------------------------------------------
---  Hilfsfunktionen
+-- |Simuliert das ^p
+spreadByP :: (FiniteField a, Num a, Fractional a) => [Polynom a] -> [Polynom a]
+spreadByP []     = []
+spreadByP (x:xs) = [P[one] | i<- [1..(charakteristik (prodOfCoeffsP x) - 1)]]
+                   ++ [x]
+                   ++ spreadByP xs
 
-shiftTupple i (n,x) = (n+i,x)
-shiftTupples i = map (shiftTupple i)
+unSff :: (FiniteField a, Num a, Fractional a) => [Polynom a] -> Polynom a
+unSff xs = product $ zipWith (^) xs [1..]
 
 --------------------------------------------------------------------------------
 --  Beispiele
@@ -60,15 +62,34 @@ shiftTupples i = map (shiftTupple i)
  -}
 f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
 sqf=[P[1::F3,1]
+    ,P[1]
     ,P[1::F3,0,1]
-    ,P[]
     ,P[2::F3,1]]
 
 testSFF = sff f == sqf
+testExmp = f == unSff sqf
+
 
 {- ----------------------------------------------------------------------------
  --  Alt:  --------------------------------------------------------------------
  -----------------------------------------------------------------------------}
+
+{-
+sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
+sff' f | df /= 0    = undefined
+       | otherwise = map (\(n,x) -> (n*charakteristik $ prodOfCoeffsP f,x))
+                         (sff' $ charRootP f)
+  where df = deriveP f
+        c  = ggTP f df
+ -}
+
+--------------------------------------------------------------------------------
+--  Hilfsfunktionen
+
+{-
+shiftTupple i (n,x) = (n+i,x)
+shiftTupples i = map (shiftTupple i)
+ -}
 
 {-
 pThPower :: FiniteField a => [Polynom a] -> [Polynom a]
