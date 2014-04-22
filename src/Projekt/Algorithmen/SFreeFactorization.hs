@@ -4,6 +4,9 @@ module Projekt.Algorithmen.SFreeFactorization
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 
+import Debug.Trace
+
+
 {-
  - from: http://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
 
@@ -33,14 +36,32 @@ import Projekt.Core.Polynomials
       Kapitel 9
  -}
 
+sff :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c) 
+      | df /= 0 && c == 1  = r
+      | otherwise = map (\(n,x) -> (n*p,x))
+                         (sff $ charRootP f)
+  where df = deriveP f
+        c'  = ggTP f df
+        p  = charakteristik $ prodOfCoeffsP f
+        (r,c)  = eval 1 (f @/ c') c'
+        eval i w c    | w == 1     = ([(1,1)], c)
+                      | otherwise = ((i,z) : r, c')
+            where y      = ggTP w c
+                  z      = w @/ y
+                  (r,c') = eval (i+1) y (c@/y)
+
+unSff :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
+unSff fs = product $ map (\(i,f) -> f^i) fs
+
+{-
+ - Versuch 2 (noch nicht funktionsfähig)
 -- |Liefert zu einem Polynom die quadratfreie Faktorisierung
 -- TODO: Geht noch nicht!
 sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [Polynom a]
 sff f | f  == 1    = []
       | df /= 0    = fst (divP f c) : sff c
       | otherwise = spreadByP $ sff $ charRootP f
-  where df = deriveP f
-        c  = ggTP f df
 
 -- |Simuliert das ^p
 spreadByP :: (FiniteField a, Num a, Fractional a) => [Polynom a] -> [Polynom a]
@@ -51,6 +72,7 @@ spreadByP (x:xs) = [P[one] | i<- [1..(charakteristik (prodOfCoeffsP x) - 1)]]
 
 unSff :: (FiniteField a, Num a, Fractional a) => [Polynom a] -> Polynom a
 unSff xs = product $ zipWith (^) xs [1..]
+ -}
 
 --------------------------------------------------------------------------------
 --  Beispiele
@@ -66,9 +88,10 @@ sqf=[P[1::F3,1]
     ,P[1::F3,0,1]
     ,P[2::F3,1]]
 
+{-
 testSFF = sff f == sqf
 testExmp = f == unSff sqf
-
+ -}
 
 {- ----------------------------------------------------------------------------
  --  Alt:  --------------------------------------------------------------------

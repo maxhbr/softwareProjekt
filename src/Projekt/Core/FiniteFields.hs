@@ -94,6 +94,7 @@ instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   elems                            = elems'
   charakteristik (FFElem (P ms) _) = charakteristik $ product ms
   charakteristik (FFKonst x)       = charakteristik x
+  elemCount                        = length . elems'
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
 -- anderen Elemente zurrück.
@@ -111,10 +112,12 @@ elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
 -- |Gibt die Charakteristik der Koeffizienten eines Polynoms
 -- TODO: Product sollte nicht nötig sein!
 --       Möglicherweise mit Backtracking
-charOfP :: (FiniteField a, Num a) => Polynom a -> Integer
+charOfP :: (FiniteField a, Num a) => Polynom a -> Int
 charOfP (P ms) = charakteristik $ product ms 
 
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
 charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
-charRootP (P ms)= P[m | (m,i) <- zip ms [0..] , i `mod` fieldChar == 0]
-  where fieldChar = charOfP $ P ms
+charRootP (P ms)= P[m^l | (m,i) <- zip ms [0..] , i `mod` p == 0]
+  where p = charOfP $ P ms
+        q = elemCount $ product ms
+        l = max (q-p) 1

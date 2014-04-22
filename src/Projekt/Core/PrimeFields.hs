@@ -38,7 +38,7 @@ predPeano :: Succ a -> a
 predPeano = const undefined
 
 class Numeral a where
-  numValue :: a -> Integer
+  numValue :: a -> Int
 
 instance Numeral Zero where
   numValue = const 0
@@ -68,7 +68,7 @@ type Seven = Succ (Succ Five)
 --------------------------------------------------------------------------------
 --  Prime fields
 
-newtype Mod n = MkMod { unMod :: Integer }
+newtype Mod n = MkMod { unMod :: Int }
   --deriving (Show)
 
 instance (Numeral n, Show n) => Show (Mod n) where
@@ -92,7 +92,7 @@ instance (Numeral n, Show n) => Show (Mod n) where
 instance (Numeral n, Show n) => ShowTex (Mod n) where
   showTex x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
 
-getRepr :: (Numeral n) => Mod n -> Integer
+getRepr :: (Numeral n) => Mod n -> Int
 getRepr x = unMod x `mod` modulus x
 
 instance (Numeral n) => Eq (Mod n) where
@@ -101,7 +101,7 @@ instance (Numeral n) => Eq (Mod n) where
 instance (Numeral n) => Num (Mod n) where
   x + y       = MkMod $ (unMod x + unMod y) `mod` modulus x
   x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
-  fromInteger = MkMod
+  fromInteger = MkMod . fromIntegral
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate      = MkMod . negate . unMod
@@ -111,14 +111,15 @@ instance (Numeral n) => FiniteField (Mod n) where
   one            = MkMod 1
   elems          = const $ elems' one
   charakteristik = modulus
+  elemCount      = modulus
 
-modulus :: Numeral a => Mod a -> Integer
+modulus :: Numeral a => Mod a -> Int
 modulus x = numValue $ modulus' x
   where modulus' :: Numeral a => Mod a -> a
         modulus' = const undefined
 
 elems' :: (Numeral n) => Mod n -> [Mod n]
-elems' x = map fromInteger [0.. (modulus x - 1)]
+elems' x = map MkMod [0.. (modulus x - 1)]
 
 instance (Numeral n) => Fractional (Mod n) where
   recip          = invMod
@@ -129,11 +130,11 @@ instance (Numeral n) => Fractional (Mod n) where
 invMod :: Numeral a => Mod a -> Mod a
 invMod x = invMod' (unMod x `mod` p,p,one,zero)
   where p = modulus x
-        invMod' :: Numeral a => (Integer, Integer, Mod a, Mod a) -> Mod a
+        invMod' :: Numeral a => (Int, Int, Mod a, Mod a) -> Mod a
         divMod' (0,_,_,_) = divZeroError
         invMod' (u,v,x1,x2)
           | u == 1     = x1
-          | otherwise = invMod' (v-q*u,u,x2-fromInteger q*x1,x1)
+          | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
             where q = v `div` u
 
 

@@ -24,7 +24,8 @@ import qualified Control.Monad.Parallel as P
 class (Eq a) => FiniteField a where
   zero, one      :: a
   elems, units   :: a -> [a]
-  charakteristik :: a -> Integer
+  charakteristik :: a -> Int
+  elemCount      :: a -> Int
 
   units x = [e | e <- elems x, e /= zero]
 
