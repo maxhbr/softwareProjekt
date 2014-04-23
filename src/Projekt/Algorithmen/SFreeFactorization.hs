@@ -36,42 +36,30 @@ import Debug.Trace
       Kapitel 9
  -}
 
-sff :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c) 
       | df /= 0 && c == 1  = r
-      | otherwise = map (\(n,x) -> (n*p,x))
-                         (sff $ charRootP f)
-  where df = deriveP f
-        c'  = ggTP f df
-        p  = charakteristik $ prodOfCoeffsP f
-        (r,c)  = eval 1 (f @/ c') c'
-        eval i w c    | w == 1     = ([(1,1)], c)
-                      | otherwise = ((i,z) : r, c')
+      | otherwise        = map (\(n,x) -> (n*p,x))
+                               (sff $ charRootP f)
+  where df            = deriveP f
+        c'            = ggTP f df
+        p             = charakteristik $ prodOfCoeffsP f
+        (r,c)         = eval 1 (f @/ c') c'
+        eval i w c    | w == 1      = ([], c)
+                      | z /= P[one] = ((i,z) : r, c')
+                      | otherwise  = (r,c')
             where y      = ggTP w c
                   z      = w @/ y
-                  (r,c') = eval (i+1) y (c@/y)
+                  (r,c') = eval (i+1) y (c @/ y)
 
-unSff :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
+unSff :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
 unSff fs = product $ map (\(i,f) -> f^i) fs
 
 {-
- - Versuch 2 (noch nicht funktionsfähig)
--- |Liefert zu einem Polynom die quadratfreie Faktorisierung
--- TODO: Geht noch nicht!
-sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [Polynom a]
-sff f | f  == 1    = []
-      | df /= 0    = fst (divP f c) : sff c
-      | otherwise = spreadByP $ sff $ charRootP f
-
--- |Simuliert das ^p
-spreadByP :: (FiniteField a, Num a, Fractional a) => [Polynom a] -> [Polynom a]
-spreadByP []     = []
-spreadByP (x:xs) = [P[one] | i<- [1..(charakteristik (prodOfCoeffsP x) - 1)]]
-                   ++ [x]
-                   ++ spreadByP xs
-
-unSff :: (FiniteField a, Num a, Fractional a) => [Polynom a] -> Polynom a
-unSff xs = product $ zipWith (^) xs [1..]
+factToList :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)]
+                                                                  -> [Polynom a]
+factToList [] = []
+factToList ((i,f):fs) = [f | j <- [1..i]] : factToList fs
  -}
 
 --------------------------------------------------------------------------------
@@ -91,67 +79,4 @@ sqf=[P[1::F3,1]
 {-
 testSFF = sff f == sqf
 testExmp = f == unSff sqf
- -}
-
-{- ----------------------------------------------------------------------------
- --  Alt:  --------------------------------------------------------------------
- -----------------------------------------------------------------------------}
-
-{-
-sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
-sff' f | df /= 0    = undefined
-       | otherwise = map (\(n,x) -> (n*charakteristik $ prodOfCoeffsP f,x))
-                         (sff' $ charRootP f)
-  where df = deriveP f
-        c  = ggTP f df
- -}
-
---------------------------------------------------------------------------------
---  Hilfsfunktionen
-
-{-
-shiftTupple i (n,x) = (n+i,x)
-shiftTupples i = map (shiftTupple i)
- -}
-
-{-
-pThPower :: FiniteField a => [Polynom a] -> [Polynom a]
-pThPower = undefined
-
-pThRoot :: FiniteField a => Polynom a -> Polynom a
-pThRoot = charRootP
- -}
-
-{-
-sff' :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
-sff' f = undefined
-  where df = deriveP f
-        loop c r w i | w  /= 1    = loop (fst $ divP c y)
-                                        (shiftP i r)
-                                        y
-                                        (i+1)
-                     | otherwise = (r,c)
-          where y = ggTP w c
-        c          = ggTP f df
-        (r',c')    = loop c (P[1]) (fst $ divP f c) 1
- -}
-
-{-
-sff' f | df == 0    = pThPower $ sff (pThRoot f)
-       | c == 1     = undefined
-       | otherwise = undefined
-  where df = deriveP f
-        c  = ggTP f df -- Hier fehlt noch der Durchgang durch die While Schleife
-        w  = fst $ divP f c
- -}
-
-{-
--- |simmuliert das '^p', indem in das Array manipuliert wird
-spreadByP :: Mod a => [a] -> [a]
-spreadByP = undefined
- -}
-
-{-
-spreadByP []     = []
-spreadByP (m:ms) = m : [0|i<-[1..(modulus m - 1)]] ++ spreadByP ms
  -}

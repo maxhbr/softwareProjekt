@@ -16,7 +16,7 @@ module Projekt.Core.Polynomials
   -- unär
   , moniP, reziprokP, deriveP
   -- binär
-  , divP, divP', (@/), modByP, ggTP, eekP
+  , divP, (@/), modByP, ggTP, eekP
   -- weiteres
   , evalP, getAllP, shiftP
   ) where
