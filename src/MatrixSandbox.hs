@@ -13,28 +13,20 @@ import Projekt.Algorithmen
 import Projekt.Core.Matrix
 
 --------------------------------------------------------------------------------
---  Globale Charakteristik
-charakteristik :: Integer
-charakteristik = 5
-
---------------------------------------------------------------------------------
---  Definiere Endlichen Körper
-
-data PeanoNumber
-instance Numeral PeanoNumber where numValue x = charakteristik
-instance Show PeanoNumber    where show       = show
-type PF = Mod PeanoNumber
-
---------------------------------------------------------------------------------
 --  Matrizen
 
-m = M [[7::PF, 8::PF, 9::PF], [4::PF, 5::PF, 6::PF], [1::PF, 2::PF, 3::PF]]
+m = M [[7::F5, 8::F5, 9::F5], [4::F5, 5::F5, 6::F5], [1::F5, 2::F5, 3::F5]]
+m23 = M [[7::F5, 8::F5, 9::F5], [4::F5, 5::F5, 6::F5]]
+m32 = M [[7::F5, 8::F5], [4::F5, 5::F5], [1::F5, 2::F5]]
 
-eye2 = M [[1::PF, 0], [0, 1::PF]]
-eye3 = M [[1::PF, 0, 0], [0, 1::PF, 0], [0, 0, 1::PF]]
-eye = genDiagM (1::PF)
+eye2 = M [[1::F5, 0], [0, 1::F5]]
+eye3 = M [[1::F5, 0, 0], [0, 1::F5, 0], [0, 0, 1::F5]]
+eye = genDiagM (1::F5)
 
 --------------------------------------------------------------------------------
 --  Matrizen von Polynomen
 
-mp = M [[P[(1,1::PF)],P[(2,1::PF)]],[P[(0,1::PF)],P[(1,1::PF)]]]
+mp = M [[P[(1,1::F5)],P[(2,1::F5)]],[P[(0,1::F5)],P[(1,1::F5)]]]
+
+--------------------------------------------------------------------------------
+-- TODO: Test Matrix Multiplikation

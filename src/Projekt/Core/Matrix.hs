@@ -40,7 +40,8 @@ genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
 --  Instanzen
 
 instance Show a => Show (Matrix a) where
-  show m = concatMap ((++ "\n") . show') $ unM m
+  show (Mdiag a) = "diag(" ++ show a ++ "…" ++ show a ++ ")"
+  show (M m)     = concatMap ((++ "\n") . show') m
     where show' (x:xs) = (show x ++) $ concatMap ((' ':) . show) xs
 
 instance (ShowTex a,Eq a) => ShowTex (Matrix a) where
@@ -64,23 +65,22 @@ instance (Num a, Eq a) => Num (Matrix a) where
   signum _      = error "Prelude.Num.signum: inappropriate abstraction"
   negate        = negateM
 
--- TODO: non exahstive patterns
 addM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 addM (Mdiag x) (Mdiag y) = Mdiag (x+y)
-addM (Mdiag x) m         = addM (genDiagM x (getNumRowsM m)) m
+addM (Mdiag x) m         = addM m (genDiagM x (getNumRowsM m))
 addM m         (Mdiag y) = addM m (genDiagM y (getNumRowsM m))
 addM (M x)     (M y)     | test      = addM' (length x) (length (head x))
                          | otherwise = error "not the same Dimensions"
   where test      = (length x == length y) && (length (head x) == length (head y))
         addM' n m = M [[x!!i!!j + y!!i!!j | j <- [0..(m-1)]] | i <- [0..(n-1)]]
 
--- TODO: replace the undefined
 multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 multM (Mdiag x) (Mdiag y) = Mdiag (x*y)
 multM (Mdiag x) m         = multM m (genDiagM x (getNumRowsM m))
-multM (M m)     (M n)     | test      = undefined
+multM (M m)     (M n)     | test      = M [ [ sum $ zipWith (*) ar bc | bc <- m ] | ar <- tn ]
                           | otherwise = error "not the same Dimensions"
   where test = length (head m) == length n
+        tn   = transpose n
 
 negateM :: (Num a) => Matrix a -> Matrix a
 negateM (Mdiag x) = Mdiag $ negate x
@@ -119,11 +119,11 @@ atM (M m) row col = m !! row !! col
 
 -- get rows
 (!!-) :: Matrix a -> [Int] -> Matrix a
-(M m) !!- ns  = M $ [m !! i | i <- ns]
+(M m) !!- ns  = M [m !! i | i <- ns]
 
 -- get columns
 (!!|) :: Matrix a -> [Int] -> Matrix a
-(!!|) (M m) ns  = M $ [[m !! i !! j | j <- ns] | i <- [0..r-1]]
+(!!|) (M m) ns  = M [[m !! i !! j | j <- ns] | i <- [0..r-1]]
   where r = getNumRowsM $ M m
 
 getNumRowsM :: Matrix a -> Int
@@ -173,7 +173,6 @@ triangularM m  = M $ triangular' 0 $ unM m
 {-fulltriangularM :: (Eq a, Fractional a) => Matrix a -> Matrix a-}
 {-fulltriangularM  = backtrackM . triangularM-}
 
-
 -- backtrack an upper triangular Matrix a
 {-backtrackM :: (Eq a, Fractional a) => Matrix a -> Matrix a-}
 {-backtrackM (M m)  = M $ backtrack' m-}
@@ -183,11 +182,9 @@ triangularM m  = M $ triangular' 0 $ unM m
                         {-| otherwise     =  undefined map (zipWith (-) $ map (/f) l) as-}
               {-where l = last as-}
                 {-f = find (/=0) l-}
-          
 
 subtrL :: (Num a) => [a] -> [a] -> [a]
-subtrL as bs = zipWith (-) as bs
-
+subtrL = zipWith (-)
 
 detM :: (Eq a, Fractional a) => Matrix a -> a
 detM m | isQuadraticM m = product [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
