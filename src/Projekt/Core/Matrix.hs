@@ -136,6 +136,7 @@ getNumColsM = length . head . unM
 --  Funktionen auf Matrizen
 
 -- |Transponiere eine Matrix
+-- TODO: Langsam, da sollte es eine bessere Möglichkeit geben!
 transposeM :: Matrix a -> Matrix a
 transposeM = M . transpose . unM
 
