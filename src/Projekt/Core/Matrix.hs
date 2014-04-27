@@ -10,6 +10,7 @@ module Projekt.Core.Matrix
   , triangularM, detM
   ) where
 import Data.List
+import Data.Array
 
 import Projekt.Core.ShowTex
 import Debug.Trace
