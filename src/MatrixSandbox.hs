@@ -37,12 +37,16 @@ mp = M [[P[0,1::F5],P[0,0,1::F5]],[P[1::F5],P[0,1::F5]]]
 main :: IO ()
 main = hspec $ do
     describe "Projekt.Core.Matrix" $ do
+      it "eye is multiplikative neutral" $ do
+        m * eye3 `shouldBe` m
+        m23 * eye3 `shouldBe` m23
+        m32 * eye2 `shouldBe` m32
       it "det(eye) = 1 (1,2,3,alg)" $ do
         detM (M[[1::F7]]) `shouldBe` 1
         detM eye2 `shouldBe` 1
         detM eye3 `shouldBe` 1
         detM eye `shouldBe` 1
-      it "det(2 *eye) = 2^n" $ do
+      it "det(2 * eye) = 2^n" $ do
         detM (M[[2::F7]]) `shouldBe` 2
         detM (eye2 * Mdiag 2) `shouldBe` 4
         detM (eye3 * Mdiag 2) `shouldBe` 8

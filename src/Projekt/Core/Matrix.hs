@@ -79,7 +79,7 @@ multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 multM (Mdiag x) (Mdiag y) = Mdiag (x*y)
 multM (Mdiag x) m         = multM m (genDiagM x (getNumRowsM m))
 multM  m        (Mdiag x) = multM m (genDiagM x (getNumRowsM m))
-multM (M m)     (M n)     | test      = M [ [ sum $ zipWith (*) ar bc | bc <- m ] | ar <- tn ]
+multM (M m)     (M n)     | test      = M [ [ sum $ zipWith (*) ar bc | ar <- tn ] | bc <- m ]
                           | otherwise = error "not the same Dimensions"
   where test = length (head m) == length n
         tn   = transpose n
