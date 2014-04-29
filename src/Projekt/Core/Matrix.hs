@@ -78,6 +78,7 @@ addM (M x)     (M y)     | test      = addM' (length x) (length (head x))
 multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 multM (Mdiag x) (Mdiag y) = Mdiag (x*y)
 multM (Mdiag x) m         = multM m (genDiagM x (getNumRowsM m))
+multM  m        (Mdiag x) = multM m (genDiagM x (getNumRowsM m))
 multM (M m)     (M n)     | test      = M [ [ sum $ zipWith (*) ar bc | bc <- m ] | ar <- tn ]
                           | otherwise = error "not the same Dimensions"
   where test = length (head m) == length n
@@ -156,7 +157,8 @@ swapItems ls r1 r2 = [get k x | (x,k) <- zip ls [0..]]
                   | otherwise = x
 
 triangularM :: (Eq a, Fractional a) => Matrix a -> Matrix a
-triangularM m  = M $ triangular' 0 $ unM m
+triangularM (Mdiag m) = Mdiag m
+triangularM (M m)     = M $ triangular' 0 m
   where triangular' n [] = []
         triangular' n m' = row : triangular' (n+1) rows'
           where (row:rows) = pivotAndSwap n m'
@@ -188,9 +190,14 @@ triangularM m  = M $ triangular' 0 $ unM m
 subtrL :: (Num a) => [a] -> [a] -> [a]
 subtrL = zipWith (-)
 
+-- TODO: Mdiag pattern
 detM :: (Eq a, Fractional a) => Matrix a -> a
-detM m | isQuadraticM m = product [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
-       | otherwise      = error "Matrix not quadratic"
+detM (Mdiag 0) = 0
+detM (Mdiag 1) = 1
+detM (Mdiag _) = error "Not enougth information given"
+detM m         | isQuadraticM m = 
+                  product [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
+               | otherwise      = error "Matrix not quadratic"
 
 {-invM :: (Eq a, Fractional a) => Matrix a -> Matrix a-}
   {-invM m | !isQuadraticM m  = error "Matrix not quadratic"-}
