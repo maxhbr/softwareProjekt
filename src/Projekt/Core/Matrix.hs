@@ -21,7 +21,7 @@ import Debug.Trace
 --------------------------------------------------------------------------------
 --  Data Definition
 
-data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a deriving Show
+data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a
 
 wavefront       :: Int -> Array (Int,Int) Int
 wavefront n     =  a  where
