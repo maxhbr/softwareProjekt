@@ -1,5 +1,5 @@
 module Projekt.Core.Matrix
-  ( Matrix (..), unM, genDiagM
+  ( Matrix (..), genDiagM
   -- tests
   , isQuadraticM, isValidM
   -- getter
@@ -18,13 +18,10 @@ import Debug.Trace
 --------------------------------------------------------------------------------
 --  Data Definition
 
-data Matrix a = M [[a]] | Mdiag a
+data Matrix a = M {unM :: [[a]]} | Mdiag a
 
 --------------------------------------------------------------------------------
 --  Basics
-
-unM :: Matrix a -> [[a]]
-unM (M m) = m
 
 isValidM :: Matrix a -> Bool
 isValidM (M m) = and [n == head ns | n <- tail ns]
