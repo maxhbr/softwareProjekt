@@ -115,7 +115,6 @@ atM (M m) row col = m !! row !! col
 (!-) :: Matrix a -> Int -> [a]
 (M m) !- n  = m !! n
 
-
 -- get rows
 (!!-) :: Matrix a -> [Int] -> Matrix a
 (M m) !!- ns  = M [m !! i | i <- ns]
@@ -183,9 +182,6 @@ triangularM (M m)     = M $ triangular' 0 m
                         {-| otherwise     =  undefined map (zipWith (-) $ map (/f) l) as-}
               {-where l = last as-}
                 {-f = find (/=0) l-}
-
-subtrL :: (Num a) => [a] -> [a] -> [a]
-subtrL = zipWith (-)
 
 -- TODO: Mdiag pattern
 detM :: (Eq a, Fractional a) => Matrix a -> a
