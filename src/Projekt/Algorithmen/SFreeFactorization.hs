@@ -1,8 +1,9 @@
 module Projekt.Algorithmen.SFreeFactorization
-  (sff, unSff
+  (sff
   ) where
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
+import Projekt.Core.Factorization
 
 import Debug.Trace
 
@@ -37,7 +38,7 @@ import Debug.Trace
  -}
 
 sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
-sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c) 
+sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
       | df /= 0 && c == 1  = r
       | otherwise        = map (\(n,x) -> (n*p,x))
                                (sff $ charRootP f)
@@ -52,8 +53,8 @@ sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
                   z      = w @/ y
                   (r,c') = eval (i+1) y (c @/ y)
 
-unSff :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
-unSff fs = product $ map (\(i,f) -> f^i) fs
+{-unSff :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a-}
+{-unSff fs = product $ map (\(i,f) -> f^i) fs-}
 
 {-
 factToList :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)]
