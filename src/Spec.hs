@@ -1,7 +1,7 @@
 import qualified PFSandbox
 import qualified PolySandbox
 import qualified FFSandbox
---import qualified MatrixSandbox
+import qualified MatrixSandbox
 import qualified AlgSandbox
 
 --------------------------------------------------------------------------------
@@ -10,5 +10,5 @@ main = do
   PFSandbox.main
   PolySandbox.main
   FFSandbox.main
-  --MatrixSandbox.main
+  MatrixSandbox.main
   AlgSandbox.main

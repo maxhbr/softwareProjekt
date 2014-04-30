@@ -8,8 +8,7 @@
 --------------------------------------------------------------------------------
 
 module AlgSandbox
-  (
-  )where
+  where
 import Projekt.Core
 import Projekt.Algorithmen
 import FFSandbox (e2f2,e2e2f2,e4f2)
@@ -35,10 +34,10 @@ testSize = 10
 main :: IO ()
 main = do
   vList <- rndSelect (getAllP (elems e2e2f2) 5) testSize
-  hspec $ do
+  hspec $
     describe "Projekt.Algorithmen.SFreeFactorization" $ do
-      it "sff and unSff should be inverse (example f over F3)" $ do
+      it "sff and unSff should be inverse (example f over F3)" $
         unSff (sff f) `shouldBe` f
-      it "sff and unSff should be inverse (random list on e2e2f2)" $ do
+      it "sff and unSff should be inverse (random list on e2e2f2)" $
         pMapM_ (\f -> unSff (sff f) `shouldBe` f) vList
     --describe "Projekt.Algorithmen.Berlekamp"
