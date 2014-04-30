@@ -1,4 +1,5 @@
 module Projekt.Core.Matrix
+{-
   ( Matrix (..), genDiagM
   -- tests
   , isQuadraticM, isValidM
@@ -8,7 +9,9 @@ module Projekt.Core.Matrix
   , swapRowsM, swapColsM, (<|>), (<-->), transposeM
   -- linear algebra
   , triangularM, detM
-  ) where
+  )
+ -}
+  where
 import Data.List
 import Data.Array
 
@@ -18,21 +21,33 @@ import Debug.Trace
 --------------------------------------------------------------------------------
 --  Data Definition
 
-data Matrix a = M {unM :: [[a]]} | Mdiag a
+data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a deriving Show
 
+wavefront       :: Int -> Array (Int,Int) Int
+wavefront n     =  a  where
+                   a = array ((1,1),(n,n))
+                        ([((1,j), 1) | j <- [1..n]] ++
+                         [((i,1), 1) | i <- [2..n]] ++
+                         [((i,j), a!(i,j-1) + a!(i-1,j-1) + a!(i-1,j))
+                                     | i <- [2..n], j <- [2..n]])
 --------------------------------------------------------------------------------
 --  Basics
 
-isValidM :: Matrix a -> Bool
-isValidM (M m) = and [n == head ns | n <- tail ns]
-  where ns = map length m
+getAllIdxs n m = concat [[(i,j) | i <- [1..n]] | j <- [1..m]]
+getAllIdxsExcept n m idxs = [idx | idx <- getAllIdxs n m
+                                 , idx `notElem` idxs]
+fillList ls n m = ls ++ [(idx,0) | idx <- getAllIdxsExcept n m idxs]
+  where idxs = map fst ls
+
 
 isQuadraticM :: Matrix a -> Bool
-isQuadraticM m = getNumColsM m == getNumRowsM m
+sQuadraticM (Mdiag a) = True
+isQuadraticM (M m) = uncurry (==) b
+  where b = snd $ bounds m
 
 genDiagM :: (Num a) => a -> Int -> Matrix a
-genDiagM x n = M [genEyeM' i | i <- [0..(n-1)]]
-  where genEyeM' i = [0 | j <- [0..(i-1)]] ++ (x:[0 | j <- [(i+1)..(n-1)]])
+genDiagM x n = M $ array ((1,1),(n,n)) $ fillList [((i,i),x) | i <- [1..n]] n n
+{-
 
 --------------------------------------------------------------------------------
 --  Instanzen
@@ -199,4 +214,5 @@ detM m         | isQuadraticM m =
 -- |Berechne die Determinante ohne nutzen von Fractional a
 altDetM :: (Eq a) => Matrix a -> a
 altDetM = undefined
+ -}
  -}
