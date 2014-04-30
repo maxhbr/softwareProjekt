@@ -28,16 +28,22 @@ sqf=[(1,P[1::F3,1])
     ,(3,P[1::F3,0,1])
     ,(4,P[2::F3,1])]
 
+pp :: (Show a) => [a] -> IO()
+pp =  mapM_ print
+
 --------------------------------------------------------------------------------
 testSize = 10
 
 main :: IO ()
 main = do
-  vList <- rndSelect (getAllP (elems e2e2f2) 5) testSize
+  list1 <- rndSelect (getAllByDegP (elems e2e2f2) 5) testSize
+  list2 <- rndSelect (getAllByDegP (elems e4f2) 5) testSize
   hspec $
     describe "Projekt.Algorithmen.SFreeFactorization" $ do
       it "sff and unFact should be inverse (example f over F3)" $
         unFact (sff f) `shouldBe` f
-      it "sff and unFact should be inverse (random list on e2e2f2)" $
-        pMapM_ (\f -> unFact (sff f) `shouldBe` f) vList
+      it "sff and unFact should be inverse (random subset of e2e2f2)" $
+        pMapM_ (\f -> unFact (sff f) `shouldBe` f) list1
+      it "sff and unFact should be inverse (random subset of e4f2)" $
+        pMapM_ (\f -> unFact (sff f) `shouldBe` f) list2
     --describe "Projekt.Algorithmen.Berlekamp"

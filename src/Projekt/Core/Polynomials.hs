@@ -12,18 +12,20 @@ module Projekt.Core.Polynomials
   -- getter
   , getDegrees, getLcP
   -- Operationen auf Polynomen
-  , aggP, degP, prodOfCoeffsP
+  , aggP, degP, unsafeDegP, prodOfCoeffsP
   -- unär
   , moniP, reziprokP, deriveP
   -- binär
   , divP, (@/), modByP, ggTP, eekP
   -- weiteres
-  , evalP, getAllP, shiftP
+  , evalP, shiftP
+  , getAllP, getAllByDegP
   ) where
 import Data.List
 import GHC.Err (divZeroError)
 import qualified Control.Arrow as A
 import Data.Maybe
+import System.Random
 
 import Projekt.Core.ShowTex
 
@@ -123,6 +125,8 @@ degP f | deg >= 0   = Just deg
        | otherwise = Nothing
   where deg = (length . unP . aggP) f - 1
 
+unsafeDegP = fromJust . degP
+
 -- |Gibt zu einem Polynom das Produkt der Koeffizient
 prodOfCoeffsP :: Num a => Polynom a -> a
 prodOfCoeffsP = product . unP
@@ -203,3 +207,12 @@ getAllP :: (Num a, Eq a) => [a] -> Int -> [Polynom a]
 getAllP cs d = map P (css d)
   where css n | n == 1     = [[y] | y <- cs]
               | otherwise = [y:ys | y <- cs, ys <- css (n-1) ]
+
+-- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome mit genau diesem
+-- Grad.
+getAllByDegP :: (Num a, Eq a) => [a] -> Int -> [Polynom a]
+getAllByDegP cs d = map P (lcss d)
+  where lcss n | n == 1     = [[y] | y <- cs]
+               | otherwise = [y:ys | y <- [e | e <- cs, e /= 0], ys <- css (n-1) ]
+        css n  | n == 1     = [[y] | y <- cs]
+               | otherwise = [y:ys | y <- cs, ys <- css (n-1) ]
