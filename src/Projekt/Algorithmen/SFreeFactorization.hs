@@ -72,12 +72,13 @@ factToList ((i,f):fs) = [f | j <- [1..i]] : factToList fs
  -        = (x+1)(x²+1)³(x+2)⁴
  -}
 f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
-sqf=[P[1::F3,1]
-    ,P[1]
-    ,P[1::F3,0,1]
-    ,P[2::F3,1]]
+sqf :: [(Int,Polynom F3)]
+sqf=[(1,P[1::F3,1])
+    ,(2,P[1])
+    ,(3,P[1::F3,0,1])
+    ,(4,P[2::F3,1])]
 
 {-
 testSFF = sff f == sqf
-testExmp = f == unSff sqf
+testExmp = f == unFact sqf
  -}
