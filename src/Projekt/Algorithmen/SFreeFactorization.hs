@@ -5,8 +5,6 @@ import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 import Projekt.Core.Factorization
 
-import Debug.Trace
-
 
 {-
  - from: http://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
@@ -53,16 +51,6 @@ sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
                   z      = w @/ y
                   (r,c') = eval (i+1) y (c @/ y)
 
-{-unSff :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a-}
-{-unSff fs = product $ map (\(i,f) -> f^i) fs-}
-
-{-
-factToList :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)]
-                                                                  -> [Polynom a]
-factToList [] = []
-factToList ((i,f):fs) = [f | j <- [1..i]] : factToList fs
- -}
-
 --------------------------------------------------------------------------------
 --  Beispiele
 
@@ -78,7 +66,3 @@ sqf=[(1,P[1::F3,1])
     ,(3,P[1::F3,0,1])
     ,(4,P[2::F3,1])]
 
-{-
-testSFF = sff f == sqf
-testExmp = f == unFact sqf
- -}

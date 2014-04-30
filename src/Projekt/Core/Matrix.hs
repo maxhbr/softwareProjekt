@@ -183,7 +183,6 @@ triangularM (M m)     = M $ triangular' 0 m
               {-where l = last as-}
                 {-f = find (/=0) l-}
 
--- TODO: Mdiag pattern
 detM :: (Eq a, Fractional a) => Matrix a -> a
 detM (Mdiag 0) = 0
 detM (Mdiag 1) = 1
@@ -195,3 +194,9 @@ detM m         | isQuadraticM m =
 {-invM :: (Eq a, Fractional a) => Matrix a -> Matrix a-}
   {-invM m | !isQuadraticM m  = error "Matrix not quadratic"-}
          {-| -}
+
+{-
+-- |Berechne die Determinante ohne nutzen von Fractional a
+altDetM :: (Eq a) => Matrix a -> a
+altDetM = undefined
+ -}
