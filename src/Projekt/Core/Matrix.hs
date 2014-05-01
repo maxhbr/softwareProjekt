@@ -14,6 +14,7 @@ module Projekt.Core.Matrix
   where
 import Data.List
 import Data.Array
+import Data.Array.IArray (amap)
 
 import Projekt.Core.ShowTex
 import Debug.Trace
@@ -23,13 +24,6 @@ import Debug.Trace
 
 data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a
 
-wavefront       :: Int -> Array (Int,Int) Int
-wavefront n     =  a  where
-                   a = array ((1,1),(n,n))
-                        ([((1,j), 1) | j <- [1..n]] ++
-                         [((i,1), 1) | i <- [2..n]] ++
-                         [((i,j), a!(i,j-1) + a!(i-1,j-1) + a!(i-1,j))
-                                     | i <- [2..n], j <- [2..n]])
 --------------------------------------------------------------------------------
 --  Basics
 
@@ -47,16 +41,19 @@ isQuadraticM (M m) = uncurry (==) b
 
 genDiagM :: (Num a) => a -> Int -> Matrix a
 genDiagM x n = M $ array ((1,1),(n,n)) $ fillList [((i,i),x) | i <- [1..n]] n n
-{-
+
 
 --------------------------------------------------------------------------------
 --  Instanzen
 
 instance Show a => Show (Matrix a) where
   show (Mdiag a) = "diag(" ++ show a ++ "…" ++ show a ++ ")"
-  show (M m)     = concatMap ((++ "\n") . show') m
-    where show' (x:xs) = (show x ++) $ concatMap ((' ':) . show) xs
+  show (M m)     = unlines [concatMap (++ " ") [show (m!(i,j))
+                                                | j <- [1..(snd b)]]
+                             | i <- [1..(fst b)]]
+    where b = snd $ bounds m
 
+{-
 instance (ShowTex a,Eq a) => ShowTex (Matrix a) where
   showTex (M [])    = ""
   showTex (M [[]])  = ""
@@ -64,6 +61,7 @@ instance (ShowTex a,Eq a) => ShowTex (Matrix a) where
   showTex (M m)     = "\\begin{pmatrix}" ++ showTex' m ++ "\\end{pmatrix}"
     where showTex'         = concatMap ((++ "\\\\") . showTex'')
           showTex'' (x:xs) = (showTex x ++) $ concatMap (('&':) . showTex) xs
+ -}
 
 instance (Eq a, Num a) => Eq (Matrix a) where
   Mdiag x == m = genDiagM x (getNumRowsM m) == m
@@ -82,25 +80,27 @@ addM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 addM (Mdiag x) (Mdiag y) = Mdiag (x+y)
 addM (Mdiag x) m         = addM m (genDiagM x (getNumRowsM m))
 addM m         (Mdiag y) = addM m (genDiagM y (getNumRowsM m))
-addM (M x)     (M y)     | test      = addM' (length x) (length (head x))
+addM (M x)     (M y)     | test      = M $ array (bounds x)
+    [(idx,x!idx + y!idx) | idx <- indices x]
                          | otherwise = error "not the same Dimensions"
-  where test      = (length x == length y) && (length (head x) == length (head y))
-        addM' n m = M [[x!!i!!j + y!!i!!j | j <- [0..(m-1)]] | i <- [0..(n-1)]]
+  where test      = bounds x == bounds y
+
+negateM :: (Num a) => Matrix a -> Matrix a
+negateM (Mdiag x) = Mdiag $ negate x
+negateM (M m)     = M $ amap negate m
 
 multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 multM (Mdiag x) (Mdiag y) = Mdiag (x*y)
 multM (Mdiag x) m         = multM m (genDiagM x (getNumRowsM m))
 multM  m        (Mdiag x) = multM m (genDiagM x (getNumRowsM m))
-multM (M m)     (M n)     | test      = M [ [ sum $ zipWith (*) ar bc | ar <- tn ] | bc <- m ]
+multM (M m)     (M n)     | k' == l    = M $ array ((1,1),(k,l'))
+    [((i,j), sum [m!(i,k) * n!(k,j) | k <- [1..l]]) | i <- [1..k] , j <- [1..l']]
                           | otherwise = error "not the same Dimensions"
-  where test = length (head m) == length n
-        tn   = transpose n
-
-negateM :: (Num a) => Matrix a -> Matrix a
-negateM (Mdiag x) = Mdiag $ negate x
-negateM (M m)     = M $ map (map negate) m
+  where ((_,_),(k,l))   = bounds m
+        ((_,_),(k',l')) = bounds n
 
 
+{-
 -- 'concat' matrices horizontally
 (<|>) :: Matrix a -> Matrix a -> Matrix a
 (<|>) (M m1) (M m2) | test      = M [ m1 !! i ++ m2 !! i | i <- [0..(n-1)] ]
@@ -114,13 +114,21 @@ negateM (M m)     = M $ map (map negate) m
                    | otherwise = error "not same column count"
   where
     test = getNumColsM (M m1) == getNumColsM (M m2)
+ -}
 
 --------------------------------------------------------------------------------
 --  Getter
 
 atM :: Matrix a -> Int -> Int -> a
-atM (M m) row col = m !! row !! col
+atM (M m) row col = m!(row,col)
 
+getNumRowsM :: Matrix a -> Int
+getNumRowsM (M m) = fst $ snd $ bounds m
+
+getNumColsM :: Matrix a -> Int
+getNumColsM (M m) = snd $ snd $ bounds m
+
+{-
 -- get column
 (!|) :: Matrix a -> Int -> [a]
 (!|) (M m) n  = [m !! i !! n | i <- [0..r-1]]
@@ -138,21 +146,17 @@ atM (M m) row col = m !! row !! col
 (!!|) :: Matrix a -> [Int] -> Matrix a
 (!!|) (M m) ns  = M [[m !! i !! j | j <- ns] | i <- [0..r-1]]
   where r = getNumRowsM $ M m
-
-getNumRowsM :: Matrix a -> Int
-getNumRowsM = length . unM
-
-getNumColsM :: Matrix a -> Int
-getNumColsM = length . head . unM
+-}
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Matrizen
 
 -- |Transponiere eine Matrix
--- TODO: Langsam, da sollte es eine bessere Möglichkeit geben!
 transposeM :: Matrix a -> Matrix a
-transposeM = M . transpose . unM
+transposeM (Mdiag a) = Mdiag a
+transposeM (M m)     = M $ ixmap (bounds m) (\(x,y) -> (y,x)) m
 
+{-
 -- |Vertausche zwei Zeilen einer Matrix
 swapRowsM :: Matrix a -> Int -> Int -> Matrix a
 swapRowsM m r1 r2 = M $ swapItems (unM m) r1 r2
@@ -202,7 +206,7 @@ detM :: (Eq a, Fractional a) => Matrix a -> a
 detM (Mdiag 0) = 0
 detM (Mdiag 1) = 1
 detM (Mdiag _) = error "Not enougth information given"
-detM m         | isQuadraticM m = 
+detM m         | isQuadraticM m =
                   product [atM (triangularM m) i i | i <- [0..(getNumRowsM m -1)]]
                | otherwise      = error "Matrix not quadratic"
 
