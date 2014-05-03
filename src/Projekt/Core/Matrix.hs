@@ -42,6 +42,11 @@ isQuadraticM (M m) = uncurry (==) b
 genDiagM :: (Num a) => a -> Int -> Matrix a
 genDiagM x n = M $ array ((1,1),(n,n)) $ fillList [((i,i),x) | i <- [1..n]] n n
 
+fromListsM :: [[a]] -> Matrix a
+fromListsM ess = M $ array ((1,1),(k,l)) [((i,j),ess!!(j-1)!!(i-1)) | i <- [1..k]
+                                                                    , j <- [1..l]]
+  where k = length $ head ess
+        l = length ess
 
 --------------------------------------------------------------------------------
 --  Instanzen
@@ -91,8 +96,8 @@ negateM (M m)     = M $ amap negate m
 
 multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 multM (Mdiag x) (Mdiag y) = Mdiag (x*y)
-multM (Mdiag x) m         = multM m (genDiagM x (getNumRowsM m))
-multM  m        (Mdiag x) = multM m (genDiagM x (getNumRowsM m))
+multM (Mdiag x) m         = multM (genDiagM x (getNumRowsM m)) m
+multM  m        (Mdiag x) = multM m (genDiagM x (getNumColsM m))
 multM (M m)     (M n)     | k' == l    = M $ array ((1,1),(k,l'))
     [((i,j), sum [m!(i,k) * n!(k,j) | k <- [1..l]]) | i <- [1..k] , j <- [1..l']]
                           | otherwise = error "not the same Dimensions"
@@ -170,7 +175,9 @@ swapItems ls r1 r2 = [get k x | (x,k) <- zip ls [0..]]
     where get k x | k == r1 = ls !! r1
                   | k == r1 = ls !! r2
                   | otherwise = x
+-}
 
+{-
 triangularM :: (Eq a, Fractional a) => Matrix a -> Matrix a
 triangularM (Mdiag m) = Mdiag m
 triangularM (M m)     = M $ triangular' 0 m
@@ -213,10 +220,23 @@ detM m         | isQuadraticM m =
 {-invM :: (Eq a, Fractional a) => Matrix a -> Matrix a-}
   {-invM m | !isQuadraticM m  = error "Matrix not quadratic"-}
          {-| -}
+ -}
 
-{-
 -- |Berechne die Determinante ohne nutzen von Fractional a
-altDetM :: (Eq a) => Matrix a -> a
-altDetM = undefined
- -}
- -}
+detLapM :: (Eq a, Num a) => Matrix a -> a
+detLapM (Mdiag 0) = 0
+detLapM (Mdiag 1) = 1
+detLapM (Mdiag _) = error "Not enougth information given"
+detLapM m | isQuadraticM m = detLapM' $ unM m
+          | otherwise      = 0
+detLapM' :: (Eq a, Num a) => Array (Int, Int) a -> a
+detLapM' m | b == (1,1) = m!(1,1)
+           | otherwise =
+  sum [(-1)^(i-1) * m!(i,1) * detLapM' (getSubArr i) | i <- [1..fst b]]
+    where b           = snd $ bounds m
+          getSubArr i = array ((1,1),(fst b-1,snd b-1)) $
+            [((i',j'),m!(i',j'+1)) | i' <- [1..(i-1)]
+                                   , j' <- [1..(snd b - 1)]]
+            ++ [((i',j'),m!(i'+1,j'+1)) | i' <- [i..(fst b - 1)]
+                                       , j' <- [1..(snd b - 1)]]
+

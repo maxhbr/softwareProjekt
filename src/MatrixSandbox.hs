@@ -19,18 +19,29 @@ import SpecCommon
 --------------------------------------------------------------------------------
 --  Matrizen
 
-m = M [[7::F5, 8::F5, 9::F5], [4::F5, 5::F5, 6::F5], [1::F5, 2::F5, 3::F5]]
-m23 = M [[7::F5, 8::F5, 9::F5], [4::F5, 5::F5, 6::F5]]
-m32 = M [[7::F5, 8::F5], [4::F5, 5::F5], [1::F5, 2::F5]]
+m = fromListsM [ [7::F5, 8::F5, 9::F5]
+               , [4::F5, 5::F5, 6::F5]
+               , [1::F5, 2::F5, 3::F5] ]
+m23 = fromListsM [ [7::F5, 8::F5, 9::F5]
+                 , [4::F5, 5::F5, 6::F5] ]
+m32 = fromListsM [ [7::F5, 8::F5]
+                 , [4::F5, 5::F5]
+                 , [1::F5, 2::F5] ]
 
-eye2 = M [[1::F5, 0], [0, 1::F5]]
-eye3 = M [[1::F5, 0, 0], [0, 1::F5, 0], [0, 0, 1::F5]]
+eye2 = fromListsM [ [1::F5, 0]
+                  , [0, 1::F5] ]
+eye3 = fromListsM [ [1::F5, 0, 0]
+                  , [0, 1::F5, 0]
+                  , [0, 0, 1::F5] ]
 eye = Mdiag (1::F5)
 
 --------------------------------------------------------------------------------
 --  Matrizen von Polynomen
 
-mp = M [[P[0,1::F5],P[0,0,1::F5]],[P[1::F5],P[0,1::F5]]]
+mp = fromListsM [ [ P[0,1::F5], P[0,0,1::F5] ]
+                , [ P[1::F5], P[0,1::F5] ] ]
+mp2 = fromListsM [ [ P[0,1::F5], P[0,0,1::F5] ]
+                 , [ P[0,1::F5], P[0,1::F5] ] ]
 
 --------------------------------------------------------------------------------
 -- TODO: Test Matrix Multiplikation
@@ -39,14 +50,20 @@ main = hspec $ do
     describe "Projekt.Core.Matrix" $ do
       it "eye is multiplikative neutral" $ do
         m * eye3 `shouldBe` m
-        m23 * eye3 `shouldBe` m23
-        m32 * eye2 `shouldBe` m32
+        m23 * eye2 `shouldBe` m23
+        m32 * eye3 `shouldBe` m32
+        m * eye `shouldBe` m
+        m23 * eye `shouldBe` m23
+        m32 * eye `shouldBe` m32
+        eye * m `shouldBe` m
+        eye * m23 `shouldBe` m23
+        eye * m32 `shouldBe` m32
       it "det(eye) = 1 (1,2,3,alg)" $ do
-        detM (M[[1::F7]]) `shouldBe` 1
-        detM eye2 `shouldBe` 1
-        detM eye3 `shouldBe` 1
-        detM eye `shouldBe` 1
+        detLapM (fromListsM[[1::F7]]) `shouldBe` 1
+        detLapM eye2 `shouldBe` 1
+        detLapM eye3 `shouldBe` 1
+        detLapM eye `shouldBe` 1
       it "det(2 * eye) = 2^n" $ do
-        detM (M[[2::F7]]) `shouldBe` 2
-        detM (eye2 * Mdiag 2) `shouldBe` 4
-        detM (eye3 * Mdiag 2) `shouldBe` 8
+        detLapM (fromListsM[[2::F7]]) `shouldBe` 2
+        detLapM (eye2 * Mdiag 2) `shouldBe` 4
+        detLapM (eye3 * Mdiag 2) `shouldBe` 8
