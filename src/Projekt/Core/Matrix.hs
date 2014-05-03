@@ -1,16 +1,14 @@
 module Projekt.Core.Matrix
-{-
-  ( Matrix (..), genDiagM
+  ( Matrix (..), genDiagM, fromListsM
   -- tests
-  , isQuadraticM, isValidM
+  , isQuadraticM
   -- getter
-  , atM, getNumRowsM, getNumColsM, (!|), (!-)
+  , atM, getNumRowsM, getNumColsM
   -- operations
-  , swapRowsM, swapColsM, (<|>), (<-->), transposeM
+  , transposeM
   -- linear algebra
-  , triangularM, detM
+  , detLapM
   )
- -}
   where
 import Data.List
 import Data.Array
@@ -27,11 +25,10 @@ data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a
 --------------------------------------------------------------------------------
 --  Basics
 
-getAllIdxs n m = concat [[(i,j) | i <- [1..n]] | j <- [1..m]]
-getAllIdxsExcept n m idxs = [idx | idx <- getAllIdxs n m
-                                 , idx `notElem` idxs]
 fillList ls n m = ls ++ [(idx,0) | idx <- getAllIdxsExcept n m idxs]
-  where idxs = map fst ls
+  where idxs                      = map fst ls
+        getAllIdxsExcept n m idxs = [idx | idx <- [(i,j) | i <- [1..n], j <- [1..m]]
+                                         , idx `notElem` idxs]
 
 
 isQuadraticM :: Matrix a -> Bool
@@ -161,6 +158,25 @@ transposeM :: Matrix a -> Matrix a
 transposeM (Mdiag a) = Mdiag a
 transposeM (M m)     = M $ ixmap (bounds m) (\(x,y) -> (y,x)) m
 
+-- |Berechne die Determinante ohne nutzen von Fractional a
+detLapM :: (Eq a, Num a) => Matrix a -> a
+detLapM (Mdiag 0) = 0
+detLapM (Mdiag 1) = 1
+detLapM (Mdiag _) = error "Not enougth information given"
+detLapM m | isQuadraticM m = detLapM' $ unM m
+          | otherwise      = 0
+detLapM' :: (Eq a, Num a) => Array (Int, Int) a -> a
+detLapM' m | b == (1,1) = m!(1,1)
+           | otherwise =
+  sum [(-1)^(i-1) * m!(i,1) * detLapM' (getSubArr i) | i <- [1..fst b]]
+    where b           = snd $ bounds m
+          getSubArr i = array ((1,1),(fst b-1,snd b-1)) $
+            [((i',j'),m!(i',j'+1)) | i' <- [1..(i-1)]
+                                   , j' <- [1..(snd b - 1)]]
+            ++ [((i',j'),m!(i'+1,j'+1)) | i' <- [i..(fst b - 1)]
+                                       , j' <- [1..(snd b - 1)]]
+
+
 {-
 -- |Vertausche zwei Zeilen einer Matrix
 swapRowsM :: Matrix a -> Int -> Int -> Matrix a
@@ -221,22 +237,3 @@ detM m         | isQuadraticM m =
   {-invM m | !isQuadraticM m  = error "Matrix not quadratic"-}
          {-| -}
  -}
-
--- |Berechne die Determinante ohne nutzen von Fractional a
-detLapM :: (Eq a, Num a) => Matrix a -> a
-detLapM (Mdiag 0) = 0
-detLapM (Mdiag 1) = 1
-detLapM (Mdiag _) = error "Not enougth information given"
-detLapM m | isQuadraticM m = detLapM' $ unM m
-          | otherwise      = 0
-detLapM' :: (Eq a, Num a) => Array (Int, Int) a -> a
-detLapM' m | b == (1,1) = m!(1,1)
-           | otherwise =
-  sum [(-1)^(i-1) * m!(i,1) * detLapM' (getSubArr i) | i <- [1..fst b]]
-    where b           = snd $ bounds m
-          getSubArr i = array ((1,1),(fst b-1,snd b-1)) $
-            [((i',j'),m!(i',j'+1)) | i' <- [1..(i-1)]
-                                   , j' <- [1..(snd b - 1)]]
-            ++ [((i',j'),m!(i'+1,j'+1)) | i' <- [i..(fst b - 1)]
-                                       , j' <- [1..(snd b - 1)]]
-
