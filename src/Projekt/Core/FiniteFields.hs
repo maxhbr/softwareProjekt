@@ -12,7 +12,7 @@ module Projekt.Core.FiniteFields
   , charOfP, charRootP
   , module X
   ) where
-import GHC.Err (divZeroError)
+import GHC.Exception
 import Data.Maybe
 import Control.Exception
 
@@ -84,7 +84,7 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
 instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
   fromRational _     = error "inappropriate abstraction"
   recip (FFKonst x)  = FFKonst (recip x)
-  recip (FFElem f p) | FFElem f p == FFElem (P []) p = divZeroError
+  recip (FFElem f p) | FFElem f p == FFElem (P []) p = throw DivideByZero
                      | otherwise                    = FFElem s p
     where (_,s,_) = eekP f p
 
