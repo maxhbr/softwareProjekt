@@ -5,7 +5,6 @@ import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 import Projekt.Core.Factorization
 
-
 {-
  - from: http://en.wikipedia.org/wiki/Factorization_of_polynomials_over_finite_fields
 
@@ -36,20 +35,19 @@ import Projekt.Core.Factorization
  -}
 
 sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
-sff f | df /= 0 && c /= 1  = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
-      | df /= 0 && c == 1  = r
-      | otherwise        = map (\(n,x) -> (n*p,x))
-                               (sff $ charRootP f)
-  where df            = deriveP f
-        c'            = ggTP f df
-        p             = charakteristik $ prodOfCoeffsP f
-        (r,c)         = eval 1 (f @/ c') c'
-        eval i w c    | w == 1      = ([], c)
-                      | z /= P[one] = ((i,z) : r, c')
-                      | otherwise  = (r,c')
+sff f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
+      | df /= 0 && c == 1 = r
+      | otherwise       = map (\(n,x) -> (n*p,x)) $ sff $ charRootP f
+  where df         = deriveP f
+        c'         = ggTP f df
+        p          = charakteristik $ prodOfCoeffsP f
+        (r,c)      = sff' 1 (f @/ c') c'
+        sff' i w c | w == 1      = ([], c)
+                   | z /= P[one] = ((i,z) : r, c')
+                   | otherwise  = (r,c')
             where y      = ggTP w c
                   z      = w @/ y
-                  (r,c') = eval (i+1) y (c @/ y)
+                  (r,c') = sff' (i+1) y (c @/ y)
 
 --------------------------------------------------------------------------------
 --  Beispiele

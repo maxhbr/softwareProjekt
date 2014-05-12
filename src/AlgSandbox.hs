@@ -9,9 +9,12 @@
 
 module AlgSandbox
   where
+
+import Debug.Trace
+
 import Projekt.Core
 import Projekt.Algorithmen
-import FFSandbox (e2f2,e2e2f2,e4f2)
+import FFSandbox (e2f2,e2e2f2,e4f2,e4f2Mipo)
 
 import SpecCommon
 
@@ -31,6 +34,18 @@ sqf=[(1,P[1::F3,1])
 pp :: (Show a) => [a] -> IO()
 pp =  mapM_ print
 
+-- | failing f:
+--  (1₂·X³+1₂·X+1₂ mod 1₂·X⁴+1₂·X+1₂)·X⁴
+-- +(1₂·X          mod 1₂·X⁴+1₂·X+1₂)·X³
+-- +(1₂·X²+1₂·X+1₂ mod 1₂·X⁴+1₂·X+1₂)·X²
+-- +(1₂            mod 1₂·X⁴+1₂·X+1₂)·X
+-- +(1₂·X³+1₂·X²   mod 1₂·X⁴+1₂·X+1₂)
+failF = P[ FFElem (P[0::F2,0,1,1]) e4f2Mipo
+         , FFElem (P[1]) e4f2Mipo
+         , FFElem (P[1::F2,1,1]) e4f2Mipo
+         , FFElem (P[0::F2,1]) e4f2Mipo
+         , FFElem (P[1::F2,1,0,1]) e4f2Mipo ]
+
 --------------------------------------------------------------------------------
 testSize = 100
 
@@ -45,5 +60,5 @@ main = do
       it "sff and unFact should be inverse (random subset of e2e2f2)" $
         pMapM_ (\f -> unFact (sff f) `shouldBe` f) list1
       it "sff and unFact should be inverse (random subset of e4f2)" $
-        pMapM_ (\f -> unFact (sff f) `shouldBe` f) list2
+        mapM_ (\f -> unFact (sff (trace (show f) f)) `shouldBe` f) list2
     --describe "Projekt.Algorithmen.Berlekamp"
