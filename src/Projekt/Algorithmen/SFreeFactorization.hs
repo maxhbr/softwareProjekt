@@ -45,9 +45,9 @@ sff f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
         sff' i w c | w == 1      = ([], c)
                    | z /= P[one] = ((i,z) : r, c')
                    | otherwise  = (r,c')
-            where y      = ggTP w c
-                  z      = w @/ y
-                  (r,c') = sff' (i+1) y (c @/ y)
+          where y      = ggTP w c
+                z      = w @/ y
+                (r,c') = sff' (i+1) y (c @/ y)
 
 --------------------------------------------------------------------------------
 --  Beispiele
