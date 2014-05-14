@@ -1,5 +1,5 @@
 module Projekt.Algorithmen.SFreeFactorization
-  (sff, sfff
+  (sff
   ) where
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
@@ -34,6 +34,9 @@ import Debug.Trace
   Oder siehe:
       Computer Algebra and Symbolic Computation: Mathematical Methods Volume 2
       Kapitel 9
+  Oder (gleich wie Wiki):
+       K. O. Geddes,  S. R. Czapor,  G. Labahn: Algorithms for Computer Algebra
+       Seite 345(355)
  -}
 
 sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
@@ -51,7 +54,7 @@ sff f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
                 z      = w @/ y
                 (r,c') = sff' (i+1) y (c @/ y)
 
-
+{-
 -- |Noch ein Versuch, um alles zu verstehen:
 sfff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 sfff (P[]) = []
@@ -75,6 +78,7 @@ sfff f     | uDegP f == 0 = [(1,f)]
               | otherwise = (1,h) : map (\(n,x) -> (n+1,x)) (sfff g)
           where g = ggTP f df
                 h = fst $ divP f g
+ -}
 
 --------------------------------------------------------------------------------
 --  Beispiele
