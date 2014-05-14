@@ -55,7 +55,8 @@ sff f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
                 (r,c') = sff' (i+1) y (c @/ y)
 
 {-
--- |Noch ein Versuch, um alles zu verstehen:
+-- |Noch ein Versuch, zum verständnis:
+-- TODO: was ist hier falsch
 sfff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 sfff (P[]) = []
 sfff f     | uDegP f == 0 = [(1,f)]
