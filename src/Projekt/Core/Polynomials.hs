@@ -12,7 +12,7 @@ module Projekt.Core.Polynomials
   -- getter
   , getDegrees, getLcP
   -- Operationen auf Polynomen
-  , aggP, degP, unsafeDegP, prodOfCoeffsP
+  , aggP, degP, uDegP, prodOfCoeffsP
   -- unär
   , moniP, reziprokP, deriveP
   -- binär
@@ -125,7 +125,8 @@ degP f | deg >= 0   = Just deg
        | otherwise = Nothing
   where deg = (length . unP . aggP) f - 1
 
-unsafeDegP = fromJust . degP
+uDegP :: (Num a, Eq a) => Polynom a -> Int
+uDegP = fromJust . degP
 
 -- |Gibt zu einem Polynom das Produkt der Koeffizient
 prodOfCoeffsP :: Num a => Polynom a -> a

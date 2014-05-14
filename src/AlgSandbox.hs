@@ -40,11 +40,11 @@ pp =  mapM_ print
 -- +(1₂·X²+1₂·X+1₂ mod 1₂·X⁴+1₂·X+1₂)·X²
 -- +(1₂            mod 1₂·X⁴+1₂·X+1₂)·X
 -- +(1₂·X³+1₂·X²   mod 1₂·X⁴+1₂·X+1₂)
-failF = P[ FFElem (P[0::F2,0,1,1]) e4f2Mipo
-         , FFElem (P[1]) e4f2Mipo
-         , FFElem (P[1::F2,1,1]) e4f2Mipo
-         , FFElem (P[0::F2,1]) e4f2Mipo
-         , FFElem (P[1::F2,1,0,1]) e4f2Mipo ]
+failF = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
+                                , 1
+                                , P[1::F2,1,1]
+                                , P[0::F2,1]
+                                , P[1::F2,1,0,1] ]
 
 --------------------------------------------------------------------------------
 testSize = 100

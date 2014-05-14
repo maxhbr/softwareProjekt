@@ -1,3 +1,8 @@
+--------------------------------------------------------------------------------
+-- 
+-- Führt alle Tests aus
+-- 
+--------------------------------------------------------------------------------
 import qualified PFSandbox
 import qualified PolySandbox
 import qualified FFSandbox

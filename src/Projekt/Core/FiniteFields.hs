@@ -7,7 +7,7 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.FiniteFields
-  ( FFElem (..)
+  ( FFElem (..), listFFElem
   , aggF
   , charOfP, charRootP
   , module X
@@ -34,6 +34,8 @@ data FFElem a = FFElem (Polynom a) (Polynom a) | FFKonst a
 aggF :: (Eq a, Fractional a) => FFElem a -> FFElem a
 aggF (FFKonst x)  = FFKonst x
 aggF (FFElem f p) = FFElem (modByP f p) p
+
+listFFElem m = map (`FFElem` m)
 
 --------------------------------------------------------------------------------
 --  Instanzen
