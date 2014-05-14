@@ -19,7 +19,6 @@ module Projekt.Core.PrimeFields
   -- Beispiele
   , F2 , F3 , F5 , F7, F101
   ) where
-import GHC.Exception
 import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
 
@@ -129,7 +128,7 @@ invMod :: Numeral a => Mod a -> Mod a
 invMod x = invMod' (unMod x `mod` p,p,one,zero)
   where p = modulus x
         invMod' :: Numeral a => (Int, Int, Mod a, Mod a) -> Mod a
-        divMod' (0,_,_,_) = throw DivideByZero
+        divMod' (0,_,_,_) = error "Division by zero"
         invMod' (u,v,x1,x2)
           | u == 1     = x1
           | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)

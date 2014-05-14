@@ -60,5 +60,5 @@ main = do
       it "sff and unFact should be inverse (random subset of e2e2f2)" $
         pMapM_ (\f -> unFact (sff f) `shouldBe` f) list1
       it "sff and unFact should be inverse (random subset of e4f2)" $
-        mapM_ (\f -> unFact (sff (trace (show f) f)) `shouldBe` f) list2
+        mapM_ (\f -> unFact (sff f) `shouldBe` f) list2
     --describe "Projekt.Algorithmen.Berlekamp"

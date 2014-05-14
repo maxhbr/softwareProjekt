@@ -22,7 +22,6 @@ module Projekt.Core.Polynomials
   , getAllP, getAllByDegP
   ) where
 import Data.List
-import GHC.Exception
 import qualified Control.Arrow as A
 import Data.Maybe
 import System.Random
@@ -155,7 +154,7 @@ deriveP (P (_:ms)) = P[m * fromInteger i | (i,m) <- zip [(1::Integer)..] ms]
 --  Teilen mit Rest durch erweitertem euklidischem Algorithmus
 divP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
 divP a b | a == 0       = (P [], P [])
-         | b == 0       = throw DivideByZero
+         | b == 0       = error "Division by zero"
          | degDiff < 0 = (P [], a)
          | otherwise   = A.first (monom +) $ divP newA b
   where degDiff   = (fromJust . degP) a - (fromJust . degP) b
