@@ -41,11 +41,23 @@ main = hspec $ do
         (\ x -> x / x * x `shouldBe` x)
         (units undefined ::[F101])
        -}
-    describe "Projekt.Core.PrimeFields @F2" $
+    describe "Projekt.Core.PrimeFields @F2" $ do
       testFieldSpec (1::F2)
-    describe "Projekt.Core.PrimeFields @F3" $
+      it "charRootP should be inverse to ^p (full)" $
+        pMapM_ (\f -> (charRootP f ^ 2) `shouldBe` f)
+        (getAllByDegP (elems (1::F2)) 4)
+    describe "Projekt.Core.PrimeFields @F3" $ do
       testFieldSpec (1::F3)
-    describe "Projekt.Core.PrimeFields @F5" $
+      it "charRootP should be inverse to ^p (full)" $
+        pMapM_ (\f -> (charRootP f ^ 3) `shouldBe` f)
+        (getAllByDegP (elems (1::F3)) 4)
+    describe "Projekt.Core.PrimeFields @F5" $ do
       testFieldSpec (1::F5)
-    describe "Projekt.Core.PrimeFields @F101" $
+      it "charRootP should be inverse to ^p (full)" $
+        pMapM_ (\f -> (charRootP f ^ 5) `shouldBe` f)
+        (getAllByDegP (elems (1::F5)) 4)
+    describe "Projekt.Core.PrimeFields @F101" $ do
       testFieldSpec (1::F101)
+      it "charRootP should be inverse to ^p (full)" $
+        pMapM_ (\f -> (charRootP f ^ 101) `shouldBe` f)
+        (getAllByDegP (elems (1::F101)) 4)

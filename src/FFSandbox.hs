@@ -149,23 +149,29 @@ main = do
       testFieldSpec e2f2
       furtherTests e2f2
       testForExceptions e2f2 e2f2Mipo
+      {-
       it "charOfP (full)" $
         pMapM_ (\f -> charOfP f `shouldBe` 2) (getAllByDegP (elems e2f2) 4)
+       -}
       it "charRootP should be inverse to ^p (full)" $
         pMapM_ (\f -> (charRootP f ^ 2) `shouldBe` f)
         (getAllByDegP (elems e2f2) 4)
     describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $ do
       testFieldSpec e4f2
       furtherTests e4f2
+      {-
       it "charOfP (subset)" $
         pMapM_ (\f -> charOfP f `shouldBe` 2) list2
+       -}
       it "charRootP should be inverse to ^p (subset)" $
         pMapM_ (\f -> (charRootP f ^ 2) `shouldBe` f) list2
     describe "Projekt.Core.FiniteFields @e2e2f2: E2 over E2 over F2" $ do
       testFieldSpec e2e2f2
       furtherTests e2e2f2
+      {-
       it "charOfP (subset)" $
         pMapM_ (\f -> charOfP f `shouldBe` 2) list1
+       -}
       it "charRootP should be inverse to ^p (subset)" $
         pMapM_ (\f -> (charRootP f ^ 2) `shouldBe` f) list1
 
@@ -178,10 +184,12 @@ main = do
     describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $
       testFieldSpec e3f3
   {-
+   - Too large:
   describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over F3" $
     testFieldSpec e3e3f3
    -}
   {-
+   - Too large:
   describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over E3 over F3" $
     testFieldSpec e3e3e3f3
    -}
