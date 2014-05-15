@@ -16,6 +16,8 @@ import FFSandbox (e2f2,e2e2f2,e4f2)
 
 import SpecCommon
 
+import Debug.Trace
+
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen
 exmpPolyInt :: Polynom Integer
@@ -41,7 +43,7 @@ subroutine e3f3 = do
   it "test * (x*1=x)" $
     pMapM_ (\ x -> x * P[1] `shouldBe` x) e3f3
   it "test divP (x/x=1)" $
-    pMapM_ (\ x -> divP x x `shouldBe` (P[1], P[])) e3f3
+    pMapM_ (\ x -> (divP x x `shouldBe` (P[1], P[]))) e3f3
   it "test divP generally" $
     pMapM_ (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
           zip (take testSize e3f3) (drop testSize e3f3)
@@ -53,12 +55,11 @@ subroutine e3f3 = do
 
 main :: IO ()
 main = do
-  list  <- rndSelect (getAllP (elems undefined ::[F5]) 4) (2*testSize)
-  uList <- rndSelect (getAllP (elems e2f2) 4)            (2*testSize)
-  vList <- rndSelect (getAllP (elems e2e2f2) 2)          (2*testSize)
-  wList <- rndSelect (getAllP (elems e4f2) 4)            (2*testSize)
+  list  <- rndSelect (getAllP (units undefined ::[F5]) 4) (2*testSize)
+  wList <- rndSelect (getAllP (units e4f2) 4)            (2*testSize)
   hspec $ do
-    describe "Projekt.Core.Polynomials @F101" $ subroutine list
-    describe "Projekt.Core.Polynomials @e2f2"    $ subroutine uList
+    describe "Projekt.Core.Polynomials @F101 (subset)" $ subroutine list
+    describe "Projekt.Core.Polynomials @e2f2 (full)" $
+      subroutine (getAllP (units e2f2) 4)
     --describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList
-    describe "Projekt.Core.Polynomials @e4f2"    $ subroutine wList
+    describe "Projekt.Core.Polynomials @e4f2 (subset)" $ subroutine wList

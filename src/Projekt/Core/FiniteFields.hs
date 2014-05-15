@@ -95,7 +95,9 @@ instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   elems                            = elems'
   charakteristik (FFElem (P ms) _) = charakteristik $ product ms
   charakteristik (FFKonst x)       = charakteristik x
-  elemCount                        = length . elems'
+  {-elemCount                        = length . elems'-}
+  elemCount (FFKonst _)            = error "Insufficient information in FFKonst"
+  elemCount (FFElem (P ms) m)      = elemCount (product ms) ^ uDegP m
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
 -- anderen Elemente zurrück.
@@ -120,5 +122,6 @@ charOfP (P ms) = charakteristik $ product ms
 charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
 charRootP (P ms)= P[m^l | (m,i) <- zip ms [0..] , i `mod` p == 0]
   where p = charOfP $ P ms
+        -- TODO: Das folgende ist unglaublich langsam!
         q = elemCount $ product ms
         l = max (q-p) 1

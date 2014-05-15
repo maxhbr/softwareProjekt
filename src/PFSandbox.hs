@@ -58,6 +58,8 @@ main = hspec $ do
         (getAllByDegP (elems (1::F5)) 4)
     describe "Projekt.Core.PrimeFields @F101" $ do
       testFieldSpec (1::F101)
+      {-
       it "charRootP should be inverse to ^p (full)" $
         pMapM_ (\f -> charRootP (f ^ 101) `shouldBe` f)
         (getAllByDegP (elems (1::F101)) 4)
+       -}

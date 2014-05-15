@@ -24,7 +24,6 @@ module Projekt.Core.Polynomials
 import Data.List
 import qualified Control.Arrow as A
 import Data.Maybe
-import System.Random
 
 import Projekt.Core.ShowTex
 
