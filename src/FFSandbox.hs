@@ -138,24 +138,45 @@ furtherTests' es us = do
                 where allUnique' (x:xs) = or [x == y | y <- xs]
 
 --------------------------------------------------------------------------------
-main :: IO ()
-main = hspec $ do
-  describe "Projekt.Core.FiniteFields @e2f2: E2 over F2" $ do
-    testFieldSpec e2f2
-    furtherTests e2f2
-    testForExceptions e2f2 e2f2Mipo
-  describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $ do
-    testFieldSpec e4f2
-    furtherTests e4f2
-  describe "Projekt.Core.FiniteFields @e2e2f2: E2 over E2 over F2" $ do
-    testFieldSpec e2e2f2
-    furtherTests e2e2f2
+testSize = 10
 
-  describe "Projekt.Core.FiniteFields @e2f3: E2 over F3" $ do
-    testFieldSpec e2f3
-    furtherTests e2f3
-  describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $
-    testFieldSpec e3f3
+main :: IO ()
+main = do
+  list1 <- rndSelect (getAllByDegP (elems e2e2f2) 5) testSize
+  list2 <- rndSelect (getAllByDegP (elems e4f2) 5) testSize
+  hspec $ do
+    describe "Projekt.Core.FiniteFields @e2f2: E2 over F2" $ do
+      testFieldSpec e2f2
+      furtherTests e2f2
+      testForExceptions e2f2 e2f2Mipo
+      it "charOfP (full)" $
+        pMapM_ (\f -> charOfP f `shouldBe` 2) (getAllByDegP (elems e2f2) 4)
+      it "charRootP should be inverse to ^p (full)" $
+        pMapM_ (\f -> (charRootP f ^ 2) `shouldBe` f)
+        (getAllByDegP (elems e2f2) 4)
+    describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $ do
+      testFieldSpec e4f2
+      furtherTests e4f2
+      it "charOfP (subset)" $
+        pMapM_ (\f -> charOfP f `shouldBe` 2) list2
+      it "charRootP should be inverse to ^p (subset)" $
+        pMapM_ (\f -> (charRootP f ^ 2) `shouldBe` f) list2
+    describe "Projekt.Core.FiniteFields @e2e2f2: E2 over E2 over F2" $ do
+      testFieldSpec e2e2f2
+      furtherTests e2e2f2
+      it "charOfP (subset)" $
+        pMapM_ (\f -> charOfP f `shouldBe` 2) list1
+      it "charRootP should be inverse to ^p (subset)" $
+        pMapM_ (\f -> (charRootP f ^ 2) `shouldBe` f) list1
+
+    describe "Projekt.Core.FiniteFields @e2f3: E2 over F3" $ do
+      testFieldSpec e2f3
+      furtherTests e2f3
+      it "charRootP should be inverse to ^p (full)" $
+        pMapM_ (\f -> (charRootP f ^ 2) `shouldBe` f)
+        (getAllByDegP (elems e2f3) 4)
+    describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $
+      testFieldSpec e3f3
   {-
   describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over F3" $
     testFieldSpec e3e3f3
