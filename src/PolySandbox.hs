@@ -13,10 +13,7 @@ import Projekt.Algorithmen.SFreeFactorization
 import Projekt.Algorithmen.Berlekamp
 
 import FFSandbox (e2f2,e2e2f2,e4f2)
-
 import SpecCommon
-
-import Debug.Trace
 
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen
@@ -43,7 +40,7 @@ subroutine e3f3 = do
   it "test * (x*1=x)" $
     pMapM_ (\ x -> x * P[1] `shouldBe` x) e3f3
   it "test divP (x/x=1)" $
-    pMapM_ (\ x -> (divP x x `shouldBe` (P[1], P[]))) e3f3
+    pMapM_ (\ x -> divP x x `shouldBe` (P[1], P[])) e3f3
   it "test divP generally" $
     pMapM_ (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
           zip (take testSize e3f3) (drop testSize e3f3)
