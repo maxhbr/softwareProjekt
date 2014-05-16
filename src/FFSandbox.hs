@@ -145,52 +145,57 @@ main = do
   list1 <- rndSelect (getAllByDegP (elems e2e2f2) 5) testSize
   list2 <- rndSelect (getAllByDegP (elems e4f2) 5) testSize
   hspec $ do
+--------------------------------------------------------------------------------
+--  in char 2
     describe "Projekt.Core.FiniteFields @e2f2: E2 over F2" $ do
       testFieldSpec e2f2
       furtherTests e2f2
       testForExceptions e2f2 e2f2Mipo
-      {-
-      it "charOfP (full)" $
+      it "charOfP (full, up to deg)" $
         pMapM_ (\f -> charOfP f `shouldBe` 2) (getAllByDegP (elems e2f2) 4)
-       -}
-      it "charRootP should be inverse to ^p (full)" $
+      it "charRootP should be inverse to ^2 (full, up to deg)" $
         pMapM_ (\f -> charRootP (f ^ 2) `shouldBe` f)
         (getAllByDegP (elems e2f2) 4)
     describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $ do
       testFieldSpec e4f2
       furtherTests e4f2
-      {-
       it "charOfP (subset)" $
         pMapM_ (\f -> charOfP f `shouldBe` 2) list2
-       -}
-      it "charRootP should be inverse to ^p (subset)" $
+      it "charRootP should be inverse to ^2 (subset)" $
         pMapM_ (\f -> charRootP (f ^ 2) `shouldBe` f) list2
     describe "Projekt.Core.FiniteFields @e2e2f2: E2 over E2 over F2" $ do
       testFieldSpec e2e2f2
       furtherTests e2e2f2
-      {-
       it "charOfP (subset)" $
         pMapM_ (\f -> charOfP f `shouldBe` 2) list1
-       -}
-      it "charRootP should be inverse to ^p (subset)" $
+      it "charRootP should be inverse to ^2 (subset)" $
         pMapM_ (\f -> charRootP (f ^ 2) `shouldBe` f) list1
 
+--------------------------------------------------------------------------------
+--  in char 3
     describe "Projekt.Core.FiniteFields @e2f3: E2 over F3" $ do
       testFieldSpec e2f3
       furtherTests e2f3
-      it "charRootP should be inverse to ^p (full)" $
+      it "charOfP (subset, up to deg)" $
+        pMapM_ (\f -> charOfP f `shouldBe` 3)
+        (getAllByDegP (elems e2f3) 4)
+      it "charRootP should be inverse to ^3 (full)" $
         pMapM_ (\f -> charRootP (f ^ 3) `shouldBe` f)
         (getAllByDegP (elems e2f3) 4)
     describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $ do
       testFieldSpec e3f3
-      it "charRootP should be inverse to ^p (full)" $
+      it "charRootP should be inverse to ^3 (full, up to deg)" $
         pMapM_ (\f -> charRootP (f ^ 3) `shouldBe` f)
         (getAllByDegP (elems e3f3) 4)
-  {-
-   - Too large:
-  describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over F3" $
-    testFieldSpec e3e3f3
-   -}
+    {-
+     - Too large:
+  list3 <- rndSelect (getAllByDegP (elems e3e3f3) 4) testSize
+  hspec $ do
+    describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over F3" $ do
+      testFieldSpec e3e3f3
+      it "charRootP should be inverse to ^3 (full, up to deg)" $
+        pMapM_ (\f -> charRootP (f ^ 3) `shouldBe` f) list3
+     -}
   {-
    - Too large:
   describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over E3 over F3" $
