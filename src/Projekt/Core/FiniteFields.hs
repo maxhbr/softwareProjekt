@@ -93,11 +93,11 @@ instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   zero                             = FFKonst zero
   one                              = FFKonst one
   elems                            = elems'
-  charakteristik (FFElem (P ms) _) = charakteristik $ product ms
+  charakteristik (FFElem (P ms) _) = charakteristik $ getReprP (P ms)
   charakteristik (FFKonst x)       = charakteristik x
   {-elemCount                        = length . elems'-}
   elemCount (FFKonst _)            = error "Insufficient information in FFKonst"
-  elemCount (FFElem (P ms) m)      = elemCount (product ms) ^ uDegP m
+  elemCount (FFElem f m)      = elemCount (getReprP f) ^ uDegP m
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
 -- anderen Elemente zurrück.
@@ -112,16 +112,22 @@ elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
 
+getMiPoP []                = error "Insufficient information"
+getMiPoP (FFKonst _:ms)  = getMiPoP ms
+getMiPoP (FFElem _ p:ms) = p
+
+getReprP (P ms) = FFElem (P [1]) $ getMiPoP ms
+
+
 -- |Gibt die Charakteristik der Koeffizienten eines Polynoms
 -- TODO: Product sollte nicht nötig sein!
 --       Möglicherweise mit Backtracking
 charOfP :: (FiniteField a, Num a) => Polynom a -> Int
-charOfP (P ms) = charakteristik $ product ms 
+charOfP f = charakteristik $ getReprP f 
 
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
 charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
 charRootP (P ms)= P[m^l | (m,i) <- zip ms [0..] , i `mod` p == 0]
   where p = charOfP $ P ms
-        -- TODO: Das folgende ist unglaublich langsam!
-        q = elemCount $ product ms
+        q = elemCount $ getReprP (P ms)
         l = max (q-p) 1
