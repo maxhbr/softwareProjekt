@@ -109,8 +109,11 @@ elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
   where deg  = fromJust $ degP p
         fieldElem = product (unP f) * product (unP p)
 
-getReprP' :: (Num a, FiniteField a) => Polynom a -> a
-getReprP' (P ms) = product ms * 0
+{-getReprP' (P ms) = product ms * 0-}
+getReprP' (P [])             = error "Insufficient information"
+getReprP' (P (FFKonst _:ms)) = getReprP $ P ms
+getReprP' (P (e:ms))         = e-e
+
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
