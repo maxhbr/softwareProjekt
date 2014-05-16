@@ -9,7 +9,7 @@ module Projekt.Core.Matrix
   -- Funktionen
   , swapRowsM, swapColsM, subM
   -- linear algebra
-  , detLapM, detM
+  , detLapM, detM, echelonM
   )
   where
 import Data.List
@@ -42,10 +42,10 @@ genDiagM :: Num a => a -> Int -> Matrix a
 genDiagM x n = M $ array ((1,1),(n,n)) $ fillList [((i,i),x) | i <- [1..n]] n n
 
 fromListsM :: [[a]] -> Matrix a
-fromListsM ess = M $ array ((1,1),(k,l)) [((i,j),ess!!(j-1)!!(i-1)) | i <- [1..k]
+fromListsM ess = M $ array ((1,1),(k,l)) [((i,j),ess!!(i-1)!!(j-1)) | i <- [1..k]
                                                                     , j <- [1..l]]
-  where k = length $ head ess
-        l = length ess
+  where k = length ess
+        l = length $ head ess
 
 --------------------------------------------------------------------------------
 --  Getter
@@ -189,20 +189,37 @@ detM m         | isQuadraticM m = detArr $ unM m
         detArr m | k == 1       = m!(1,1)
                  | m!(1,1) == 0 = - detArrPivot m
                  | otherwise = (m!(1,1) *) $ detArr $ subArr (2,2) (k,l) $
-                   detArrElim m
+                   arrElim m
           where (k,l) = snd $ bounds m
 
         -- |Sucht ein Pivot Element und vertauscht wenn nötig
         detArrPivot :: (Eq a, Num a, Fractional a) => Array (Int, Int) a -> a
         detArrPivot m | null lst  = 0
-                      | otherwise = detArr $ swapColsArr 1 (minimum lst) m
+                      | otherwise = detArr $ swapRowsArr 1 (minimum lst) m
           where (k,l) = snd $ bounds m
                 lst   = [i | i <- [1..k] , m!(i,1) /= 0]
 
-        -- |Zieht die erste Zeile passend von allen anderen ab
-        detArrElim :: (Eq a, Num a, Fractional a) => Array (Int, Int) a
-                                                          -> Array (Int, Int) a
-        detArrElim m = array ((1,1),(k,l)) $
-          concat [[((i,j), m!(i,j) - m!(i,1) / m!(1,1) * m!(1,j)) | j <- [1..l]]
-            | i <- [1..k]]
-              where (k,l) = snd $ bounds m
+
+-- |Zieht die erste Zeile passend von allen anderen ab
+arrElim :: (Eq a, Num a, Fractional a) => Array (Int, Int) a
+                                                  -> Array (Int, Int) a
+arrElim m = 
+  (m // [ ((1,j),m!(1,j)/m!(1,1)) | j <- [1..l]])
+    // [ ((i,j), m!(i,j) - m!(i,1) / m!(1,1) * m!(1,j)) | j <- [1..l],
+        i <- [2..k]]
+  where (k,l) = snd $ bounds m
+
+
+echelonM :: (Eq a, Num a, Fractional a) => Matrix a -> Matrix a
+echelonM (Mdiag n) = Mdiag n
+echelonM m         = M $ echelonM' $ unM m
+  where echelonM' :: (Eq a, Num a, Fractional a) =>     
+                    Array (Int,Int) a -> Array (Int,Int) a
+        echelonM' m | k == 1       = arrElim m
+                    | m!(1,1) == 0 = echelonM' $ swapRowsArr 1 (minimum lst) m
+                    | otherwise   = m' // shifted
+          where (k,l) = snd $ bounds m
+                lst   = [i | i <- [1..k], m!(i,1) /= 0]
+                m' = arrElim m
+                shifted = map (\((i,j),x) -> ((i+1,j+1),x)) $ assocs m''
+                m''     = echelonM' $ subArr (2,2) (k,l) $ m'
