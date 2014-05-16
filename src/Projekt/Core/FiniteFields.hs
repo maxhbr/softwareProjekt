@@ -89,15 +89,15 @@ instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
                      | otherwise                    = FFElem s p
     where (_,s,_) = eekP f p
 
-instance (Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
+instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   zero                             = FFKonst zero
   one                              = FFKonst one
   elems                            = elems'
-  charakteristik (FFElem (P ms) _) = charakteristik $ getReprP (P ms)
+  charakteristik (FFElem (P ms) _) = charakteristik $ product ms
   charakteristik (FFKonst x)       = charakteristik x
   {-elemCount                        = length . elems'-}
   elemCount (FFKonst _)            = error "Insufficient information in FFKonst"
-  elemCount (FFElem f m)      = elemCount (getReprP f) ^ uDegP m
+  elemCount (FFElem (P ms) m)      = elemCount (product ms) ^ uDegP m
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
 -- anderen Elemente zurrück.
@@ -112,17 +112,16 @@ elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
 
-getMiPoP []                = error "Insufficient information"
-getMiPoP (FFKonst _:ms)  = getMiPoP ms
-getMiPoP (FFElem _ p:ms) = p
-
-getReprP (P ms) = FFElem (P [1]) $ getMiPoP ms
+getReprP :: (Eq a, FiniteField a, Num a) => Polynom a -> a
+getReprP (P [])             = error "Insufficient information"
+getReprP (P (FFKonst _:ms)) = getReprP $ P ms
+getReprP (P (e:ms))         = e-e
 
 
 -- |Gibt die Charakteristik der Koeffizienten eines Polynoms
 -- TODO: Product sollte nicht nötig sein!
 --       Möglicherweise mit Backtracking
-charOfP :: (FiniteField a, Num a) => Polynom a -> Int
+charOfP :: (Eq a, FiniteField a, Num a) => Polynom a -> Int
 charOfP f = charakteristik $ getReprP f 
 
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
