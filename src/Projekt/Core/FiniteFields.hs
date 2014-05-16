@@ -128,4 +128,4 @@ charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
 charRootP (P ms)= P[m^l | (m,i) <- zip ms [0..] , i `mod` p == 0]
   where p = charOfP $ P ms
         q = elemCount $ getReprP (P ms)
-        l = max (q-p) 1
+        l = max (quot q p) 1
