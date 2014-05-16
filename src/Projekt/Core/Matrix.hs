@@ -9,7 +9,8 @@ module Projekt.Core.Matrix
   -- Funktionen
   , swapRowsM, swapColsM, subM
   -- linear algebra
-  , detLapM, detM, echelonM
+  , detLapM, detM, echelonM, kernelM
+  , (<|>), (<->)
   )
   where
 import Data.List
@@ -46,6 +47,7 @@ fromListsM ess = M $ array ((1,1),(k,l)) [((i,j),ess!!(i-1)!!(j-1)) | i <- [1..k
                                                                     , j <- [1..l]]
   where k = length ess
         l = length $ head ess
+
 
 --------------------------------------------------------------------------------
 --  Getter
@@ -89,6 +91,7 @@ instance (Num a, Eq a) => Num (Matrix a) where
   signum _      = error "Prelude.Num.signum: inappropriate abstraction"
   negate        = negateM
 
+
 addM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 addM (Mdiag x) (Mdiag y) = Mdiag (x+y)
 addM (Mdiag x) m         = addM m (genDiagM x (getNumRowsM m))
@@ -111,6 +114,27 @@ multM (M m)     (M n)     | k' == l    = M $ array ((1,1),(k,l'))
                           | otherwise = error "not the same Dimensions"
   where ((_,_),(k,l))   = bounds m
         ((_,_),(k',l')) = bounds n
+
+--------------------------------------------------------------------------------
+--  Grundlegende Operationen
+
+-- |Horizontales Aneinanderfügen von Matrizen
+(<|>) :: Matrix a -> Matrix a -> Matrix a
+(<|>) (M m1) (M m2) =  M $ array ((1,1),(k1,l1+l2)) $ (assocs m1) ++ 
+                             assocs (ixmap ((1,l1+1),(k2,l1+l2)) 
+                                    (\(i,j) -> (i,j-l1)) m2)
+  where (k1,l1) = snd $ bounds m1
+        (k2,l2) = snd $ bounds m2
+
+-- |Vertikales Aneinanderfügen von Matrizen
+(<->) :: Matrix a -> Matrix a -> Matrix a
+(<->) (M m1) (M m2) =  M $ array ((1,1),(k1+k2,l1)) $ (assocs m1) ++ 
+                             assocs (ixmap ((k1+1,1),(k1+k2,l1)) 
+                                    (\(i,j) -> (i-k1,j)) m2)
+  where (k1,l1) = snd $ bounds m1
+        (k2,l2) = snd $ bounds m2
+
+
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Matrizen
@@ -157,7 +181,8 @@ swapColsArr l0 l1 m = array ((1,1),(k,l))
 -- |Transponiere eine Matrix
 transposeM :: Matrix a -> Matrix a
 transposeM (Mdiag a) = Mdiag a
-transposeM (M m)     = M $ ixmap (bounds m) (\(x,y) -> (y,x)) m
+transposeM (M m)     = M $ ixmap ((1,1),(l,k)) (\(x,y) -> (y,x)) m
+  where (k,l) = snd $ bounds m
 
 -- |Berechne die Determinante ohne nutzen von Fractional a
 detLapM :: (Eq a, Num a) => Matrix a -> a
@@ -203,23 +228,52 @@ detM m         | isQuadraticM m = detArr $ unM m
 -- |Zieht die erste Zeile passend von allen anderen ab
 arrElim :: (Eq a, Num a, Fractional a) => Array (Int, Int) a
                                                   -> Array (Int, Int) a
-arrElim m = 
+arrElim m | m!(1,1) == 0 = m
+          | otherwise   =
   (m // [ ((1,j),m!(1,j)/m!(1,1)) | j <- [1..l]])
     // [ ((i,j), m!(i,j) - m!(i,1) / m!(1,1) * m!(1,j)) | j <- [1..l],
         i <- [2..k]]
   where (k,l) = snd $ bounds m
 
 
+-- |Berechnet die Zeilenstufenform einer Matrix
 echelonM :: (Eq a, Num a, Fractional a) => Matrix a -> Matrix a
 echelonM (Mdiag n) = Mdiag n
-echelonM m         = M $ echelonM' $ unM m
+echelonM (M m)     = M $ echelonM' m
   where echelonM' :: (Eq a, Num a, Fractional a) =>     
                     Array (Int,Int) a -> Array (Int,Int) a
         echelonM' m | k == 1       = arrElim m
-                    | m!(1,1) == 0 = echelonM' $ swapRowsArr 1 (minimum lst) m
-                    | otherwise   = m' // shifted
-          where (k,l) = snd $ bounds m
-                lst   = [i | i <- [1..k], m!(i,1) /= 0]
-                m' = arrElim m
-                shifted = map (\((i,j),x) -> ((i+1,j+1),x)) $ assocs m''
-                m''     = echelonM' $ subArr (2,2) (k,l) $ m'
+                    | l == 1       = arrElim m
+                    | hasPivot    = echelonM' $ swapRowsArr 1 (minimum lst) m
+                    | noPivot     = echelonM'_noPivot m
+                    | otherwise   = echelonM'_Pivot m
+          where (k,l)    = snd $ bounds m
+                lst      = [i | i <- [1..k], m!(i,1) /= 0]
+                hasPivot = m!(1,1) == 0 && length lst /= 0
+                noPivot  = m!(1,1) == 0 && length lst == 0
+
+                echelonM'_Pivot m = m' // shifted
+                  where m' = arrElim m
+                        shifted = map (\((i,j),x) -> ((i+1,j+1),x)) $ assocs m''
+                        m''     = echelonM' $ subArr (2,2) (k,l) $ m'
+
+                echelonM'_noPivot m = m // shifted
+                  where m' = echelonM' $ subArr (1,2) (k,l) m
+                        shifted = map (\((i,j),x) -> ((i,j+1),x)) $ assocs m'
+
+
+-- |Berechnet den Kern einer Matrix, d.h. 
+--  kernelM gibt eine Matrix zurück, deren Spalten eine Basis des
+--  des Kerns sind
+kernelM :: (Eq a, Num a, Fractional a) => Matrix a -> Matrix a
+kernelM (Mdiag m) = error "No kernel here"
+kernelM m     = M $ array ((1,1), (k,lzs)) $
+                  [ ((i,j),b!(i,zs!!(j-1))) | i <- [1..k], j <- [1..lzs]]
+  where (k,l) = snd $ bounds $ unM m
+        mfull = transposeM $ echelonM $
+                transposeM $ m <-> genDiagM (fromInteger 1) k
+        a     = subArr (1,1) (k,l) $ unM mfull
+        b     = subArr (k+1,1) (k+k,l) $ unM mfull
+        zs    = map (\((i,j),x) -> j) $ 
+                            filter (\((i,j),x) -> i==j && x == 0) $ assocs a
+        lzs   = length zs
