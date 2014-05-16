@@ -31,7 +31,6 @@ class (Eq a) => FiniteField a where
   getReprP       :: Polynom a -> a
 
   units x = [e | e <- elems x, e /= zero]
-  getReprP (P []) = error "Insufficient information"
 
 --------------------------------------------------------------------------------
 --  Tests

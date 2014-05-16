@@ -21,6 +21,7 @@ module Projekt.Core.PrimeFields
   ) where
 import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
+import Projekt.Core.Polynomials
 
 --------------------------------------------------------------------------------
 --  Peano numbers
@@ -104,11 +105,12 @@ instance (Numeral n) => Num (Mod n) where
   negate      = MkMod . negate . unMod
 
 instance (Numeral n) => FiniteField (Mod n) where
-  zero           = MkMod 0
-  one            = MkMod 1
-  elems          = const $ elems' one
-  charakteristik = modulus
-  elemCount      = modulus
+  zero                = MkMod 0
+  one                 = MkMod 1
+  elems               = const $ elems' one
+  charakteristik      = modulus
+  elemCount           = modulus
+  getReprP (P (m:ms)) = m * 0
 
 modulus :: Numeral a => Mod a -> Int
 modulus x = numValue $ modulus' x
