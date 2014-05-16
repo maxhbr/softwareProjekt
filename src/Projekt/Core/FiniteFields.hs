@@ -97,6 +97,7 @@ instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) wh
   charakteristik (FFKonst x)  = charakteristik x
   elemCount (FFKonst _)       = error "Insufficient information in FFKonst"
   elemCount (FFElem f m)      = elemCount (getReprP f) ^ uDegP m
+  getReprP f                  = getReprP' f
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
 -- anderen Elemente zurrück.
@@ -108,11 +109,11 @@ elems' (FFElem f p) = map (`FFElem` p) (getAllP (elems fieldElem) deg)
   where deg  = fromJust $ degP p
         fieldElem = product (unP f) * product (unP p)
 
+getReprP' :: (Num a, FiniteField a) => Polynom a -> a
+getReprP' (P ms) = product ms * 0
+
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
-
-getReprP :: (Num a, FiniteField a) => Polynom a -> a
-getReprP (P ms) = product ms * 0
 
 -- |Gibt die Charakteristik der Koeffizienten eines Polynoms
 -- TODO: Product sollte nicht nötig sein!

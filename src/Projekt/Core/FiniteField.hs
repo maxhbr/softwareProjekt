@@ -18,6 +18,8 @@ import Control.Monad
 -- TODO: remove?
 import qualified Control.Monad.Parallel as P
 
+import Projekt.Core.Polynomials
+
 --------------------------------------------------------------------------------
 --  Klassen Definition
 
@@ -26,6 +28,7 @@ class (Eq a) => FiniteField a where
   elems, units   :: a -> [a]
   charakteristik :: a -> Int
   elemCount      :: a -> Int
+  getReprP       :: Polynom a -> a
 
   units x = [e | e <- elems x, e /= zero]
 
