@@ -16,9 +16,9 @@ module Projekt.Core.Matrix
 import Data.List
 import Data.Array
 import Data.Array.IArray (amap)
+import Debug.Trace
 
 import Projekt.Core.ShowTex
-import Debug.Trace
 
 --------------------------------------------------------------------------------
 --  Data Definition
@@ -120,7 +120,7 @@ multM (M m)     (M n)     | k' == l    = M $ array ((1,1),(k,l'))
 
 -- |Horizontales Aneinanderfügen von Matrizen
 (<|>) :: Matrix a -> Matrix a -> Matrix a
-(<|>) (M m1) (M m2) =  M $ array ((1,1),(k1,l1+l2)) $ (assocs m1) ++ 
+(<|>) (M m1) (M m2) =  M $ array ((1,1),(k1,l1+l2)) $ assocs m1 ++ 
                              assocs (ixmap ((1,l1+1),(k2,l1+l2)) 
                                     (\(i,j) -> (i,j-l1)) m2)
   where (k1,l1) = snd $ bounds m1
@@ -128,7 +128,7 @@ multM (M m)     (M n)     | k' == l    = M $ array ((1,1),(k,l'))
 
 -- |Vertikales Aneinanderfügen von Matrizen
 (<->) :: Matrix a -> Matrix a -> Matrix a
-(<->) (M m1) (M m2) =  M $ array ((1,1),(k1+k2,l1)) $ (assocs m1) ++ 
+(<->) (M m1) (M m2) =  M $ array ((1,1),(k1+k2,l1)) $ assocs m1 ++ 
                              assocs (ixmap ((k1+1,1),(k1+k2,l1)) 
                                     (\(i,j) -> (i-k1,j)) m2)
   where (k1,l1) = snd $ bounds m1
@@ -249,13 +249,13 @@ echelonM (M m)     = M $ echelonM' m
                     | otherwise   = echelonM'_Pivot m
           where (k,l)    = snd $ bounds m
                 lst      = [i | i <- [1..k], m!(i,1) /= 0]
-                hasPivot = m!(1,1) == 0 && length lst /= 0
-                noPivot  = m!(1,1) == 0 && length lst == 0
+                hasPivot = m!(1,1) == 0 && not (null lst)
+                noPivot  = m!(1,1) == 0 && null lst
 
                 echelonM'_Pivot m = m' // shifted
                   where m' = arrElim m
                         shifted = map (\((i,j),x) -> ((i+1,j+1),x)) $ assocs m''
-                        m''     = echelonM' $ subArr (2,2) (k,l) $ m'
+                        m''     = echelonM' $ subArr (2,2) (k,l) m'
 
                 echelonM'_noPivot m = m // shifted
                   where m' = echelonM' $ subArr (1,2) (k,l) m
@@ -267,11 +267,11 @@ echelonM (M m)     = M $ echelonM' m
 --  des Kerns sind
 kernelM :: (Eq a, Num a, Fractional a) => Matrix a -> Matrix a
 kernelM (Mdiag m) = error "No kernel here"
-kernelM m     = M $ array ((1,1), (k,lzs)) $
+kernelM m     = M $ array ((1,1), (k,lzs))
                   [ ((i,j),b!(i,zs!!(j-1))) | i <- [1..k], j <- [1..lzs]]
   where (k,l) = snd $ bounds $ unM m
         mfull = transposeM $ echelonM $
-                transposeM $ m <-> genDiagM (fromInteger 1) k
+                transposeM $ m <-> genDiagM 1 k
         a     = subArr (1,1) (k,l) $ unM mfull
         b     = subArr (k+1,1) (k+k,l) $ unM mfull
         zs    = map (\((i,j),x) -> j) $ 

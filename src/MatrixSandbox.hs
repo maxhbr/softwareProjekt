@@ -63,8 +63,8 @@ main = hspec $ do
     describe "Projekt.Core.Matrix" $ do
       it "eye is multiplikative neutral" $ do
         m * eye3 `shouldBe` m
-        m23 * eye2 `shouldBe` m23
-        m32 * eye3 `shouldBe` m32
+        m23 * eye3 `shouldBe` m23
+        m32 * eye2 `shouldBe` m32
         m * eye `shouldBe` m
         m23 * eye `shouldBe` m23
         m32 * eye `shouldBe` m32
