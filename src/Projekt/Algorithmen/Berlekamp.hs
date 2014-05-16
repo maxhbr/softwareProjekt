@@ -8,8 +8,11 @@ import Debug.Trace
 
 
 
-berlekampMatrix :: (Show a, Fractional a, Num a, FiniteField a) => Polynom a -> Matrix a
-berlekampMatrix f = kernelM $ transposeM $ 
+-- |Berechnet eine Basis des Berlekampraums zu f,
+--  d.h. gibt eine Matrix zurück, deren Spalten gerade den Berlekampraum 
+--  aufspannen bzgl der kanonischen Basis { 1, x, x², x³, ... }
+berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a) => Polynom a -> Matrix a
+berlekampBasis f = kernelM $ transposeM $ 
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n 
   where n     = fromJust $ degP f
         q     = elemCount a
