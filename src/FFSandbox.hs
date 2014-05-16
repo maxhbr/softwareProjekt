@@ -144,6 +144,7 @@ main :: IO ()
 main = do
   list1 <- rndSelect (getAllByDegP (elems e2e2f2) 5) testSize
   list2 <- rndSelect (getAllByDegP (elems e4f2) 5) testSize
+  list3 <- rndSelect (getAllByDegP (elems e3f3) 5) testSize
   hspec $ do
 --------------------------------------------------------------------------------
 --  in char 2
@@ -185,8 +186,7 @@ main = do
     describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $ do
       testFieldSpec e3f3
       it "charRootP should be inverse to ^3 (full, up to deg)" $
-        pMapM_ (\f -> charRootP (f ^ 3) `shouldBe` f)
-        (getAllByDegP (elems e3f3) 4)
+        pMapM_ (\f -> charRootP (f ^ 3) `shouldBe` f) list3
     {-
      - Too large:
   list3 <- rndSelect (getAllByDegP (elems e3e3f3) 4) testSize
