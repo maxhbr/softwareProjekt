@@ -15,6 +15,7 @@ import Test.Hspec
 import Control.Exception (evaluate)
 
 import SpecCommon
+import FFSandbox hiding (main)
 
 --------------------------------------------------------------------------------
 --  Matrizen
@@ -58,8 +59,11 @@ mp2 = fromListsM [ [ P[0,1::F5], P[0,0,1::F5] ]
 
 --------------------------------------------------------------------------------
 -- TODO: Test Matrix Multiplikation
+testSize = 10
 main :: IO ()
-main = hspec $ do
+main = do
+  list <- rndSelect (getAllM (elems e2e2f2) (3,3)) testSize
+  hspec $
     describe "Projekt.Core.Matrix" $ do
       it "eye is multiplikative neutral" $ do
         m * eye3 `shouldBe` m
@@ -71,12 +75,25 @@ main = hspec $ do
         eye * m `shouldBe` m
         eye * m23 `shouldBe` m23
         eye * m32 `shouldBe` m32
-      it "det(eye) = 1 (1,2,3,alg)" $ do
+      it "detLapM(eye) = 1 (1,2,3,alg)" $ do
         detLapM (fromListsM[[1::F7]]) `shouldBe` 1
         detLapM eye2 `shouldBe` 1
         detLapM eye3 `shouldBe` 1
         detLapM eye `shouldBe` 1
-      it "det(2 * eye) = 2^n" $ do
+      it "detLapM(2 * eye) = 2^n" $ do
         detLapM (fromListsM[[2::F7]]) `shouldBe` 2
         detLapM (eye2 * Mdiag 2) `shouldBe` 4
         detLapM (eye3 * Mdiag 2) `shouldBe` 8
+      it "detLapM == detM (F3 (2,2))" $
+        pMapM_ (\ x ->  detLapM x `shouldBe` detM x )
+          (getAllM (elems (1::F3)) (2,2))
+      it "detLapM == detM (e2f2 (2,2))" $
+        pMapM_ (\ x ->  detLapM x `shouldBe` detM x )
+          (getAllM (elems e2f2) (2,2))
+      {-
+      it "detLapM == detM (e2e2f2 (2,2))" $
+        pMapM_ (\ x ->  detLapM x `shouldBe` detM x )
+          (getAllM (elems e2e2f2) (2,2))
+       -}
+      it "detLapM == detM (e2e2f2 (3,3) subset)" $
+        pMapM_ (\ x ->  detLapM x `shouldBe` detM x ) list

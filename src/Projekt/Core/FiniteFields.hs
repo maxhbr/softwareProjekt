@@ -96,7 +96,7 @@ instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) wh
   charakteristik (FFElem f _) = charakteristik $ getReprP f
   charakteristik (FFKonst x)  = charakteristik x
   elemCount (FFKonst _)       = error "Insufficient information in FFKonst"
-  elemCount (FFElem f m)      = elemCount (getReprP f) ^ uDegP m
+  elemCount (FFElem _ m)      = elemCount (getReprP m) ^ uDegP m
   getReprP                    = getReprP'
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller

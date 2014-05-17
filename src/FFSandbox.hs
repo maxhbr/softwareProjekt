@@ -17,6 +17,7 @@ module FFSandbox
   , main
   )where
 import Projekt.Core
+import Debug.Trace
 
 import SpecCommon
 
@@ -54,6 +55,7 @@ e2f2 = FFElem (P[0,1::F2]) e2f2Mipo
  -}
 e2e2f2Mipo = P[e2f2,one,one] -- x²+x+e2f2
 e2e2f2 = FFElem (P[0,one]) e2e2f2Mipo
+--e2e2f2 = FFElem (P[0,e2f2]) e2e2f2Mipo
 
 {- F16=E4
  - als Grad 4 Erweiterung con F2 durch MPol x⁴+x²+1
@@ -154,23 +156,17 @@ main = do
       testFieldSpec e2f2
       furtherTests e2f2
       testForExceptions e2f2 e2f2Mipo
-      it "charOfP (full, up to deg)" $
-        pMapM_ (\f -> charOfP f `shouldBe` 2) (getAllByDegP (elems e2f2) 4)
       it "charRootP should be inverse to ^2 (full, up to deg)" $
         pMapM_ (\f -> charRootP (f ^ 2) `shouldBe` f)
         (getAllByDegP (elems e2f2) 4)
     describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $ do
       testFieldSpec e4f2
       furtherTests e4f2
-      it "charOfP (subset)" $
-        pMapM_ (\f -> charOfP f `shouldBe` 2) list2
       it "charRootP should be inverse to ^2 (subset)" $
         pMapM_ (\f -> charRootP (f ^ 2) `shouldBe` f) list2
     describe "Projekt.Core.FiniteFields @e2e2f2: E2 over E2 over F2" $ do
       testFieldSpec e2e2f2
       furtherTests e2e2f2
-      it "charOfP (subset)" $
-        pMapM_ (\f -> charOfP f `shouldBe` 2) list1
       it "charRootP should be inverse to ^2 (subset)" $
         pMapM_ (\f -> charRootP (f ^ 2) `shouldBe` f) list1
 
@@ -179,9 +175,6 @@ main = do
     describe "Projekt.Core.FiniteFields @e2f3: E2 over F3" $ do
       testFieldSpec e2f3
       furtherTests e2f3
-      it "charOfP (subset, up to deg)" $
-        pMapM_ (\f -> charOfP f `shouldBe` 3)
-        (getAllByDegP (elems e2f3) 4)
       it "charRootP should be inverse to ^3 (full)" $
         pMapM_ (\f -> charRootP (f ^ 3) `shouldBe` f)
         (getAllByDegP (elems e2f3) 4)

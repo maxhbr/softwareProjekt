@@ -7,10 +7,12 @@ module Projekt.Core.Matrix
   -- operations
   , transposeM
   -- Funktionen
+  , (<|>), (<->)
   , swapRowsM, swapColsM, subM
   -- linear algebra
   , detLapM, detM, echelonM, kernelM
-  , (<|>), (<->)
+  -- Weiteres
+  , getAllM
   )
   where
 import Data.List
@@ -277,3 +279,15 @@ kernelM m     = M $ array ((1,1), (k,lzs))
         zs    = map (\((i,j),x) -> j) $ 
                             filter (\((i,j),x) -> i==j && x == 0) $ assocs a
         lzs   = length zs
+
+
+--------------------------------------------------------------------------------
+--  Weiteres
+
+getAllM :: [a] -> (Int,Int) -> [Matrix a]
+getAllM cs (k,l) = map fromListsM $ rowMs k
+  where lines = lines' l
+        lines' n | n == 1     = [[y] | y <- cs]
+                | otherwise = [y:ys | y <- cs, ys <- lines' (n-1) ]
+        rowMs n | n == 1     = [[y] | y <- lines]
+                | otherwise = [y:ys | y <- lines, ys <- rowMs (n-1) ]
