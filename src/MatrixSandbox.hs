@@ -62,7 +62,6 @@ mp2 = fromListsM [ [ P[0,1::F5], P[0,0,1::F5] ]
 testSize = 10
 main :: IO ()
 main = do
-  list <- rndSelect (getAllM (elems e2e2f2) (3,3)) testSize
   hspec $
     describe "Projekt.Core.Matrix" $ do
       it "eye is multiplikative neutral" $ do
@@ -95,5 +94,10 @@ main = do
         pMapM_ (\ x ->  detLapM x `shouldBe` detM x )
           (getAllM (elems e2e2f2) (2,2))
        -}
+      {-
+  list <- rndSelect (getAllM (elems e2e2f2) (3,3)) testSize
+  hspec $
+    describe "Projekt.Core.Matrix" $ do
       it "detLapM == detM (e2e2f2 (3,3) subset)" $
         pMapM_ (\ x ->  detLapM x `shouldBe` detM x ) list
+       -}
