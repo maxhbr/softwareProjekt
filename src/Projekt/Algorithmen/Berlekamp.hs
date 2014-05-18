@@ -1,6 +1,7 @@
 
 module Projekt.Algorithmen.Berlekamp where
 import Data.Maybe
+import Data.List
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 import Projekt.Core.Matrix
@@ -9,13 +10,45 @@ import Debug.Trace
 
 
 -- |Berechnet eine Basis des Berlekampraums zu f,
---  d.h. gibt eine Matrix zurück, deren Spalten gerade den Berlekampraum 
+--  d.h. gibt eine Matrix zurück, deren Zeilen gerade den Berlekampraum 
 --  aufspannen bzgl der kanonischen Basis { 1, x, x², x³, ... }
-berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a) => Polynom a -> Matrix a
-berlekampBasis f = kernelM $ transposeM $ 
+berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a) 
+                                                     => Polynom a -> Matrix a
+berlekampBasis f = transposeM $ kernelM $ transposeM $ 
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n 
   where n     = fromJust $ degP f
         q     = elemCount a
         a     = prodOfCoeffsP f
         red i = take n $ (unP (snd (divP (fromMonomialsP [(i*q,1)]) f))
                               ++ [0*a | i <- [0..]] )
+
+
+-- |Faktorisiert ein Polynom f über einem endlichen Körper
+--  Voraussetzungen: f ist quadratfrei
+--  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
+berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
+                                                  => Polynom a -> [Polynom a]
+berlekampFactor f = berlekampFactor' f m
+  where m = berlekampBasis f
+        berlekampFactor' :: (Num a, Fractional a, FiniteField a) 
+                                      => Polynom a -> Matrix a -> [Polynom a]
+        berlekampFactor' f m | (fromJust $ degP f) <= 1 = [f]
+                             | getNumRowsM m == 1       = [f]
+                             | otherwise               = (berlekampFactor' g n)
+                                                    ++ (berlekampFactor' g' n')
+          where g  = head $ filter (\x -> x /= 1 && x /= f)
+                    [ggTP f (h - (P [s])) | s <- (elems ((unP f)!!0))]
+                g' = f @/ g
+                h  = P $ getRowM m 2
+                n  = newKer m g
+                n' = newKer m g'
+                newKer m g  = fromListsM $ take r m'
+                  where (k,l) = boundsM m
+                        m'    = toListsM $ echelonM $ fromListsM
+                                  [ take l $ unP $ modByP (P (getRowM m i)) g
+                                                                | i <- [1..k]] 
+                        r     = k-1- (fromMaybe (-1) 
+                                      $ findIndex (\x -> (all (\y -> y==0) x)) 
+                                                        $ reverse m')
+
+    
