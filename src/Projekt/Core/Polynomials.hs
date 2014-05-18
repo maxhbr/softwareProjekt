@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.Polynomials
@@ -24,6 +25,8 @@ module Projekt.Core.Polynomials
 import Data.List
 import qualified Control.Arrow as A
 import Data.Maybe
+import Data.MemoTrie
+import Control.Arrow (first)
 
 import Projekt.Core.ShowTex
 
@@ -95,6 +98,22 @@ instance (Num a, Eq a) => Num (Polynom a) where
   abs _           = error "Prelude.Num.abs: inappropriate abstraction"
   signum (P ms)   = P $ map signum ms
   negate (P ms)   = P $ map negate ms
+
+instance HasTrie a => HasTrie (Polynom a) where
+  newtype Polynom a :->: b = PolyTrie (Either () (a,[a]) :->: b)
+  trie f = PolyTrie (trie (f . P . list))
+  untrie (PolyTrie t) = untrie t . delist . unP
+  enumerate (PolyTrie t) = enum' (P . list) t
+
+enum' :: (HasTrie a) => (a -> a') -> (a :->: b) -> [(a', b)]
+enum' f = (fmap.first) f . enumerate
+
+list :: Either () (x,[x]) -> [x]
+list = either (const []) (uncurry (:))
+
+delist :: [x] -> Either () (x,[x])
+delist []     = Left ()
+delist (x:xs) = Right (x,xs)
 
 addP [] gs          = gs
 addP fs []          = fs

@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Project.Core.FiniteFields
@@ -89,6 +90,21 @@ instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
   recip (FFElem f p) | FFElem f p == FFElem (P []) p = error "Division by zero"
                      | otherwise                    = FFElem s p
     where (_,s,_) = eekP f p
+
+instance (Num a, HasTrie a) => HasTrie (FFElem a) where
+  newtype FFElem a :->: b = FFElemTrie (([a],[a]) :->: b)
+  trie f = FFElemTrie (trie (f . unPT))
+  untrie (FFElemTrie t) = untrie t . toPT
+  enumerate (FFElemTrie t) = undefined
+
+unPT :: (Num a, HasTrie a) => ([a],[a]) -> FFElem a
+unPT (f,m) | null m && null f       = FFKonst 0
+           | null m && not (null f) = FFKonst $ head f
+           | otherwise              = FFElem (P f) (P m)
+
+toPT :: (HasTrie a) => FFElem a -> ([a],[a])
+toPT (FFKonst x)  = ([x],[])
+toPT (FFElem f m) = (unP f, unP m)
 
 instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   zero                        = FFKonst zero
