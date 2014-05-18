@@ -15,5 +15,5 @@ main = do
   PFSandbox.main
   PolySandbox.main
   FFSandbox.main
-  MatrixSandbox.main
-  AlgSandbox.main
+  {-MatrixSandbox.main-}
+  {-AlgSandbox.main-}

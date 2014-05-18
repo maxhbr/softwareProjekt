@@ -106,24 +106,28 @@ toPT :: (HasTrie a) => FFElem a -> ([a],[a])
 toPT (FFKonst x)  = ([x],[])
 toPT (FFElem f m) = (unP f, unP m)
 
-instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
+instance (Eq a, Num a, Fractional a, FiniteField a, HasTrie a) => FiniteField (FFElem a) where
   zero                        = FFKonst zero
   one                         = FFKonst one
   elems                       = elems'
   charakteristik (FFElem f _) = charakteristik $ getReprP f
   charakteristik (FFKonst x)  = charakteristik x
   elemCount (FFKonst _)       = error "Insufficient information in FFKonst"
-  elemCount (FFElem _ m)      = elemCount (getReprP m) ^ uDegP m
+  elemCount (FFElem _ m)      = elemCount' m
   getReprP                    = getReprP'
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
 -- anderen Elemente zurrück.
 -- Diese Funktion benötigt ein FFElem, ein FFKonst ist zu universell und
 -- enthält deswegen zu wenig Information, über den Körper in dem es lebt.
-elems' :: (Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
+elems' :: (Num a, Fractional a, FiniteField a, HasTrie a) => FFElem a -> [FFElem a]
 elems' (FFKonst x)  = error "Insufficient information in FFKonst"
-elems' (FFElem f p) = elems'' (uDegP p) $ product (unP f) * product (unP p) * 0
-  where elems'' d e = map (`FFElem` p) (getAllP (elems e) d)
+elems' (FFElem f p) = elemsMemo (uDegP p) $ product (unP f) * product (unP p) * 0
+  where elemsMemo = memo2 elems''
+        elems'' d e = map (`FFElem` p) (getAllP (elems e) d)
+
+elemCount'  = memo elemCount''
+elemCount'' m = elemCount (getReprP m) ^ uDegP m
 
 getReprP' (P [])             = error "Insufficient information"
 getReprP' (P (FFKonst _:ms)) = getReprP $ P ms
