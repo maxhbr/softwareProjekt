@@ -45,6 +45,8 @@ genDiagM :: Num a => a -> Int -> Matrix a
 genDiagM x n = M $ array ((1,1),(n,n)) $ fillList [((i,i),x) | i <- [1..n]] n n
 
 fromListsM :: [[a]] -> Matrix a
+fromListsM []  = error "empty lists given to fromListsM"
+fromListsM [[]]  = error "empty lists given to fromListsM"
 fromListsM ess = M $ array ((1,1),(k,l)) [((i,j),ess!!(i-1)!!(j-1)) | i <- [1..k]
                                                                     , j <- [1..l]]
   where k = length ess

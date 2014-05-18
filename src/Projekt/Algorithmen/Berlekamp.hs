@@ -22,7 +22,7 @@ import Projekt.Algorithmen.SFreeFactorization
 --  d.h. gibt eine Matrix zurück, deren Zeilen gerade den Berlekampraum
 --  aufspannen bzgl der kanonischen Basis { 1, x, x², x³, ... }
 berlekampBasis :: (Fractional a, Num a, FiniteField a)
-                                                     => Polynom a -> Matrix a
+                                                       => Polynom a -> Matrix a
 berlekampBasis f = transposeM $ kernelM $ transposeM $
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n
   where n     = fromJust $ degP f
@@ -38,7 +38,7 @@ berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
                                               => Polynom a -> [(Int,Polynom a)]
 berlekampFactor f = berlekampFactor' f m
   where m = berlekampBasis f
-        berlekampFactor' :: (Num a, Fractional a, FiniteField a)
+        berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)
                                       => Polynom a -> Matrix a -> [(Int,Polynom a)]
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
                              | getNumRowsM m == 1 = [(1,f)]
