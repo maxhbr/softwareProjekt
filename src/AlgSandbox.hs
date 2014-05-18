@@ -57,7 +57,7 @@ main :: IO ()
 main = do
   list1 <- rndSelect (getAllByDegP (elems e2e2f2) 5) testSize
   list2 <- rndSelect (getAllByDegP (elems e4f2) 5) testSize
-  hspec $
+  hspec $ do
     describe "Projekt.Algorithmen.SFreeFactorization" $ do
       it "sff and unFact should be inverse (example f over F3)" $
         unFact (sff f) `shouldBe` f
@@ -65,4 +65,8 @@ main = do
         pMapM_ (\f -> unFact (sff f) `shouldBe` f) list1
       it "sff and unFact should be inverse (random subset of e4f2)" $
         mapM_ (\f -> unFact (sff f) `shouldBe` f) list2
-    --describe "Projekt.Algorithmen.Berlekamp"
+    describe "Projekt.Algorithmen.Berlekamp" $ do
+      it "sffAndBerlekamp and unFact should be inverse (example f over F3)" $
+        unFact (sffAndBerlekamp f) `shouldBe` f
+      it "sffAndBerlekamp and unFact should be inverse (random subset of e2e2f2)" $
+        pMapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) list1

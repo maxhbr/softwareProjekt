@@ -1,3 +1,11 @@
+--------------------------------------------------------------------------------
+-- | 
+-- Module      : Project.Algorithmen.SFreeFactorization
+-- Note        : Implementiert eine Quadratfreie Faktorisierung
+-- 
+-- 
+-- 
+--------------------------------------------------------------------------------
 module Projekt.Algorithmen.SFreeFactorization
   (sff
   ) where

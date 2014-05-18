@@ -33,13 +33,15 @@ unFact fs = product $ map (\(i,f) -> f^i) fs
 -- |Ersetzt eine Faktoriesierung, durch die n-te Potenz dieser Faktoriesierung
 potFact :: (FiniteField a, Num a, Fractional a) => Int -> [(Int,Polynom a)]
                                                            -> [(Int,Polynom a)]
+potFact _ []         = []
 potFact n ((i,f):ts) = (i*n,f) : potFact n ts
 
 -- |Nimmt eine Faktoriesierung und wendet auf diese einen gegebenen
 -- Faktoriesierungsalgorithmus an
-appFact :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)]
-                          -> (Polynom a -> [(Int,Polynom a)]) -> [(Int,Polynom a)]
-appFact ((i,f):ts) alg = potFact i (alg f) ++ appFact ts alg
+appFact :: (FiniteField a, Num a, Fractional a) => 
+  (Polynom a -> [(Int,Polynom a)]) -> [(Int,Polynom a)] -> [(Int,Polynom a)]
+appFact _ []           = []
+appFact alg ((i,f):ts) = potFact i (alg f) ++ appFact alg ts
 
 -- |Fasst in einer Faktoriesierung gleiche Funktionen Zusammen
 aggFact :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)]
