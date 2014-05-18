@@ -24,8 +24,6 @@ module Projekt.Core.Polynomials
 import Data.List
 import qualified Control.Arrow as A
 import Data.Maybe
-import Data.Array
-import Data.Array.IArray (amap)
 
 import Projekt.Core.ShowTex
 
@@ -37,7 +35,7 @@ import Projekt.Core.ShowTex
 -- |Polynome sind Listen von Monomen, welche durch Paare (Integer,a)
 -- dargestellt werden. In der ersten Stelle steht der Grad, in der zweiten der
 -- Koeffizient.
-data Polynom a = P {unP :: Array Int a} deriving ()
+data Polynom a = P {unP :: [a]} deriving ()
 
 instance (Eq a, Num a) => Eq (Polynom a) where
   f == g = unP (aggP f) == unP (aggP g)
@@ -46,21 +44,16 @@ if' :: Bool -> a -> a -> a
 if' True  x _ = x
 if' False _ y = y
 
-fromListP :: [a] -> Polynom a
-fromListP [] = P $ array 0 []
-fromListP ms = P $ listArray (0,length ms) ms
-
 -- |Polonoe aus einer Liste von Monomen (dargestellt als Tuppel) erzeugen.
 fromMonomialsP :: (Num a, Eq a) => [(Int,a)] -> Polynom a
-fromMonomialsP []         = fromListP []
-fromMonomialsP ms = P $ array (0,d) ms
-  where d = maximum $ map (\(i,_) -> i) ms
+fromMonomialsP []         = P[]
+fromMonomialsP ((i,m):ms) = P ([0 | j <- [1..i]] ++ [m]) + fromMonomialsP ms
 
 instance (Show a, Eq a, Num a) => Show (Polynom a) where
   show (P []) = "0"
   show (P ms) = intercalate "+" $
                 (\ss -> [s | s <- reverse ss , s /= ""]) $
-                zipWith (curry show') (elems ms) [0..]
+                zipWith (curry show') ms [0..]
     where show' :: (Show a, Eq a, Num a) => (a,Int) -> String
           show' (0,_) = ""
           show' (m,i) = show m ++ showExp i
@@ -86,7 +79,7 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (Polynom a) where
   showTex (P []) = "0"
   showTex (P ms) = intercalate "+" $
                    (\ss -> [s | s <- reverse ss , s /= ""]) $
-                   zipWith (curry showTex') (elems ms) [0..]
+                   zipWith (curry showTex') ms [0..]
     where showTex' :: (ShowTex a, Eq a, Num a) => (a,Int) -> String
           showTex' (0,_) = ""
           showTex' (m,i) = showTex m ++ showExp i
@@ -103,7 +96,9 @@ instance (Num a, Eq a) => Num (Polynom a) where
   signum (P ms)   = P $ map signum ms
   negate (P ms)   = P $ map negate ms
 
-addP f g  =  
+addP [] gs          = gs
+addP fs []          = fs
+addP (f:fs) (g:gs)  = f+g : addP fs gs
 
 multP (f:fs) (g:gs) = f*g : addP (multP [f] gs) (multP fs(g:gs))
 multP _ _           = []
