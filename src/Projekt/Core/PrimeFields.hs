@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeOperators, CPP #-}
+{-# LANGUAGE CPP #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.PrimeFields
@@ -8,7 +8,7 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.PrimeFields
-  (
+  ( 
   -- Peano Numerale
     Numeral (numValue)
   , Zero
@@ -20,20 +20,15 @@ module Projekt.Core.PrimeFields
   -- Beispiele
   , F2 , F3 , F5 , F7, F101
   ) where
-import Data.Word
-import Data.MemoTrie
-import Data.Bits
-import Control.Arrow (first)
-
 import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
 
 --------------------------------------------------------------------------------
---  Peano Zahlen
+--  Peano numbers
 
-data Zero = Zero
-data Succ a = Succ
+data Zero
+data Succ a
 
 --succPeano :: a -> Succ a
 --succPeano = const undefined
@@ -54,21 +49,6 @@ instance Show Zero where
 instance Numeral a => Show (Succ a) where
   show = show . numValue
 
---------------------------------------------------------------------------------
---  Triviale HasTrie Instanzen für Peano Zahlen:
-
-instance HasTrie Zero where
-  data Zero :->: a = ZeroTrie a
-  trie f = ZeroTrie (f Zero)
-  untrie (ZeroTrie a) = const a
-  enumerate = undefined
-instance (Numeral a) => HasTrie (Succ a) where
-  data Succ a :->: b = SuccTrie b
-  trie f = SuccTrie (f Succ)
-  untrie (SuccTrie a) = const a
-  enumerate = undefined
-
-
 --TODO
 {-
 toPeano :: Integer -> r
@@ -88,7 +68,6 @@ type Seven = Succ (Succ Five)
 --  Prime fields
 
 newtype Mod n = MkMod { unMod :: Int }
-  --deriving (Show)
 
 instance (Numeral n, Show n) => Show (Mod n) where
   show x = "\x1B[33m" ++ show (unMod x) ++ "\x1B[39m" ++ showModulus x
@@ -141,49 +120,22 @@ modulus x = numValue $ modulus' x
 elems' :: (Numeral n) => Mod n -> [Mod n]
 elems' x = map MkMod [0.. (modulus x - 1)]
 
-instance (Numeral a) => HasTrie (Mod a) where
-  data Mod a :->: x     = ModTrie ([Bool] :->: x)
-  trie f                = ModTrie (trie (f . MkMod . unbits))
-  untrie (ModTrie t)    = untrie t . bits . unMod
-  enumerate (ModTrie t) = enum' (MkMod . unbits) t
-
-instance (Numeral n, HasTrie n) => Fractional (Mod n) where
+instance (Numeral n) => Fractional (Mod n) where
   recip          = invMod
   fromRational _ = error "inappropriate abstraction"
 
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
-invMod :: (Numeral a) => Mod a -> Mod a
-invMod = memo invMod'
-  where invMod' x = invMod'' (unMod x `mod` p,p,one,zero)
-          where p = modulus x
-        invMod'' :: Numeral a => (Int, Int, Mod a, Mod a) -> Mod a
-        divMod'' (0,_,_,_) = error "Division by zero"
-        invMod'' (u,v,x1,x2)
+invMod :: Numeral a => Mod a -> Mod a
+invMod 0 = error "Division by zero"
+invMod x = invMod' (unMod x `mod` p,p,one,zero)
+  where p = modulus x
+        invMod' :: Numeral a => (Int, Int, Mod a, Mod a) -> Mod a
+        divMod' (0,_,_,_) = error "Division by zero"
+        invMod' (u,v,x1,x2)
           | u == 1     = x1
-          | otherwise = invMod'' (v-q*u,u,x2-MkMod q*x1,x1)
+          | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
             where q = v `div` u
-
---------------------------------------------------------------------------------
---  Das Folgende stammt aus der MemoTrie.hs
-
-enum' :: (HasTrie a) => (a -> a') -> (a :->: b) -> [(a', b)]
-enum' f = (fmap.first) f . enumerate
-
--- | Extract bits in little-endian order
-bits :: (Num t, Bits t) => t -> [Bool]
-bits 0 = []
-bits x = testBit x 0 : bits (shiftR x 1)
-
--- | Convert boolean to 0 (False) or 1 (True)
-unbit :: Num t => Bool -> t
-unbit False = 0
-unbit True  = 1
-
--- | Bit list to value
-unbits :: (Num t, Bits t) => [Bool] -> t
-unbits [] = 0
-unbits (x:xs) = unbit x .|. shiftL (unbits xs) 1
 
 --------------------------------------------------------------------------------
 --  Examples
@@ -194,15 +146,10 @@ type F5 = Mod Five
 type F7 = Mod Seven
 
 -- Größere Primzahlen
-#define PFInstance(MName,MValue,TName,PFName) \
+#define PFInstance(MName,MValue,PFName) \
 data MName = MName; \
 instance Numeral MName where {numValue x = MValue} ;\
 instance Show MName where {show = show} ;\
-instance HasTrie MName where \
-  {data MName :->: b = TName b ;\
-  trie f = TName (f MName) ;\
-  untrie (TName a) = const a ;\
-  enumerate = undefined} ;\
 type PFName = Mod MName ;\
 
-PFInstance(Peano101,101,Trie101,F101)
+PFInstance(Peano101,101,F101)
