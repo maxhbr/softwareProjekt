@@ -1,7 +1,7 @@
 module Projekt.Core.Matrix
-  ( Matrix (..), genDiagM, fromListsM
+  ( Matrix (..), genDiagM, fromListsM, toListsM
   -- getter
-  , atM, getNumRowsM, getNumColsM
+  , atM, getNumRowsM, getNumColsM, getRowM, getColM, boundsM
   -- tests
   , isQuadraticM
   -- operations
@@ -50,7 +50,9 @@ fromListsM ess = M $ array ((1,1),(k,l)) [((i,j),ess!!(i-1)!!(j-1)) | i <- [1..k
   where k = length ess
         l = length $ head ess
 
-
+toListsM :: Matrix a -> [[a]]
+toListsM (M m) = [[m!(i,j) | j <- [1..l]] | i <- [1..k]]
+  where (k,l) = snd $ bounds m
 --------------------------------------------------------------------------------
 --  Getter
 
@@ -63,6 +65,16 @@ getNumRowsM (M m) = fst $ snd $ bounds m
 getNumColsM :: Matrix a -> Int
 getNumColsM (M m) = snd $ snd $ bounds m
 
+getColM :: Matrix a -> Int -> [a]
+getColM (M m) i = [m!(j,i) | j <- [1..k]]
+  where (k,l) = snd $ bounds m
+
+getRowM :: Matrix a -> Int -> [a]
+getRowM (M m) i = [m!(i,j) | j <- [1..l]]
+  where (k,l) = snd $ bounds m
+
+boundsM :: Matrix a -> (Int,Int)
+boundsM (M m) = snd $ bounds m
 --------------------------------------------------------------------------------
 --  Instanzen
 
