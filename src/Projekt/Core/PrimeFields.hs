@@ -110,7 +110,7 @@ instance (Numeral n) => FiniteField (Mod n) where
   elems               = const $ elems' one
   charakteristik      = modulus
   elemCount           = modulus
-  getReprP (P (m:ms)) = m * 0
+  getReprP f          = f!!!0 * 0
 
 modulus :: Numeral a => Mod a -> Int
 modulus x = numValue $ modulus' x
