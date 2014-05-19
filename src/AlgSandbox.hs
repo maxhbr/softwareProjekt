@@ -40,19 +40,21 @@ f' = P[4::F5, 1, 0, 0, 4, 1]
 
 f'' = P[1::F2, 1, 1, 1]
 
+--------------------------------------------------------------------------------
 -- | failing f:
 --  (1₂·X³+1₂·X+1₂ mod 1₂·X⁴+1₂·X+1₂)·X⁴
 -- +(1₂·X          mod 1₂·X⁴+1₂·X+1₂)·X³
 -- +(1₂·X²+1₂·X+1₂ mod 1₂·X⁴+1₂·X+1₂)·X²
 -- +(1₂            mod 1₂·X⁴+1₂·X+1₂)·X
 -- +(1₂·X³+1₂·X²   mod 1₂·X⁴+1₂·X+1₂)
-failF = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
+sffFailF = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
                                 , 1
                                 , P[1::F2,1,1]
                                 , P[0::F2,1]
                                 , P[1::F2,1,0,1] ]
 
--- |Böses Polynom für Berlekamp (f geht auch)
+--------------------------------------------------------------------------------
+-- |Böses Polynom für Berlekamp (f geht auch, da bFailF ein Teiler von f ist)
 bFailF = P[1::F3,0,1]
 
 --------------------------------------------------------------------------------
@@ -75,3 +77,5 @@ main = do
         unFact (sffAndBerlekamp f) `shouldBe` f
       it "sffAndBerlekamp and unFact should be inverse (random subset of e2e2f2)" $
         pMapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) list1
+      it "sffAndBerlekamp and unFact should be inverse (random subset of e4f2)" $
+        mapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) list2

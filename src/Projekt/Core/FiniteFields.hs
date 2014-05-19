@@ -14,7 +14,6 @@ module Projekt.Core.FiniteFields
   ) where
 import Data.Maybe
 import Control.Exception
-import Data.MemoTrie
 
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
