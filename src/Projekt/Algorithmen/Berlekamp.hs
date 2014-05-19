@@ -45,7 +45,7 @@ berlekampFactor f = berlekampFactor' f m
                              | otherwise         = berlekampFactor' g n
                                                  ++ berlekampFactor' g' n'
           where g  = head [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
-                             , x /= 1 , x /= f]
+                             , x /= 1]
                 g' = f @/ g
                 h  = P $ getRowM m 2
                 n  = newKer m g
