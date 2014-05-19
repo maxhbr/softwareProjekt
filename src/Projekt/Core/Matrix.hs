@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
 module Projekt.Core.Matrix
   ( Matrix (..), genDiagM, fromListsM, toListsM
   -- getter
@@ -18,7 +19,8 @@ module Projekt.Core.Matrix
 import Data.List
 import Data.Array
 import Data.Array.IArray (amap)
-import Debug.Trace
+import Control.Arrow (first)
+import Data.MemoTrie
 
 import Projekt.Core.ShowTex
 
@@ -97,9 +99,25 @@ instance (Eq a, Num a) => Eq (Matrix a) where
   m == Mdiag x = m == genDiagM x (getNumRowsM m)
   M a == M b   = a == b
 
-instance (Num a, Eq a) => Num (Matrix a) where
-  x + y         = addM x y
-  x * y         = multM x y
+instance HasTrie a => HasTrie (Matrix a) where
+  newtype Matrix a :->: b = MatrixTrie (Either () ([a],[[a]]) :->: b)
+  trie f = MatrixTrie (trie (f . fromListsM . list))
+  untrie (MatrixTrie t) = untrie t . delist . toListsM
+  enumerate (MatrixTrie t) = enum' (fromListsM . list) t
+
+enum' :: (HasTrie a) => (a -> a') -> (a :->: b) -> [(a', b)]
+enum' f = (fmap.first) f . enumerate
+
+list :: Either () ([x],[[x]]) -> [[x]]
+list = either (const []) (uncurry (:))
+
+delist :: [[x]] -> Either () ([x],[[x]])
+delist []     = Left ()
+delist (x:xs) = Right (x,xs)
+
+instance (Num a, HasTrie a, Eq a) => Num (Matrix a) where
+  x + y         = memo (uncurry addM) (x,y)
+  x * y         = memo (uncurry multM) (x,y)
   fromInteger i = Mdiag (fromInteger i)
   abs _         = error "Prelude.Num.abs: inappropriate abstraction"
   signum _      = error "Prelude.Num.signum: inappropriate abstraction"
@@ -134,16 +152,16 @@ multM (M m)     (M n)     | k' == l    = M $ array ((1,1),(k,l'))
 
 -- |Horizontales Aneinanderfügen von Matrizen
 (<|>) :: Matrix a -> Matrix a -> Matrix a
-(<|>) (M m1) (M m2) =  M $ array ((1,1),(k1,l1+l2)) $ assocs m1 ++ 
-                             assocs (ixmap ((1,l1+1),(k2,l1+l2)) 
+(<|>) (M m1) (M m2) =  M $ array ((1,1),(k1,l1+l2)) $ assocs m1 ++
+                             assocs (ixmap ((1,l1+1),(k2,l1+l2))
                                     (\(i,j) -> (i,j-l1)) m2)
   where (k1,l1) = snd $ bounds m1
         (k2,l2) = snd $ bounds m2
 
 -- |Vertikales Aneinanderfügen von Matrizen
 (<->) :: Matrix a -> Matrix a -> Matrix a
-(<->) (M m1) (M m2) =  M $ array ((1,1),(k1+k2,l1)) $ assocs m1 ++ 
-                             assocs (ixmap ((k1+1,1),(k1+k2,l1)) 
+(<->) (M m1) (M m2) =  M $ array ((1,1),(k1+k2,l1)) $ assocs m1 ++
+                             assocs (ixmap ((k1+1,1),(k1+k2,l1))
                                     (\(i,j) -> (i-k1,j)) m2)
   where (k1,l1) = snd $ bounds m1
         (k2,l2) = snd $ bounds m2
@@ -254,7 +272,7 @@ arrElim m | m!(1,1) == 0 = m
 echelonM :: (Eq a, Num a, Fractional a) => Matrix a -> Matrix a
 echelonM (Mdiag n) = Mdiag n
 echelonM (M m)     = M $ echelonM' m
-  where echelonM' :: (Eq a, Num a, Fractional a) =>     
+  where echelonM' :: (Eq a, Num a, Fractional a) =>
                     Array (Int,Int) a -> Array (Int,Int) a
         echelonM' m | k == 1       = arrElim m
                     | l == 1       = arrElim m
@@ -276,7 +294,7 @@ echelonM (M m)     = M $ echelonM' m
                         shifted = map (\((i,j),x) -> ((i,j+1),x)) $ assocs m'
 
 
--- |Berechnet den Kern einer Matrix, d.h. 
+-- |Berechnet den Kern einer Matrix, d.h.
 --  kernelM gibt eine Matrix zurück, deren Spalten eine Basis des
 --  des Kerns sind
 kernelM :: (Eq a, Num a, Fractional a) => Matrix a -> Matrix a
@@ -288,7 +306,7 @@ kernelM m     = M $ array ((1,1), (k,lzs))
                 transposeM $ m <-> genDiagM 1 k
         a     = subArr (1,1) (k,l) $ unM mfull
         b     = subArr (k+1,1) (k+k,l) $ unM mfull
-        zs    = map (\((i,j),x) -> j) $ 
+        zs    = map (\((i,j),x) -> j) $
                             filter (\((i,j),x) -> i==j && x == 0) $ assocs a
         lzs   = length zs
 
@@ -296,8 +314,10 @@ kernelM m     = M $ array ((1,1), (k,lzs))
 --------------------------------------------------------------------------------
 --  Weiteres
 
-getAllM :: [a] -> (Int,Int) -> [Matrix a]
-getAllM cs (k,l) = map fromListsM $ rowMs k
+getAllM :: (HasTrie a) => [a] -> (Int,Int) -> [Matrix a]
+getAllM = memo2 getAllM'
+getAllM' :: (HasTrie a) => [a] -> (Int,Int) -> [Matrix a]
+getAllM' cs (k,l) = map fromListsM $ rowMs k
   where lines = lines' l
         lines' n | n == 1     = [[y] | y <- cs]
                 | otherwise = [y:ys | y <- cs, ys <- lines' (n-1) ]
