@@ -5,6 +5,8 @@ import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 import Projekt.Core.Factorization
 
+import Data.MemoTrie
+
 import Debug.Trace
 
 {-
@@ -39,7 +41,7 @@ import Debug.Trace
        Seite 345(355)
  -}
 
-sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff :: (FiniteField a, HasTrie a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 sff f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
       | df /= 0 && c == 1 = r
       | otherwise       = map (\(n,x) -> (n*p,x)) $ sff $ charRootP f

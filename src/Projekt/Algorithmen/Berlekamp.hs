@@ -6,13 +6,16 @@ import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 import Projekt.Core.Matrix
 import Debug.Trace
+import Data.MemoTrie
 
 
+berlekampFactor = undefined
 
+{-
 -- |Berechnet eine Basis des Berlekampraums zu f,
 --  d.h. gibt eine Matrix zurück, deren Zeilen gerade den Berlekampraum 
 --  aufspannen bzgl der kanonischen Basis { 1, x, x², x³, ... }
-berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a) 
+berlekampBasis :: (Show a, HasTrie a, Fractional a, Num a, FiniteField a) 
                                                      => Polynom a -> Matrix a
 berlekampBasis f = transposeM $ kernelM $ transposeM $ 
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n 
@@ -26,7 +29,7 @@ berlekampBasis f = transposeM $ kernelM $ transposeM $
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
-berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
+berlekampFactor :: (Show a, HasTrie a, Fractional a, Num a, FiniteField a)
                                                   => Polynom a -> [Polynom a]
 berlekampFactor f = berlekampFactor' f m
   where m = berlekampBasis f
@@ -52,3 +55,4 @@ berlekampFactor f = berlekampFactor' f m
                                                         $ reverse m')
 
     
+ -}

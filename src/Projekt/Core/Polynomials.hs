@@ -23,7 +23,6 @@ module Projekt.Core.Polynomials
   , getAllP, getAllByDegP
   ) where
 import Data.List
-import qualified Control.Arrow as A
 import Data.Maybe
 import Data.MemoTrie
 import Control.Arrow (first)
@@ -174,11 +173,13 @@ divP :: (Eq a, HasTrie a, Fractional a) => Polynom a -> Polynom a -> (Polynom a,
 divP a b | a == 0       = (P [], P [])
          | b == 0       = error "Division by zero"
          | degDiff < 0 = (P [], a)
-         | otherwise   = A.first (monom +) $ divP newA b
+         | otherwise   = memo2 divP' a b
   where degDiff   = (fromJust . degP) a - (fromJust . degP) b
-        lcQuot    = getLcP a / getLcP b
-        monom     = fromMonomialsP [(degDiff,lcQuot)]
-        newA      = a - monom * b
+        divP' a b = first (monom +) $ divP newA b
+          where degDiff   = (fromJust . degP) a - (fromJust . degP) b
+                lcQuot    = getLcP a / getLcP b
+                monom     = fromMonomialsP [(degDiff,lcQuot)]
+                newA      = a - monom * b
 
 divP' :: (Eq a, HasTrie a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 divP' a b = fst $ divP a b
