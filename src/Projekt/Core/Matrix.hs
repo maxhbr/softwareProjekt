@@ -290,8 +290,7 @@ kernelM m     = M $ array ((1,1), (k,lzs))
                 transposeM $ m <-> genDiagM 1 k
         a     = subArr (1,1) (k,l) $ unM mfull
         b     = subArr (k+1,1) (k+k,l) $ unM mfull
-        zs    = map (\((i,j),x) -> j) $ 
-                            filter (\((i,j),x) -> i==j && x == 0) $ assocs a
+        zs    = [j | j <- [1..l], (and [a!(i',j) == 0 | i' <- [j..k]])]
         lzs   = length zs
 
 
