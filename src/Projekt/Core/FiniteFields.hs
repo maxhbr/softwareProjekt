@@ -32,7 +32,7 @@ import Projekt.Core.ShowTex
 -- FFKonst implementiert.
 data FFElem a = FFElem (Polynom a) (Polynom a) | FFKonst a
 
-aggF :: (Eq a, Fractional a) => FFElem a -> FFElem a
+aggF :: (Eq a, HasTrie a, Fractional a) => FFElem a -> FFElem a
 aggF (FFKonst x)  = FFKonst x
 aggF (FFElem f p) = FFElem (modByP f p) p
 
@@ -41,7 +41,7 @@ listFFElem m = map (`FFElem` m)
 --------------------------------------------------------------------------------
 --  Instanzen
 
-instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
+instance (Num a, HasTrie a, Eq a, Fractional a) => Eq (FFElem a) where
   (FFKonst x)  == (FFKonst y)  = x==y
   (FFElem f p) == (FFKonst y)  = null $ unP $ aggP (f - P[y])
   (FFKonst x)  == (FFElem g p) = null $ unP $ aggP (P[x] - g)
@@ -63,7 +63,7 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (FFElem a) where
     "\\left(\\underline{" ++ showTex f ++ "}_{mod~" ++ showTex p ++"}\\right)"
 
 
-instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
+instance (Num a, HasTrie a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
 
   (FFKonst x)  + (FFKonst y)              = FFKonst (x+y)
@@ -84,7 +84,7 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   abs _    = error "Prelude.Num.abs: inappropriate abstraction"
   signum _ = error "Prelude.Num.signum: inappropriate abstraction"
 
-instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
+instance (Show a, HasTrie a, Eq a, Fractional a) => Fractional (FFElem a) where
   fromRational _     = error "inappropriate abstraction"
   recip (FFKonst x)  = FFKonst (recip x)
   recip (FFElem f p) | FFElem f p == FFElem (P []) p = error "Division by zero"
@@ -106,7 +106,8 @@ toPT :: (HasTrie a) => FFElem a -> ([a],[a])
 toPT (FFKonst x)  = ([x],[])
 toPT (FFElem f m) = (unP f, unP m)
 
-instance (Eq a, Num a, Fractional a, FiniteField a, HasTrie a) => FiniteField (FFElem a) where
+instance (Eq a, Num a, Fractional a, FiniteField a, HasTrie a)
+                                                => FiniteField (FFElem a) where
   zero                        = FFKonst zero
   one                         = FFKonst one
   elems                       = elems'
@@ -126,7 +127,9 @@ elems' (FFElem f p) = elemsMemo (uDegP p) $ product (unP f) * product (unP p) * 
   where elemsMemo = memo2 elems''
         elems'' d e = map (`FFElem` p) (getAllP (elems e) d)
 
+elemCount' :: (Eq a, Num a, FiniteField a, HasTrie a) => Polynom a -> Int
 elemCount'  = memo elemCount''
+elemCount'' :: (Eq a, Num a, FiniteField a, HasTrie a) => Polynom a -> Int
 elemCount'' m = elemCount (getReprP m) ^ uDegP m
 
 getReprP' (P [])             = error "Insufficient information"

@@ -48,7 +48,7 @@ if' True  x _ = x
 if' False _ y = y
 
 -- |Polonoe aus einer Liste von Monomen (dargestellt als Tuppel) erzeugen.
-fromMonomialsP :: (Num a, Eq a) => [(Int,a)] -> Polynom a
+fromMonomialsP :: (Num a, HasTrie a, Eq a) => [(Int,a)] -> Polynom a
 fromMonomialsP []         = P[]
 fromMonomialsP ((i,m):ms) = P ([0 | j <- [1..i]] ++ [m]) + fromMonomialsP ms
 
@@ -91,9 +91,9 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (Polynom a) where
           showExp 1 = "\\cdot{}X"
           showExp i = "\\cdot{}X^{" ++ show i ++ "}"
 
-instance (Num a, Eq a) => Num (Polynom a) where
-  (P ms) + (P ns) = P $ addP ms ns
-  (P ms) * (P ns) = P $ multP ms ns
+instance (Num a, HasTrie a, Eq a) => Num (Polynom a) where
+  (P ms) + (P ns) = memo (\ (ms,ns) -> P $ addP ms ns) (ms,ns)
+  (P ms) * (P ns) = memo (\ (ms,ns) -> P $ multP ms ns) (ms,ns)
   fromInteger i   = P [fromInteger i]
   abs _           = error "Prelude.Num.abs: inappropriate abstraction"
   signum (P ms)   = P $ map signum ms
@@ -170,7 +170,7 @@ deriveP (P (_:ms)) = P[m * fromInteger i | (i,m) <- zip [(1::Integer)..] ms]
 
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
 --  Teilen mit Rest durch erweitertem euklidischem Algorithmus
-divP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
+divP :: (Eq a, HasTrie a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
 divP a b | a == 0       = (P [], P [])
          | b == 0       = error "Division by zero"
          | degDiff < 0 = (P [], a)
@@ -180,22 +180,22 @@ divP a b | a == 0       = (P [], P [])
         monom     = fromMonomialsP [(degDiff,lcQuot)]
         newA      = a - monom * b
 
-divP' :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+divP' :: (Eq a, HasTrie a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 divP' a b = fst $ divP a b
 
-(@/) :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+(@/) :: (Eq a, HasTrie a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 (@/) = divP'
 
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
 --
 -- mehr Performance durch andere Rechnung?
-modByP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+modByP :: (Eq a, HasTrie a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 modByP f p = snd $ divP f p
 
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit
 --  ggT(a,b) = d = s*a + t*b
-eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a
+eekP :: (Eq a, HasTrie a, Fractional a) => Polynom a -> Polynom a
                                           -> (Polynom a, Polynom a, Polynom a)
 eekP f g | g == 0     = (moniP f ,P[recip $ getLcP f] ,P[])
          | otherwise = (d,t,s-t*q)
@@ -203,7 +203,7 @@ eekP f g | g == 0     = (moniP f ,P[recip $ getLcP f] ,P[])
         (d,s,t) = eekP g r
 
 -- |Algorithmus für ggT
-ggTP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+ggTP :: (Eq a, HasTrie a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 
 --------------------------------------------------------------------------------

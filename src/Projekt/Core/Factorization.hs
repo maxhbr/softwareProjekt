@@ -12,6 +12,7 @@ module Projekt.Core.Factorization
   )where
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
+import Data.MemoTrie
 
 import Data.List
 
@@ -27,7 +28,7 @@ toFact :: Polynom a -> [(Int,Polynom a)]
 toFact f = [(1,f)]
 
 -- |Multipliziert eine Faktoriesierung aus
-unFact :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
+unFact :: (FiniteField a, HasTrie a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
 unFact fs = product $ map (\(i,f) -> f^i) fs
 
 -- |Ersetzt eine Faktoriesierung, durch die n-te Potenz dieser Faktoriesierung
