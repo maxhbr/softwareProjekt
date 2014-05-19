@@ -12,7 +12,7 @@ ghc --make \
     $DIR/../Spec.hs
 
 if [ $? -eq 0 ]; then
-  $DIR/../out/Spec +RTS -N4
+  time $DIR/../out/Spec +RTS -N4
 fi
 
 # -fforce-recomp, -O2 and -fllvm are from:
