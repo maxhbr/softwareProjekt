@@ -103,8 +103,7 @@ addP (f:fs) (g:gs)  = f+g : addP fs gs
 multP (f:fs) (g:gs) = f*g : addP (multP [f] gs) (multP fs(g:gs))
 multP _ _           = []
 
--- |Sortiert die Koeffizienten absteigend und fasst passende Koeffizienten
--- zusammen.
+-- |Entfernt trailing zeros
 aggP :: (Num a, Eq a) => Polynom a -> Polynom a
 aggP (P ms) = P $ take l ms
   where l = maximum $ 0:[i+1 | i <- [0..(length ms - 1)] , ms!!i /= 0]
