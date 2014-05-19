@@ -7,7 +7,7 @@ import qualified PFSandbox
 import qualified PolySandbox
 import qualified FFSandbox
 import qualified MatrixSandbox
-import qualified AlgSandbox
+{-import qualified AlgSandbox-}
 
 --------------------------------------------------------------------------------
 main :: IO ()

@@ -9,8 +9,6 @@
 
 module PolySandbox where
 import Projekt.Core
-import Projekt.Algorithmen.SFreeFactorization
-import Projekt.Algorithmen.Berlekamp
 
 import FFSandbox (e2f2,e2e2f2,e4f2)
 import SpecCommon
