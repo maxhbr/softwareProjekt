@@ -7,7 +7,7 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.Polynomials
-  ( Polynom (P), unP
+  ( Polynom (..)
   , fromMonomialsP
   -- getter
   , getDegrees, getLcP

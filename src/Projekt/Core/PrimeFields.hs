@@ -140,8 +140,8 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
 --------------------------------------------------------------------------------
 --  Examples
 
-type F2 = Mod Two
-type F3 = Mod Three
+{-type F2 = Mod Two-}
+{-type F3 = Mod Three-}
 type F5 = Mod Five
 type F7 = Mod Seven
 
@@ -152,4 +152,6 @@ instance Numeral MName where {numValue x = MValue} ;\
 instance Show MName where {show = show} ;\
 type PFName = Mod MName ;\
 
+PFInstance(Peano2,2,F2)
+PFInstance(Peano3,3,F3)
 PFInstance(Peano101,101,F101)
