@@ -150,8 +150,9 @@ prodOfCoeffsP = product . unP
 --  Unär:
 --
 
-moniP :: (Eq a, Fractional a) => Polynom a -> Polynom a
-moniP f = P [m / getLcP f | m <- unP f]
+moniP :: (Num a, Eq a, Fractional a) => Polynom a -> Polynom a
+moniP (P ms) | last ms == 1 = P ms
+             | otherwise   = P [m / getLcP (P ms) | m <- ms]
 
 -- |Gibt das reziproke Polynom zurrück
 -- TODO: Inverses des konstanten Terms ranmultiplizieren???
