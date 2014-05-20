@@ -57,6 +57,19 @@ sffFailF = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
 -- |Böses Polynom für Berlekamp (f geht auch, da bFailF ein Teiler von f ist)
 bFailF = P[1::F3,0,1]
 
+bFailF2 = (P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
+                                   , 1
+                                   , P[1::F2,1,1]
+                                   , P[0::F2,1]
+                                   , P[1::F2,1,0,1] ])^2
+        * (P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
+                                   , 1
+                                   , P[1::F2,1,0,1] ])
+        * (P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
+                                   , 1
+                                   , 1
+                                   , P[1::F2,1,0,1] ])
+
 --------------------------------------------------------------------------------
 testSize = 100
 

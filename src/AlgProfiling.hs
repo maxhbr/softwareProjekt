@@ -30,18 +30,25 @@ e4f2 = FFElem (P[0,1::F2]) e4f2Mipo
  -}
 f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
 
-sffFailF = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
-                                , 1
-                                , P[1::F2,1,1]
-                                , P[0::F2,1]
-                                , P[1::F2,1,0,1] ]
+testPoly = (P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
+                                    , 1
+                                    , P[1::F2,1,1]
+                                    , P[0::F2,1]
+                                    , P[1::F2,1,0,1] ])^2
+         * (P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
+                                    , 1
+                                    , P[1::F2,1,0,1] ])
+         * (P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
+                                    , 1
+                                    , 1
+                                    , P[1::F2,1,0,1] ])
 
-{-main :: IO ()-}
+main :: IO ()
 main = do
-  gen <- getStdGen
-  let xs = getAllByDegP (elems e2e2f2) 4
+  {-gen <- getStdGen-}
+  {-let xs = getAllByDegP (elems e2e2f2) 4-}
   {-print $ length xs -- 61440-}
   -- print $ sffAndBerlekamp $ xs!!(head $ randomRs (0, length xs - 1) gen)
   {-print $ map fst $ sffAndBerlekamp $ xs!!(quot 61440 2 + i)-}
-  print $ map fst $ sffAndBerlekamp (sffFailF^2)
+  print $ map fst $ sffAndBerlekamp testPoly
 
