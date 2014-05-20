@@ -90,7 +90,7 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (Polynom a) where
 
 instance (Num a, Eq a) => Num (Polynom a) where
   (P ms) + (P ns) = P $ addP ms ns
-  (P ms) * (P ns) = P $ multP ms ns
+  (P ms) * (P ns) = P $ multP' ms ns
   fromInteger i   = P [fromInteger i]
   abs _           = error "Prelude.Num.abs: inappropriate abstraction"
   signum (P ms)   = P $ map signum ms
@@ -102,6 +102,21 @@ addP (f:fs) (g:gs)  = f+g : addP fs gs
 
 multP (f:fs) (g:gs) = f*g : addP (multP [f] gs) (multP fs(g:gs))
 multP _ _           = []
+
+multP' f []             = []
+multP' [] f             = []
+multP' f g  | n >= m    = foldl1' (addP) $ [ multMonom f i a | (i,a) <- gz]
+            | otherwise = multP' g f
+  where n  = length f
+        m  = length g
+        gz = zip [0..] g
+
+-- |Multipliziert f mit a*x^i
+multMonom :: Num a => [a] -> Int -> a -> [a]
+multMonom f i a  = (take i $ replicate i 0) ++ map (a*) f
+
+multMonomP :: Num a => Polynom a -> Int -> a -> Polynom a
+multMonomP (P f) i a  = P $ (take i $ replicate i 0) ++ map (a*) f
 
 -- |Entfernt trailing zeros
 aggP :: (Num a, Eq a) => Polynom a -> Polynom a
@@ -135,8 +150,9 @@ prodOfCoeffsP = product . unP
 --  Unär:
 --
 
-moniP :: (Eq a, Fractional a) => Polynom a -> Polynom a
-moniP f = P [m / getLcP f | m <- unP f]
+moniP :: (Num a, Eq a, Fractional a) => Polynom a -> Polynom a
+moniP (P ms) | last ms == 1 = P ms
+             | otherwise   = P [m / getLcP (P ms) | m <- ms]
 
 -- |Gibt das reziproke Polynom zurrück
 -- TODO: Inverses des konstanten Terms ranmultiplizieren???
@@ -158,7 +174,7 @@ divP a b | a == 0       = (P [], P [])
   where degDiff   = (fromJust . degP) a - (fromJust . degP) b
         lcQuot    = getLcP a / getLcP b
         monom     = fromMonomialsP [(degDiff,lcQuot)]
-        newA      = a - monom * b
+        newA      = a - multMonomP b degDiff lcQuot
 
 divP' :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 divP' a b = fst $ divP a b
