@@ -38,7 +38,19 @@ import Projekt.Core.ShowTex
 data Polynom a = P {unP :: [a]} deriving ()
 
 instance (Eq a, Num a) => Eq (Polynom a) where
-  f == g = unP (aggP f) == unP (aggP g)
+  {-f == g = unP (aggP f) == unP (aggP g)-}
+  f == g = eqP f g
+
+eqP (P ms) (P ns) = eqP' ms ns
+  where eqP' [] ns = nullP' ns
+        eqP' ms [] = nullP' ms
+        eqP' (m:ms) (n:ns) = m==n && eqP' ms ns
+
+nullP (P ms) = nullP' ms
+nullP' []     = True
+nullP' (m:ms) | m /= 0     = False
+              | otherwise = nullP' ms
+
 
 if' :: Bool -> a -> a -> a
 if' True  x _ = x
