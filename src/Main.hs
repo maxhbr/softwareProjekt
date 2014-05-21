@@ -56,14 +56,14 @@ problem1 = do
   print $ length list
 
   print "wende SFF an:"
-  {-sffList <- mapConcurrently (return . appSff) list-}
   let sffList = parMap rpar appSff list
+  {-let sffList = parMap rpar (\(f,i) -> trace ("sff " ++ show i) (appSff f)) (zip list [1..])-}
   let sffListIrred = [fs | fs <- sffList , isTrivialFact fs]
   print $ length sffListIrred
 
   print "wende Berlekamp an:"
-  {-bList <- mapConcurrently (return . appBerlekamp) list-}
   let bList = parMap rpar appBerlekamp sffList
+  {-let bList = parMap rpar (\(f,i) -> trace ("b " ++ show i) (appBerlekamp f)) (zip sffList [1..])-}
   let bListIrred = [fs | fs <- bList , isTrivialFact fs]
   print $ length bListIrred
 
