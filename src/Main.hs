@@ -12,7 +12,10 @@ module Main
 import Projekt.Core
 import Projekt.Algorithmen
 import Debug.Trace
-import qualified Control.Monad.Parallel as P
+{-import qualified Control.Monad.Parallel as P-}
+{-import Control.Concurrent.Async (mapConcurrently)-}
+import Control.Parallel
+import Control.Parallel.Strategies
 
 --------------------------------------------------------------------------------
 --  Beliebiger Primkörper
@@ -53,12 +56,14 @@ problem1 = do
   print $ length list
 
   print "wende SFF an:"
-  sffList <- P.mapM (return . appSff) list
+  {-sffList <- mapConcurrently (return . appSff) list-}
+  let sffList = parMap rpar appSff list
   let sffListIrred = [fs | fs <- sffList , isTrivialFact fs]
   print $ length sffListIrred
 
   print "wende Berlekamp an:"
-  bList <- P.mapM (return . appBerlekamp) list
+  {-bList <- mapConcurrently (return . appBerlekamp) list-}
+  let bList = parMap rpar appBerlekamp sffList
   let bListIrred = [fs | fs <- bList , isTrivialFact fs]
   print $ length bListIrred
 
