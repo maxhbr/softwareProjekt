@@ -8,6 +8,7 @@
 --------------------------------------------------------------------------------
 module Projekt.Algorithmen.Berlekamp
   ( berlekamp, appBerlekamp, sffAndBerlekamp
+  , findIrred, findIrreds
   -- Algorithmus
   , berlekampBasis
   , berlekampFactor
@@ -21,10 +22,13 @@ import Projekt.Core.Factorization
 import Debug.Trace
 import Projekt.Algorithmen.SFreeFactorization
 
+import Control.Parallel
+import Control.Parallel.Strategies
+
 --------------------------------------------------------------------------------
 --  Wrapper
 
-berlekamp :: (Show a ,FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+berlekamp :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 berlekamp = appFact berlekampFactor . obviousFactor
 
 appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
@@ -36,6 +40,20 @@ appBerlekamp = appFact berlekamp
 sffAndBerlekamp :: (Show a, Fractional a, Num a, FiniteField a)
                                               => Polynom a -> [(Int,Polynom a)]
 sffAndBerlekamp f = appBerlekamp $ sff f
+
+-- |Wählt aus einer Liste von Polynomen das erste Irreduzibele Polynom heraus
+findIrred :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> Polynom a
+findIrred = head . findIrreds
+
+-- |Filtert mittels SFF und Berlekamp aus einer Liste die irreduzibleneiner
+-- liste heraus
+findIrreds :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [Polynom a]
+findIrreds ps = parMap rpar unFact irreds
+  where irreds = [fs | fs <- parMap rpar appBerlekamp
+                       [fs | fs <- parMap rpar appSff
+                             [(toFact . aggP) f | f <- ps , f /= P[]]
+                           , isTrivialFact fs]
+                     , isTrivialFact fs]
 
 --------------------------------------------------------------------------------
 --  Algorithmus

@@ -36,10 +36,16 @@ e2f2Mipo = P[1::F2,1,1] -- x²+x+1
 e2f2 = FFElem (P[0,1::F2]) e2f2Mipo
 
 e2e2f2Mipo = P[e2f2,one,one] -- x²+x+e2f2
-e2e2f2 = FFElem (P[0,one]) e2e2f2Mipo
+e2e2f2 = FFElem (P[0,e2f2]) e2e2f2Mipo
 
 e4f2Mipo = P[1::F2,1::F2,0,0,1::F2] -- x⁴+x²+1
 e4f2 = FFElem (P[0,1::F2]) e4f2Mipo
+
+e5e2f2MiPo = findIrred $ getAllMonicPs (elems e2f2) [5]
+e5e2f2 = FFElem (P[0,e2f2]) e5e2f2MiPo
+
+e5e4f2MiPo = findIrred $ getAllMonicPs (elems e4f2) [5]
+e5e4f2 = FFElem (P[0,e4f2]) e5e4f2MiPo
 
 --------------------------------------------------------------------------------
 --  Problem1:
@@ -51,8 +57,8 @@ problem1 e deg = do
   print $ ("Anzahl aller Elemente im Galoiskörper: " ++) $ show $ length es
 
   let list = [(toFact . aggP) f | f <- getAllMonicP es deg, f /= P[]]
-  print $ "Anzahl aller monischen Polynome /=0 bis zu Grad " 
-    ++ (show deg) ++ ": " ++ (show $ length list)
+  print $ "Anzahl aller monischen Polynome /=0 bis zu Grad "
+    ++ show deg ++ ": " ++ show (length list)
 
   print "Suche Irred!"
 
@@ -73,10 +79,46 @@ problem1 e deg = do
    -}
 
 --------------------------------------------------------------------------------
+--  Problem2:
+--      Finde ein irreduziblen Polynom über Endlichem Körper, welcher `e`
+--      enthält, von einem vorgegebenem Grad `deg`.
+
+problem2 e deg = do
+  let es = elems e
+  let list = [(toFact . aggP) f | f <- getAllMonicPs es [deg], f /= P[]]
+  print $ "Anzahl aller monischen Polynome /=0 bis zu Grad "
+    ++ show deg ++ ": " ++ show (length list)
+  let sffList = [fs | fs <- parMap rpar appSff list, isTrivialFact fs]
+  let bList = [fs | fs <- parMap rpar appBerlekamp sffList, isTrivialFact fs]
+
+  print "Irred:"
+  print $ snd $ head $ head bList
+
+problem2b e deg = do
+  print "Irred:"
+  print $ unFact $ head irreds
+    where irreds = [fs | fs <- parMap rpar appBerlekamp
+                         [fs | fs <- parMap rpar appSff
+                               [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
+                                                  , f /= P[]]
+                             , isTrivialFact fs]
+                       , isTrivialFact fs]
+
+problem2c e deg = do
+  print "Irred:"
+  print $ findIrred $ getAllMonicPs (elems e) [deg]
+
+--------------------------------------------------------------------------------
+--  Problem3:
+--      Finde den Körper e5e2f2 bzw. e5e4f2
+
+problem3 = print $ length $ elems e5e2f2
+problem3b = print $ length $ elems e5e4f2
+
+--------------------------------------------------------------------------------
 --  Main
 
-e = e4f2
-deg = 4
-
 main :: IO ()
-main = problem1 e deg
+{-main = Problem1 e2f2 5-}
+{-main = problem2c e2f2 5-}
+main = problem3

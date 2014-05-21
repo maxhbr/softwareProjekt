@@ -55,6 +55,13 @@ isTrivialFact :: [(Int,a)] -> Bool
 isTrivialFact [] = error "[] is not a factorization"
 isTrivialFact ms = sum (map fst ms) == 1
 
+{-
+getFirstTrivial :: (Num a) => [[(Int,a)]] -> a
+getFirstTrivial [] = error "no irred Poly found"
+getFirstTrivial (m:ms) | isTrivialFact m = (snd . head) m
+                       | otherwise       = getFirstTrivial ms
+ -}
+
 --------------------------------------------------------------------------------
 --  Einfache / offensichtliche Faktorisierungen
 
