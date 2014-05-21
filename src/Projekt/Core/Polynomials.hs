@@ -18,7 +18,7 @@ module Projekt.Core.Polynomials
   -- binär
   , divP, (@/), modByP, ggTP, eekP
   -- weiteres
-  , evalP, shiftP
+  , evalP
   , getAllP, getAllByDegP
   ) where
 import Data.List
@@ -117,7 +117,7 @@ multP _ _           = []
 
 multP' f []             = []
 multP' [] f             = []
-multP' f g  | n >= m    = foldl1' (addP) $ [ multMonom f i a | (i,a) <- gz]
+multP' f g  | n >= m    = foldl1' addP [ multMonom f i a | (i,a) <- gz]
             | otherwise = multP' g f
   where n  = length f
         m  = length g
@@ -125,15 +125,23 @@ multP' f g  | n >= m    = foldl1' (addP) $ [ multMonom f i a | (i,a) <- gz]
 
 -- |Multipliziert f mit a*x^i
 multMonom :: Num a => [a] -> Int -> a -> [a]
-multMonom f i a  = (take i $ replicate i 0) ++ map (a*) f
+multMonom f i a  = [0 | i <- [1..i]] ++ map (a*) f
 
 multMonomP :: Num a => Polynom a -> Int -> a -> Polynom a
-multMonomP (P f) i a  = P $ (take i $ replicate i 0) ++ map (a*) f
+multMonomP (P f) i a  = P $ multMonom f i a
 
 -- |Entfernt trailing zeros
 aggP :: (Num a, Eq a) => Polynom a -> Polynom a
+aggP (P ms) = P $ aggP' ms []
+  where aggP' [] ns     = []
+        aggP' (m:ms) ns | m /= 0     = ns ++ [m] ++ aggP' ms []
+                        | otherwise = aggP' ms (ns ++ [m])
+{-
+ - Alt:
+aggP :: (Num a, Eq a) => Polynom a -> Polynom a
 aggP (P ms) = P $ take l ms
   where l = maximum $ 0:[i+1 | i <- [0..(length ms - 1)] , ms!!i /= 0]
+ -}
 
 getLcP :: (Num a, Eq a) => Polynom a -> a
 getLcP (P[]) = 0
@@ -222,10 +230,6 @@ ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 evalP x f = evalP' x (unP f) 0
 evalP' x [] acc = acc
 evalP' x (m:ms) acc = evalP' x ms $ acc*x+m
-
--- |Multipliziert ein Polynom P ms mit X^j
-shiftP :: Num a => Int -> Polynom a -> Polynom a
-shiftP j (P ms) = P ([0 | i <- [1..j]] ++ ms)
 
 -- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome bis zu diesem
 -- Grad.
