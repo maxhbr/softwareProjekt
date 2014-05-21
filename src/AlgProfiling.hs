@@ -3,8 +3,9 @@ import Debug.Trace
 import Projekt.Core
 import Projekt.Algorithmen
 import System.Random
---------------------------------------------------------------------------------
---  Beispiele
+import Data.List
+{----------------------------------------------------------------------------------}
+{---  Beispiele-}
 e2f2Mipo = P[1::F2,1,1] -- x²+x+1
 e2f2 = FFElem (P[0,1::F2]) e2f2Mipo
 
@@ -42,8 +43,11 @@ testPoly3 = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
                                     , 1
                                     , 1
                                     , P[1::F2,1,0,1] ]
-testPoly = testPoly1 ^2 * testPoly2 * testPoly3
+testPoly = testPoly1 * testPoly2 
+
+
 
 main :: IO ()
-main = print $ map fst $ sffAndBerlekamp testPoly
+{-main = print $ map fst $ sffAndBerlekamp testPoly-}
+main = print $ berlekampBasis testPoly
 
