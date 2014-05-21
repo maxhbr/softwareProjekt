@@ -5,18 +5,18 @@ mkdir -p $DIR/../out
 
 ghc --make \
   -outputdir out \
-  -o out/Spec \
+  -o out/Main \
   -threaded \
   -O2 \
   -fllvm \
-    $DIR/../Spec.hs
+    $DIR/../Main.hs
   #-fforce-recomp \
 
 if [ $? -eq 0 ]; then
   if (( $# != 1 )); then
-    time $DIR/../out/Spec +RTS -N4
+    time $DIR/../out/Main +RTS -N4
   else
-    time $DIR/../out/Spec +RTS -N${1}
+    time $DIR/../out/Main +RTS -N${1}
   fi
 fi
 
