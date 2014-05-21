@@ -36,13 +36,14 @@ e2e2f2Mipo = P[e2f2,one,one] -- x²+x+e2f2
 e2e2f2 = FFElem (P[0,one]) e2e2f2Mipo
 
 --------------------------------------------------------------------------------
---  Main
+--  Problem1:
+--      Finde alle irreduziblen Polynome über Endlichem Körper, welcher `e`
+--      enthält, bis zu einem vorgegebenem Grad `deg`.
 
-e = e2f2
+e = e2e2f2
 deg = 4
 
-main :: IO ()
-main = do
+problem1 = do
   print "Anzahl aller Elemente im Galoiskörper:"
   let es = elems e
   print $ length es
@@ -66,3 +67,9 @@ main = do
     then do print "die irreduziblen Polynome"
             mapM_ (print . snd . head) bListIrred
    -}
+
+--------------------------------------------------------------------------------
+--  Main
+
+main :: IO ()
+main = problem1
