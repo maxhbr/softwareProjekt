@@ -36,6 +36,9 @@ berlekampBasis f = transposeM $ kernelM $ transposeM $
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
 berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
                                               => Polynom a -> [(Int,Polynom a)]
+berlekampFactor (P[]) = [(1,P[])]
+berlekampFactor (P[m]) = [(1,P[m])]
+berlekampFactor (P[m0,m1]) = [(1,P[m0,m1])]
 berlekampFactor f = berlekampFactor' f m
   where m = berlekampBasis f
         berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)

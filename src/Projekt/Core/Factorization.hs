@@ -9,6 +9,7 @@
 module Projekt.Core.Factorization
   ( toFact, unFact
   , potFact, appFact, aggFact
+  , isTrivialFact
   )where
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
@@ -48,3 +49,6 @@ aggFact :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)]
                                                             -> [(Int,Polynom a)]
 aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], f /= P[one]]
 
+isTrivialFact :: [(Int,a)] -> Bool
+isTrivialFact [] = error "[] is not a factorization"
+isTrivialFact ms = sum (map fst ms) == 1

@@ -48,6 +48,9 @@ import Debug.Trace
  -}
 
 sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff (P[]) = [(1,P[])]
+sff (P[m]) = [(1,P[m])]
+sff (P[m0,m1]) = [(1,P[m0,m1])]
 sff f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
       | df /= 0 && c == 1 = r
       | otherwise       = map (\(n,x) -> (n*p,x)) $ sff $ charRootP f
@@ -77,12 +80,3 @@ sqf=[(1,P[1::F3,1])
     ,(2,P[1])
     ,(3,P[1::F3,0,1])
     ,(4,P[2::F3,1])]
-
-e4f2Mipo = P[1::F2,1::F2,0,0,1::F2]
-failF = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
-                                , 1
-                                , P[1::F2,1,1]
-                                , P[0::F2,1]
-                                , P[1::F2,1,0,1] ]
-
-ff = P[2::F3,1]*P[1,0,1]
