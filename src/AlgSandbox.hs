@@ -88,7 +88,13 @@ main = do
     describe "Projekt.Algorithmen.Berlekamp" $ do
       it "sffAndBerlekamp and unFact should be inverse (example f over F3)" $
         unFact (sffAndBerlekamp f) `shouldBe` f
+      it "sffAndBerlekamp and unFact should be inverse (example bFailF)" $
+        unFact (sffAndBerlekamp bFailF) `shouldBe` bFailF
+      it "sffAndBerlekamp and unFact should be inverse (example sffFailF)" $
+        unFact (sffAndBerlekamp sffFailF) `shouldBe` sffFailF
+      {-
       it "sffAndBerlekamp and unFact should be inverse (random subset of e2e2f2)" $
         pMapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) list1
       it "sffAndBerlekamp and unFact should be inverse (random subset of e4f2)" $
         mapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) list2
+       -}
