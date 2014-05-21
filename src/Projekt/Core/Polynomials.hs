@@ -19,7 +19,8 @@ module Projekt.Core.Polynomials
   , divP, (@/), modByP, ggTP, eekP
   -- weiteres
   , evalP
-  , getAllP, getAllByDegP
+  , getAllP, getAllPs
+  , getAllMonicP, getAllMonicPs
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -68,11 +69,13 @@ instance (Show a, Eq a, Num a) => Show (Polynom a) where
                 zipWith (curry show') ms [0..]
     where show' :: (Show a, Eq a, Num a) => (a,Int) -> String
           show' (0,_) = ""
-          show' (m,i) = show m ++ showExp i
+          show' (m,0) = show m
+          {-show' (1,i) = showExp i-}
+          show' (m,i) = show m ++ "·" ++ showExp i
           showExp :: Int -> String
           showExp 0 = ""
-          showExp 1 = "·\x1B[04mX\x1B[24m"
-          showExp i = "·\x1B[04mX" ++ showExp' (show i) ++ "\x1B[24m"
+          showExp 1 = "\x1B[04mX\x1B[24m"
+          showExp i = "\x1B[04mX" ++ showExp' (show i) ++ "\x1B[24m"
           showExp' :: String -> String
           showExp' ""     = []
           showExp' (c:cs) = newC : showExp' cs
@@ -149,7 +152,7 @@ getLcP f     = (last . unP . aggP) f
 
 -- |Nimmt ein Polynom und gibt eine liste der Gräder zurrück.
 getDegrees :: (Num a, Eq a) => Polynom a -> [Int]
-getDegrees (P ms) = [snd m | m <- (zip ms [0..]), fst m /= 0]
+getDegrees (P ms) = [snd m | m <- zip ms [0..], fst m /= 0]
 {-getDegrees (P ms) = [i | i <- [0..(length ms - 1)] , ms!!i /= 0]-}
 
 -- |Gibt zu einem Polynom den Grad
@@ -232,18 +235,31 @@ evalP x f = evalP' x (unP f) 0
 evalP' x [] acc = acc
 evalP' x (m:ms) acc = evalP' x ms $ acc*x+m
 
+--------------------------------------------------------------------------------
+--  liste alle möglichen Polynome auf
+
 -- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome bis zu diesem
 -- Grad.
-getAllP :: (Num a, Eq a) => [a] -> Int -> [Polynom a]
-getAllP cs d = map P (css d)
-  where css n | n == 1     = [[y] | y <- cs]
-              | otherwise = [y:ys | y <- cs, ys <- css (n-1) ]
+-- Das Nullpoylnom (P[]) ist NICHT enthalten
+getAllP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
+getAllP es d = [(P . map (e*) . unP) f | f <- getAllMonicP es d
+                                       , e <- es , e /= 0]
 
--- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome mit genau diesem
--- Grad.
-getAllByDegP :: (Num a, Eq a) => [a] -> Int -> [Polynom a]
-getAllByDegP cs d = map P (lcss d)
-  where lcss n | n == 1     = [[y] | y <- cs]
-               | otherwise = [y:ys | y <- [e | e <- cs, e /= 0], ys <- css (n-1) ]
-        css n  | n == 1     = [[y] | y <- cs]
-               | otherwise = [y:ys | y <- cs, ys <- css (n-1) ]
+-- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle 
+-- Polynome deren Gräder in der Liste enthalten sind
+getAllPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
+getAllPs es ds = [(P . map (e*) . unP) f | f <- getAllMonicPs es ds
+                                         , e <- es , e /= 0]
+
+getAllMonicP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
+getAllMonicP es d = getAllMonicPs es [0..d]
+
+getAllMonicPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
+getAllMonicPs es is = map P $ concat [allMonics i | i <- is]
+  where allMonics 0 = [[one]]
+        allMonics i = [rs++[one] | rs <- ess (i-1)]
+        ess i       | i == 0     = [[y] | y <- es]
+                    | otherwise = [y:ys | y <- es, ys <- ess (i-1) ]
+        one         = head [e | e <- es, e == 1]
+        {-one         = onefy $ head [e | e <- es, e /= 0]-}
+        {-onefy x     = x/x-}

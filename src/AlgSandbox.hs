@@ -75,18 +75,18 @@ testSize = 100
 
 main :: IO ()
 main = do
-  list1 <- rndSelect (getAllByDegP (elems e2e2f2) 5) testSize
-  list2 <- rndSelect (getAllByDegP (elems e4f2) 5) testSize
+  list1 <- rndSelect (getAllPs (elems e2e2f2) [5,4]) testSize
+  list2 <- rndSelect (getAllPs (elems e4f2) [5,4]) testSize
   hspec $ do
     describe "Projekt.Algorithmen.SFreeFactorization" $ do
       it "sff and unFact should be inverse (example f over F3)" $
         unFact (sff f) `shouldBe` f
       it "sff and unFact should be inverse (up to deg 10 of f2)" $
         pMapM_ (\f -> unFact (sff f) `shouldBe` f) 
-        (getAllByDegP (elems (0::F2)) 10)
+        (getAllP (elems (0::F2)) 10)
       it "sff and unFact should be inverse (up to deg 7 of e2f2)" $
         pMapM_ (\f -> unFact (sff f) `shouldBe` f) 
-        (getAllByDegP (elems e2f2) 7)
+        (getAllP (elems e2f2) 7)
       it "sff and unFact should be inverse (random subset of e2e2f2)" $
         pMapM_ (\f -> unFact (sff f) `shouldBe` f) list1
       it "sff and unFact should be inverse (random subset of e4f2)" $
@@ -100,7 +100,7 @@ main = do
         unFact (sffAndBerlekamp sffFailF) `shouldBe` sffFailF
       it "sffAndBerlekamp and unFact should be inverse (random subset of e2e2f2)" $
         pMapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) $
-        take (quot testSize 10 + 1) list1
+        take (quot testSize 50 + 1) list1
       it "sffAndBerlekamp and unFact should be inverse (random subset of e4f2)" $
         mapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) $
-        take (quot testSize 10 + 1) list2
+        take (quot testSize 50 + 1) list2

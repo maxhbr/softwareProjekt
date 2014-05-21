@@ -43,19 +43,16 @@ e2e2f2 = FFElem (P[0,one]) e2e2f2Mipo
 --      Finde alle irreduziblen Polynome über Endlichem Körper, welcher `e`
 --      enthält, bis zu einem vorgegebenem Grad `deg`.
 
-e = e2e2f2
-deg = 4
-
-problem1 = do
+problem1 e deg = do
   print "Anzahl aller Elemente im Galoiskörper:"
   let es = elems e
   print $ length es
 
-  print $ "Anzahl aller Polynomeb /=0 bis zu Grad " ++ show deg ++ ":"
-  let list = [(toFact . aggP) f | f <- getAllP es deg, f /= P[]]
+  print $ "Anzahl aller monischen Polynome /=0 bis zu Grad " ++ show deg ++ ":"
+  let list = [(toFact . aggP) f | f <- getAllMonicP es deg, f /= P[]]
   print $ length list
 
-  print "Suche Irred:"
+  print "Suche Irred!"
 
   -- print "wende SFF an:"
   {-let sffList = parMap rpar (\(f,i) -> trace ("sff " ++ show i) (appSff f)) (zip list [1..])-}
@@ -64,6 +61,8 @@ problem1 = do
   -- print "wende Berlekamp an:"
   {-let bList = parMap rpar (\(f,i) -> trace ("b " ++ show i) (appBerlekamp f)) (zip sffList [1..])-}
   let bList = [fs | fs <- parMap rpar appBerlekamp sffList, isTrivialFact fs]
+
+  print "Anzahl Irred:"
   print $ length bList
 
   {-
@@ -75,5 +74,8 @@ problem1 = do
 --------------------------------------------------------------------------------
 --  Main
 
+e = f2
+deg = 4
+
 main :: IO ()
-main = problem1
+main = problem1 e deg

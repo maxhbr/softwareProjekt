@@ -54,7 +54,7 @@ e2f2 = FFElem (P[0,1::F2]) e2f2Mipo
  - Mit einer Nullstelle: e2e2f2
  -}
 e2e2f2Mipo = P[e2f2,one,one] -- x²+x+e2f2
-e2e2f2 = FFElem (P[0,one]) e2e2f2Mipo
+e2e2f2 = FFElem (P[0,e2f2]) e2e2f2Mipo
 --e2e2f2 = FFElem (P[0,e2f2]) e2e2f2Mipo
 
 {- F16=E4
@@ -144,11 +144,17 @@ furtherTests' es us e = do
 --------------------------------------------------------------------------------
 testSize = 10
 
+tst = hspec $
+  describe "tst" $
+    it "tst run" $
+      pMapM_ (\f -> charRootP (f ^ 2) `shouldBe` f)
+        (getAllMonicPs (elems e2e2f2) [1])
+
 main :: IO ()
 main = do
-  list1 <- rndSelect (getAllByDegP (elems e2e2f2) 5) testSize
-  list2 <- rndSelect (getAllByDegP (elems e4f2) 5) testSize
-  list3 <- rndSelect (getAllByDegP (elems e3f3) 5) testSize
+  list1 <- rndSelect (getAllPs (elems e2e2f2) [5,4]) testSize
+  list2 <- rndSelect (getAllPs (elems e4f2) [5,4]) testSize
+  list3 <- rndSelect (getAllPs (elems e3f3) [4,3]) testSize
   hspec $ do
 --------------------------------------------------------------------------------
 --  in char 2
@@ -158,7 +164,7 @@ main = do
       testForExceptions e2f2 e2f2Mipo
       it "charRootP should be inverse to ^2 (full, up to deg)" $
         pMapM_ (\f -> charRootP (f ^ 2) `shouldBe` f)
-        (getAllByDegP (elems e2f2) 4)
+        (getAllPs (elems e2f2) [4])
     describe "Projekt.Core.FiniteFields @e4f2: E4 over F2" $ do
       testFieldSpec e4f2
       furtherTests e4f2
@@ -177,14 +183,14 @@ main = do
       furtherTests e2f3
       it "charRootP should be inverse to ^3 (full)" $
         pMapM_ (\f -> charRootP (f ^ 3) `shouldBe` f)
-        (getAllByDegP (elems e2f3) 4)
+        (getAllPs (elems e2f3) [4])
     describe "Projekt.Core.FiniteFields @e3f3: E3 over F3" $ do
       testFieldSpec e3f3
       it "charRootP should be inverse to ^3 (subset)" $
         pMapM_ (\f -> charRootP (f ^ 3) `shouldBe` f) list3
     {-
      - Too large:
-  list3 <- rndSelect (getAllByDegP (elems e3e3f3) 4) testSize
+  list3 <- rndSelect (getAllPs (elems e3e3f3) [4]) testSize
   hspec $ do
     describe "Projekt.Core.FiniteFields @e3e3f3: E3 over E3 over F3" $ do
       testFieldSpec e3e3f3

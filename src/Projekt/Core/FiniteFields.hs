@@ -106,12 +106,12 @@ instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) wh
 -- enthält deswegen zu wenig Information, über den Körper in dem es lebt.
 elems' :: (Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
 elems' (FFKonst x)  = error "Insufficient information in FFKonst"
-elems' (FFElem f p) = elems'' (uDegP p) $ product (unP f) * product (unP p) * 0
-  where elems'' d e = map (`FFElem` p) (getAllP (elems e) d)
+elems' (FFElem f p) = map (`FFElem` p) (P[] : getAllP (elems e) (uDegP p -1))
+  where e = product (unP f) * product (unP p)
 
 getReprP' (P [])             = error "Insufficient information in empty Polynomial"
 getReprP' (P (FFKonst _:ms)) = getReprP $ P ms
-getReprP' (P (e:ms))         = e * 0
+getReprP' (P (FFElem f p : ms))         = FFElem 0 p
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
@@ -125,6 +125,7 @@ charOfP f = charakteristik $ getReprP f
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
 charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
 charRootP (P []) = P []
+charRootP (P [1]) = P [1]
 charRootP (P ms) = P[m^l | (m,i) <- zip ms [0..] , i `mod` p == 0]
   where p = charOfP $ P ms
         q = elemCount $ getReprP (P ms)
