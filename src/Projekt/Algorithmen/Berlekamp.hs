@@ -20,20 +20,21 @@ import Projekt.Core.Matrix
 import Projekt.Core.Factorization
 import Debug.Trace
 import Projekt.Algorithmen.SFreeFactorization
+import Data.MemoTrie
 
 --------------------------------------------------------------------------------
 --  Wrapper
 
-berlekamp :: (Show a ,FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+berlekamp :: (Show a ,FiniteField a, Num a, Fractional a, HasTrie a) => Polynom a -> [(Int,Polynom a)]
 berlekamp = appFact berlekampFactor . obviousFactor
 
-appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a, HasTrie a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 appBerlekamp = appFact berlekamp
 
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 -- Benutzt wird dazu die Quadratfreie Faktorisierung mit anschließendem
 -- Berlekamp
-sffAndBerlekamp :: (Show a, Fractional a, Num a, FiniteField a)
+sffAndBerlekamp :: (Show a, Fractional a, Num a, FiniteField a, HasTrie a)
                                               => Polynom a -> [(Int,Polynom a)]
 sffAndBerlekamp f = appBerlekamp $ sff f
 
@@ -43,7 +44,7 @@ sffAndBerlekamp f = appBerlekamp $ sff f
 -- |Berechnet eine Basis des Berlekampraums zu f,
 --  d.h. gibt eine Matrix zurück, deren Zeilen gerade den Berlekampraum
 --  aufspannen bzgl der kanonischen Basis { 1, x, x², x³, ... }
-berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a)
+berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a, HasTrie a)
                                                        => Polynom a -> Matrix a
 berlekampBasis f = transposeM $ kernelM $ transposeM $
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n
@@ -56,14 +57,14 @@ berlekampBasis f = transposeM $ kernelM $ transposeM $
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
-berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
+berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a, HasTrie a)
                                               => Polynom a -> [(Int,Polynom a)]
 berlekampFactor (P[]) = [(1,P[])]
 berlekampFactor (P[m]) = [(1,P[m])]
 berlekampFactor (P[m0,m1]) = [(1,P[m0,m1])]
 berlekampFactor f = berlekampFactor' f m
   where m = berlekampBasis f
-        berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)
+        berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a, HasTrie a)
                                       => Polynom a -> Matrix a -> [(Int,Polynom a)]
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
                              | getNumRowsM m == 1 = [(1,f)]

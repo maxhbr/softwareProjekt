@@ -13,14 +13,15 @@ module Projekt.Algorithmen.SFreeFactorization
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 import Projekt.Core.Factorization
+import Data.MemoTrie
 
 --------------------------------------------------------------------------------
 --  Wrapper
 
-sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff :: (FiniteField a, Num a, Fractional a, HasTrie a) => Polynom a -> [(Int,Polynom a)]
 sff = appFact sffFactor . obviousFactor
 
-appSff :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appSff :: (FiniteField a, Num a, Fractional a, HasTrie a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 appSff = appFact sff
 
 --------------------------------------------------------------------------------
@@ -58,7 +59,7 @@ appSff = appFact sff
        Seite 345(355)
  -}
 
-sffFactor :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sffFactor :: (FiniteField a, Num a, Fractional a, HasTrie a) => Polynom a -> [(Int,Polynom a)]
 sffFactor (P[]) = [(1,P[])]
 sffFactor (P[m]) = [(1,P[m])]
 sffFactor (P[m0,m1]) = [(1,P[m0,m1])]
