@@ -4,16 +4,25 @@
 -- Module      : Projekt.Core.PrimeFields
 -- Note        : Einfache prim Körper
 --
---
+-- Ein Primkörper wird wie Folgt definiert (Am Beispiel F7):
+-- Man benötigt einen Datentyp, der sich den Modulus merkt
+--      data MName = Numeral7
+-- Dieser braucht eine passende Instanz Numeral und eine Instanz Show
+--      instance Numeral Numeral7 where {numValue x = 7}
+--      instance Show Numeral7 where {show = show}
+-- Damik kann man nun den Primkörper definieren
+--      type F7 = Mod Numeral7
+-- Also zusammengefasst:
+{-
+data MName = Numeral7
+instance Numeral Numeral7 where {numValue x = 7}
+instance Show Numeral7 where {show = show}
+type F7 = Mod Numeral7
+ -}
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.PrimeFields
-  ( 
-  -- Peano Numerale
-    Numeral (numValue)
-  , Zero
-  , Succ
-  , Two , Three , Five , Seven
+  ( Numeral (..)
   -- Endliche Körper
   , Mod
   , modulus
@@ -25,47 +34,10 @@ import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
 
 --------------------------------------------------------------------------------
---  Peano numbers
-
-data Zero
-data Succ a
-
---succPeano :: a -> Succ a
---succPeano = const undefined
-
-predPeano :: Succ a -> a
-predPeano = const undefined
+--  Prime fields
 
 class Numeral a where
   numValue :: a -> Int
-
-instance Numeral Zero where
-  numValue = const 0
-instance Numeral a => Numeral (Succ a) where
-  numValue x = numValue (predPeano x) + 1
-
-instance Show Zero where
-  show = show . numValue
-instance Numeral a => Show (Succ a) where
-  show = show . numValue
-
---TODO
-{-
-toPeano :: Integer -> r
-toPeano i = toPeano' i id
-  where toPeano' :: Integer -> (forall n. (Numeral n) => n -> r) -> r
-        toPeano' 0 k = k (undefined :: Zero)
-        toPeano' n k = toPeano' (n-1) (k . succ)
- -}
-
--- shortcuts
-type Two   = Succ (Succ Zero)
-type Three = Succ Two
-type Five  = Succ (Succ Three)
-type Seven = Succ (Succ Five)
-
---------------------------------------------------------------------------------
---  Prime fields
 
 newtype Mod n = MkMod { unMod :: Int }
 
@@ -140,18 +112,14 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
 --------------------------------------------------------------------------------
 --  Examples
 
-{-type F2 = Mod Two-}
-{-type F3 = Mod Three-}
-type F5 = Mod Five
-type F7 = Mod Seven
-
--- Größere Primzahlen
 #define PFInstance(MName,MValue,PFName) \
 data MName = MName; \
 instance Numeral MName where {numValue x = MValue} ;\
 instance Show MName where {show = show} ;\
 type PFName = Mod MName ;\
 
-PFInstance(Peano2,2,F2)
-PFInstance(Peano3,3,F3)
-PFInstance(Peano101,101,F101)
+PFInstance(Numeral2,2,F2)
+PFInstance(Numeral3,3,F3)
+PFInstance(Numeral5,5,F5)
+PFInstance(Numeral7,7,F7)
+PFInstance(Numeral101,101,F101)
