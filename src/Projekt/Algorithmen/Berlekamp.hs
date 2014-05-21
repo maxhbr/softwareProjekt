@@ -11,7 +11,6 @@ module Projekt.Algorithmen.Berlekamp
   -- Algorithmus
   , berlekampBasis
   , berlekampFactor
-  , newKer
   )where
 import Data.Maybe
 import Data.List
