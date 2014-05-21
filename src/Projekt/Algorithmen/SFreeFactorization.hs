@@ -62,32 +62,6 @@ sff f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
                 z      = w @/ y
                 (r,c') = sff' (i+1) y (c @/ y)
 
-{-
--- |Noch ein Versuch, zum verständnis:
--- TODO: was ist hier falsch
-sfff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
-sfff (P[]) = []
-sfff f     | uDegP f == 0 = [(1,f)]
-           | df /= 0      = sfff'
-           | otherwise   = map (\(n,x) -> (n*p,x)) $ sfff $ charRootP f
-  where df    = deriveP f
-        p     = charakteristik $ prodOfCoeffsP f
-
-        -- |Hier kann davon ausgegangen werden, dass die Ableitung von f nicht
-        -- verschwindet, deshalb kann man hier den klassischen Algorithmus
-        -- anwenden
-        --      im Fall g==1 ist das Polynom f bereits quadratfrei
-        --      sonst ist: alles was in g enthalten ist  mindestens in
-        --                   quadratischer Ordnung in f (jetzt eine Ordnun
-        --                   niedriger)
-        --                 das h sind die teile, die in f nur noch in Ordnun 1
-        --                   vorkommen und somit für den nächsten schritt
-        --                   rausfliegen
-        sfff' | g == 1     = [(1,f)]
-              | otherwise = (1,h) : map (\(n,x) -> (n+1,x)) (sfff g)
-          where g = ggTP f df
-                h = fst $ divP f g
- -}
 
 --------------------------------------------------------------------------------
 --  Beispiele
