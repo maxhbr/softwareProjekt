@@ -6,7 +6,7 @@
 --
 -- Ein Primkörper wird wie Folgt definiert (Am Beispiel F7):
 -- Man benötigt einen Datentyp, der sich den Modulus merkt
---      data MName = Numeral7
+--      data Numeral7
 -- Dieser braucht eine passende Instanz Numeral und eine Instanz Show
 --      instance Numeral Numeral7 where {numValue x = 7}
 --      instance Show Numeral7 where {show = show}
@@ -14,7 +14,7 @@
 --      type F7 = Mod Numeral7
 -- Also zusammengefasst:
 {-
-data MName = Numeral7
+data Numeral7
 instance Numeral Numeral7 where {numValue x = 7}
 instance Show Numeral7 where {show = show}
 type F7 = Mod Numeral7
@@ -113,7 +113,7 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
 --  Examples
 
 #define PFInstance(MName,MValue,PFName) \
-data MName = MName; \
+data MName; \
 instance Numeral MName where {numValue x = MValue} ;\
 instance Show MName where {show = show} ;\
 type PFName = Mod MName ;\
