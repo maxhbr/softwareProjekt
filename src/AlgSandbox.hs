@@ -81,11 +81,12 @@ main = do
     describe "Projekt.Algorithmen.SFreeFactorization" $ do
       it "sff and unFact should be inverse (example f over F3)" $
         unFact (sff f) `shouldBe` f
-      {-
       it "sff and unFact should be inverse (up to deg 10 of f2)" $
         pMapM_ (\f -> unFact (sff f) `shouldBe` f) 
-        (getAllByDegP (elems (0::F2)) 5)
-       -}
+        (getAllByDegP (elems (0::F2)) 10)
+      it "sff and unFact should be inverse (up to deg 7 of e2f2)" $
+        pMapM_ (\f -> unFact (sff f) `shouldBe` f) 
+        (getAllByDegP (elems e2f2) 7)
       it "sff and unFact should be inverse (random subset of e2e2f2)" $
         pMapM_ (\f -> unFact (sff f) `shouldBe` f) list1
       it "sff and unFact should be inverse (random subset of e4f2)" $
@@ -97,9 +98,9 @@ main = do
         unFact (sffAndBerlekamp bFailF) `shouldBe` bFailF
       it "sffAndBerlekamp and unFact should be inverse (example sffFailF)" $
         unFact (sffAndBerlekamp sffFailF) `shouldBe` sffFailF
-      {-
       it "sffAndBerlekamp and unFact should be inverse (random subset of e2e2f2)" $
-        pMapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) list1
+        pMapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) $
+        take (quot testSize 10 + 1) list1
       it "sffAndBerlekamp and unFact should be inverse (random subset of e4f2)" $
-        mapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) list2
-       -}
+        mapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) $
+        take (quot testSize 10 + 1) list2

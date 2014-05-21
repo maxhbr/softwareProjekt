@@ -14,9 +14,9 @@ import Projekt.Algorithmen
 import Debug.Trace
 
 data PfNumeral
-instance Numeral PfNumeral where 
+instance Numeral PfNumeral where
   numValue x = 2 -- setze die Charakteristik
-instance Show PfNumeral where 
+instance Show PfNumeral where
   show = show
 type PF = Mod PfNumeral
 
