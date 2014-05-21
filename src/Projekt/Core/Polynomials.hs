@@ -149,7 +149,8 @@ getLcP f     = (last . unP . aggP) f
 
 -- |Nimmt ein Polynom und gibt eine liste der Gräder zurrück.
 getDegrees :: (Num a, Eq a) => Polynom a -> [Int]
-getDegrees (P ms) = [i | i <- [0..(length ms - 1)] , ms!!i /= 0]
+getDegrees (P ms) = [snd m | m <- (zip ms [0..]), fst m /= 0]
+{-getDegrees (P ms) = [i | i <- [0..(length ms - 1)] , ms!!i /= 0]-}
 
 -- |Gibt zu einem Polynom den Grad
 degP :: (Num a, Eq a) => Polynom a -> Maybe Int
