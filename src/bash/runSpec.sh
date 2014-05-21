@@ -7,10 +7,10 @@ ghc --make \
   -outputdir out \
   -o out/Spec \
   -threaded \
-  -fforce-recomp \
   -O2 \
   -fllvm \
     $DIR/../Spec.hs
+  #-fforce-recomp \
 
 if [ $? -eq 0 ]; then
   time $DIR/../out/Spec +RTS -N4
