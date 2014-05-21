@@ -55,17 +55,16 @@ problem1 = do
   let list = [(toFact . aggP) f | f <- getAllP es deg, f /= P[]]
   print $ length list
 
-  print "wende SFF an:"
-  let sffList = parMap rpar appSff list
-  {-let sffList = parMap rpar (\(f,i) -> trace ("sff " ++ show i) (appSff f)) (zip list [1..])-}
-  let sffListIrred = [fs | fs <- sffList , isTrivialFact fs]
-  print $ length sffListIrred
+  print "Suche Irred:"
 
-  print "wende Berlekamp an:"
-  let bList = parMap rpar appBerlekamp sffList
+  -- print "wende SFF an:"
+  {-let sffList = parMap rpar (\(f,i) -> trace ("sff " ++ show i) (appSff f)) (zip list [1..])-}
+  let sffList = [fs | fs <- parMap rpar appSff list, isTrivialFact fs]
+
+  -- print "wende Berlekamp an:"
   {-let bList = parMap rpar (\(f,i) -> trace ("b " ++ show i) (appBerlekamp f)) (zip sffList [1..])-}
-  let bListIrred = [fs | fs <- bList , isTrivialFact fs]
-  print $ length bListIrred
+  let bList = [fs | fs <- parMap rpar appBerlekamp sffList, isTrivialFact fs]
+  print $ length bList
 
   {-
   if length bListIrred < 100
