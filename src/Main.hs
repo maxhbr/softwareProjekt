@@ -12,6 +12,10 @@ module Main
 import Projekt.Core
 import Projekt.Algorithmen
 import Debug.Trace
+import qualified Control.Monad.Parallel as P
+
+--------------------------------------------------------------------------------
+--  Beliebiger Primkörper
 
 data PfNumeral
 instance Numeral PfNumeral where
@@ -20,11 +24,27 @@ instance Show PfNumeral where
   show = show
 type PF = Mod PfNumeral
 
-deg = 3
+--------------------------------------------------------------------------------
+--  Erweiterungen über F2
+
+f2 = 1::F2
+
+e2f2Mipo = P[1::F2,1,1] -- x²+x+1
+e2f2 = FFElem (P[0,1::F2]) e2f2Mipo
+
+e2e2f2Mipo = P[e2f2,one,one] -- x²+x+e2f2
+e2e2f2 = FFElem (P[0,one]) e2e2f2Mipo
+
+--------------------------------------------------------------------------------
+--  Main
+
+e = e2f2
+deg = 4
+
 main :: IO ()
 main = do
   print "Anzahl aller Elemente im Galoiskörper:"
-  let es = elems undefined ::[PF]
+  let es = elems e
   print $ length es
 
   print $ "Anzahl aller Polynomeb /=0 bis zu Grad " ++ show deg ++ ":"
@@ -32,12 +52,17 @@ main = do
   print $ length list
 
   print "wende SFF an:"
-  let sffList = map appSff list
-  print $ length [fs | fs <- sffList , isTrivialFact fs]
+  sffList <- P.mapM (return . appSff) list
+  let sffListIrred = [fs | fs <- sffList , isTrivialFact fs]
+  print $ length sffListIrred
 
   print "wende Berlekamp an:"
-  let bList = map appBerlekamp sffList
-  print $ length [fs | fs <- bList , isTrivialFact fs]
+  bList <- P.mapM (return . appBerlekamp) list
+  let bListIrred = [fs | fs <- bList , isTrivialFact fs]
+  print $ length bListIrred
 
-  print "die irreduziblen Polynome"
-  mapM_ (print . snd . head) [fs | fs <- bList , isTrivialFact fs]
+  {-
+  if length bListIrred < 100
+    then do print "die irreduziblen Polynome"
+            mapM_ (print . snd . head) bListIrred
+   -}
