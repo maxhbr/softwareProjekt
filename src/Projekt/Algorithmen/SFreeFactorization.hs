@@ -53,7 +53,7 @@ sff f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sff $ charRootP c)
       | otherwise       = map (\(n,x) -> (n*p,x)) $ sff $ charRootP f
   where df         = deriveP f
         c'         = ggTP f df
-        p          = charakteristik $ prodOfCoeffsP f
+        p          = charOfP f
         (r,c)      = sff' 1 (f @/ c') c'
         sff' i w c | w == 1      = ([], c)
                    | z /= P[one] = ((i,z) : r, c')
