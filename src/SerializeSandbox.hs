@@ -51,8 +51,8 @@ testPoly3 = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
                                     , P[1::F2,1,0,1] ]
 testPoly = testPoly1 * testPoly2 
 
-testSerializeWrite = writeFile "/tmp/serialize.txt" (encode testPoly)
-testSerializeRead = readFile "/tmp/serialize.txt" >>= return . decode :: IO (Polynom (FFElem F2))
+testSerializeWrite = writeFile "/tmp/serialize" (encode testPoly)
+testSerializeRead = readFile "/tmp/serialize" >>= return . decode :: IO (Polynom (FFElem F2))
 
 
 main :: IO ()

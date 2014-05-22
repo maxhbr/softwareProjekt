@@ -9,6 +9,8 @@
 module Main
   where
 
+import Prelude hiding (writeFile)
+
 import Projekt.Core
 import Projekt.Algorithmen
 import Debug.Trace
@@ -16,6 +18,9 @@ import Debug.Trace
 {-import Control.Concurrent.Async (mapConcurrently)-}
 import Control.Parallel
 import Control.Parallel.Strategies
+
+import Data.Binary
+import Data.ByteString.Lazy (writeFile)
 
 --------------------------------------------------------------------------------
 --  Beliebiger Primkörper
@@ -78,6 +83,17 @@ problem1 e deg = do
             mapM_ (print . snd . head) bListIrred
    -}
 
+-- Speicher gefundene als Liste in eine Datei
+problem1b e deg = do 
+  writeFile "/tmp/irreds" (encode irreds)
+  print $ ("Anzahl Irred: " ++) $ show $ length irreds
+    where irreds = [fs | fs <- parMap rpar appBerlekamp
+                         [fs | fs <- parMap rpar appSff
+                               [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
+                                                  , f /= P[]]
+                             , isTrivialFact fs]
+                       , isTrivialFact fs]
+
 --------------------------------------------------------------------------------
 --  Problem2:
 --      Finde ein irreduziblen Polynom über Endlichem Körper, welcher `e`
@@ -119,6 +135,6 @@ problem3b = print $ length $ elems e5e4f2
 --  Main
 
 main :: IO ()
-{-main = Problem1 e2f2 5-}
+main = problem1b e2f2 2
 {-main = problem2c e2f2 5-}
-main = problem3
+{-main = problem3-}
