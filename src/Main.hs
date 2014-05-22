@@ -85,6 +85,8 @@ problem1 e deg = do
 
 -- Speicher gefundene als Liste in eine Datei
 problem1b e deg = do 
+  print "Berechne monischen irred Polynome /=0 bis zu Grad "
+    ++ show deg
   writeFile "/tmp/irreds" (encode irreds)
   print $ ("Anzahl Irred: " ++) $ show $ length irreds
     where irreds = [fs | fs <- parMap rpar appBerlekamp
@@ -135,6 +137,6 @@ problem3b = print $ length $ elems e5e4f2
 --  Main
 
 main :: IO ()
-main = problem1b e2f2 2
+main = problem1b e2f2 4
 {-main = problem2c e2f2 5-}
 {-main = problem3-}
