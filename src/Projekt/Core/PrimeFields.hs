@@ -33,6 +33,8 @@ import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
 
+import Data.MemoTrie
+
 --------------------------------------------------------------------------------
 --  Prime fields
 
@@ -70,11 +72,13 @@ instance (Numeral n) => Eq (Mod n) where
 
 instance (Numeral n) => Num (Mod n) where
   x + y       = add x y 
-  x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
+  x * y       = MkMod $ memo3 multHelper (unMod x) (unMod y) (modulus x)
   fromInteger = MkMod . fromIntegral
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate      = MkMod . negate . unMod
+
+multHelper x y p = x * y `mod` p
 
 add x y  | z <= 10000 = MkMod z
          | otherwise = MkMod $ z `rem` modulus x
