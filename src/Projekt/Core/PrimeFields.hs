@@ -33,8 +33,6 @@ import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
 
-import Data.MemoTrie
-
 --------------------------------------------------------------------------------
 --  Prime fields
 
@@ -44,7 +42,7 @@ class Numeral a where
 newtype Mod n = MkMod { unMod :: Int }
 
 instance (Numeral n, Show n) => Show (Mod n) where
-  show x = "\x1B[33m" ++ show (unMod x) ++ "\x1B[39m" ++ showModulus x
+  show x = "\x1B[33m" ++ show (unMod x `mod` modulus x) ++ "\x1B[39m" ++ showModulus x
     where showModulus :: (Numeral n) => Mod n -> String
           showModulus = showModulus' . show . modulus
           showModulus' :: String -> String
@@ -65,24 +63,22 @@ instance (Numeral n, Show n) => ShowTex (Mod n) where
   showTex x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
 
 getRepr :: (Numeral n) => Mod n -> Int
-getRepr x = unMod x `mod` modulus x
+getRepr = unMod
 
 instance (Numeral n) => Eq (Mod n) where
   x == y = (unMod x - unMod y) `mod` modulus x == 0
 
 instance (Numeral n) => Num (Mod n) where
   x + y       = add x y 
-  x * y       = MkMod $ memo3 multHelper (unMod x) (unMod y) (modulus x)
+  x * y       = MkMod $ unMod x * unMod y
   fromInteger = MkMod . fromIntegral
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate      = MkMod . negate . unMod
 
-multHelper x y p = x * y `mod` p
-
 add x y  | z <= 10000 = MkMod z
-         | otherwise = MkMod $ z `rem` modulus x
-  where z = (unMod x) + (unMod y)
+         | otherwise = MkMod z
+  where z = unMod x + unMod y
 
 instance (Numeral n) => FiniteField (Mod n) where
   zero                = MkMod 0
