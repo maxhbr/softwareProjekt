@@ -131,6 +131,23 @@ multM (M m)     (M n)     | k' == l    = M $ array ((1,1),(k,l'))
   where ((_,_),(k,l))   = bounds m
         ((_,_),(k',l')) = bounds n
 
+instance (Num a, Binary a) => Binary (Polynom a) where
+   put (M x) = put x
+   get       = do x <- get
+                  return (M x)
+instance (Num a, Binary a) => Binary (Matrix a) where
+  put (Mdiag m) = do put (0 :: Word8)
+                     put m
+  put (M x)     = do put (1 :: Word8)
+                     put x
+
+  get = do t <- get :: Get Word8
+           case t of
+                0 -> do m <- get
+                       return $ Mdiag m
+                1 -> do x  <- get
+                       return $ M x
+
 --------------------------------------------------------------------------------
 --  Grundlegende Operationen
 

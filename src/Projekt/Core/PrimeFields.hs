@@ -33,6 +33,11 @@ import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
 
+-- import qualified Data.Serialize as DS -- (Serialize, get, put)
+-- import GHC.Generics -- (Generic)
+-- import Data.Serialize.Derive -- (derivePut, deriveGet)
+import Data.Binary
+
 --------------------------------------------------------------------------------
 --  Prime fields
 
@@ -69,16 +74,12 @@ instance (Numeral n) => Eq (Mod n) where
   x == y = (unMod x - unMod y) `mod` modulus x == 0
 
 instance (Numeral n) => Num (Mod n) where
-  x + y       = add x y 
+  x + y       = MkMod $ (unMod x + unMod y) `mod` modulus x
   x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
   fromInteger = MkMod . fromIntegral
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate      = MkMod . negate . unMod
-
-add x y  | z <= 10000 = MkMod z
-         | otherwise = MkMod $ z `rem` modulus x
-  where z = (unMod x) + (unMod y)
 
 instance (Numeral n) => FiniteField (Mod n) where
   zero                = MkMod 0
@@ -112,6 +113,11 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
           | u == 1     = x1
           | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
             where q = v `div` u
+
+instance (Numeral a) => Binary (Mod a) where
+   put (MkMod x) = put x
+   get           = do x <- get
+                      return $ MkMod x
 
 --------------------------------------------------------------------------------
 --  Examples
