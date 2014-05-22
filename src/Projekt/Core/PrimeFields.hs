@@ -1,129 +1,143 @@
-{-# LANGUAGE CPP #-}
---------------------------------------------------------------------------------
+{-# LANGUAGE ScopedTypeVariables, MultiParamTypeClasses, DeriveDataTypeable, TemplateHaskell, BangPatterns, DataKinds #-}
+{-# OPTIONS_GHC -Wall #-}
+-----------------------------------------------------------------------------
 -- |
--- Module      : Projekt.Core.PrimeFields
--- Note        : Einfache prim Körper
+-- Module      :  Data.FiniteField.PrimeField
+-- Copyright   :  (c) Masahiro Sakai 2013
+-- License     :  BSD-style
 --
--- Ein Primkörper wird wie Folgt definiert (Am Beispiel F7):
--- Man benötigt einen Datentyp, der sich den Modulus merkt
---      data Numeral7
--- Dieser braucht eine passende Instanz Numeral und eine Instanz Show
---      instance Numeral Numeral7 where {numValue x = 7}
---      instance Show Numeral7 where {show = show}
--- Damik kann man nun den Primkörper definieren
---      type F7 = Mod Numeral7
--- Also zusammengefasst:
-{-
-data Numeral7
-instance Numeral Numeral7 where {numValue x = 7}
-instance Show Numeral7 where {show = show}
-type F7 = Mod Numeral7
- -}
+-- Maintainer  :  masahiro.sakai@gmail.com
+-- Stability   :  provisional
+-- Portability :  non-portable (ScopedTypeVariables, MultiParamTypeClasses, DeriveDataTypeable, TemplateHaskell, BangPatterns)
 --
---------------------------------------------------------------------------------
+-- Finite field of prime order p, Fp = Z/pZ.
+--
+-- References:
+--
+-- * <http://en.wikipedia.org/wiki/Finite_field>
+--
+-----------------------------------------------------------------------------
 module Projekt.Core.PrimeFields
-  ( Numeral (..)
-  -- Endliche Körper
-  , Mod
-  , modulus
-  -- Beispiele
-  , F2 , F3 , F5 , F7, F101
+  ( PrimeField
+  , toInteger
+  -- * Template haskell utilities
+  -- $TH
+  , primeField
+  , F2, F3
+  {-, F2, F3, F5, F7, F101-}
   ) where
+
+import Prelude hiding (toInteger)
+import Control.DeepSeq
+import Data.Hashable
+import Data.Ratio (denominator, numerator)
+import Data.Typeable
+import qualified Language.Haskell.TH as TH
+import qualified TypeLevel.Number.Nat as TL
 import Projekt.Core.FiniteField
-import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
+import Projekt.Core.ShowTex
 
---------------------------------------------------------------------------------
---  Prime fields
+-- | Finite field of prime order p, Fp = Z/pZ.
+--
+-- NB: Primality of @p@ is assumed, but not checked.
+newtype PrimeField p = PrimeField Integer deriving (Eq, Typeable)
 
-class Numeral a where
-  numValue :: a -> Int
+-- | conversion to 'Integer'
+toInteger :: PrimeField p -> Integer
+toInteger (PrimeField a) = a
 
-newtype Mod n = MkMod { unMod :: Int }
+toInt :: Integral a => PrimeField p -> a
+toInt = fromInteger . toInteger
 
-instance (Numeral n, Show n) => Show (Mod n) where
-  show x = "\x1B[33m" ++ show (unMod x) ++ "\x1B[39m" ++ showModulus x
-    where showModulus :: (Numeral n) => Mod n -> String
-          showModulus = showModulus' . show . modulus
-          showModulus' :: String -> String
-          showModulus' "" = ""
-          showModulus' (c:cs) = newC : showModulus' cs
-            where newC | c == '0' = '₀'
-                       | c == '1' = '₁'
-                       | c == '2' = '₂'
-                       | c == '3' = '₃'
-                       | c == '4' = '₄'
-                       | c == '5' = '₅'
-                       | c == '6' = '₆'
-                       | c == '7' = '₇'
-                       | c == '8' = '₈'
-                       | c == '9' = '₀'
+instance Show (PrimeField p) where
+  showsPrec n (PrimeField x) = showsPrec n x
 
-instance (Numeral n, Show n) => ShowTex (Mod n) where
-  showTex x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
+instance TL.Nat p => Read (PrimeField p) where
+  readsPrec n s = [(fromInteger a, s') | (a,s') <- readsPrec n s]
 
-getRepr :: (Numeral n) => Mod n -> Int
-getRepr x = unMod x `mod` modulus x
+instance NFData (PrimeField p) where
+  rnf (PrimeField a) = rnf a
 
-instance (Numeral n) => Eq (Mod n) where
-  x == y = (unMod x - unMod y) `mod` modulus x == 0
+instance TL.Nat p => Num (PrimeField p) where
+  PrimeField a + PrimeField b = fromInteger $ a+b
+  PrimeField a * PrimeField b = fromInteger $ a*b
+  PrimeField a - PrimeField b = fromInteger $ a-b
+  negate (PrimeField a)       = fromInteger $ negate a
+  abs a         = a
+  signum _      = 1
+  fromInteger a = PrimeField $ a `mod` TL.toInt (undefined :: p)
 
-instance (Numeral n) => Num (Mod n) where
-  x + y       = add x y 
-  x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
-  fromInteger = MkMod . fromIntegral
-  abs _       = error "Prelude.Num.abs: inappropriate abstraction"
-  signum _    = error "Prelude.Num.signum: inappropriate abstraction"
-  negate      = MkMod . negate . unMod
+instance TL.Nat p => Fractional (PrimeField p) where
+  fromRational r = fromInteger (numerator r) / fromInteger (denominator r)
+--  recip a = a ^ (TL.toInt (undefined :: p) - 2 :: Integer)
+  recip (PrimeField a) =
+    case exgcd a p of
+      (_, r, _) -> fromInteger r
+    where
+      p :: Integer
+      p = TL.toInt (undefined :: p)
 
-add x y  | z <= 10000 = MkMod z
-         | otherwise = MkMod $ z `rem` modulus x
-  where z = (unMod x) + (unMod y)
+instance TL.Nat p => Bounded (PrimeField p) where
+  minBound = PrimeField 0
+  maxBound = PrimeField (TL.toInt (undefined :: p) - 1)
 
-instance (Numeral n) => FiniteField (Mod n) where
-  zero                = MkMod 0
-  one                 = MkMod 1
-  elems               = const $ elems' one
-  charakteristik      = modulus
-  elemCount           = modulus
-  getReprP (P (m:ms)) = m * 0
+instance TL.Nat p => Enum (PrimeField p) where
+  toEnum x
+    | toInt (minBound :: PrimeField p) <= x && x <= toInt (maxBound :: PrimeField p) = fromIntegral x
+    | otherwise = error "PrimeField.toEnum: bad argument"
+  fromEnum = toInt
 
-modulus :: Numeral a => Mod a -> Int
-modulus x = numValue $ modulus' x
-  where modulus' :: Numeral a => Mod a -> a
-        modulus' = const undefined
+instance Ord (PrimeField p) where
+  PrimeField a `compare` PrimeField b = a `compare` b
+  PrimeField a `max` PrimeField b = PrimeField (a `max` b)
+  PrimeField a `min` PrimeField b = PrimeField (a `min` b)
 
-elems' :: (Numeral n) => Mod n -> [Mod n]
-elems' x = map MkMod [0.. (modulus x - 1)]
+instance TL.Nat p => FiniteField (PrimeField p) where
+  zero                = PrimeField 0
+  one                 = PrimeField 1
+  elems               = const $ [minBound..maxBound]
+  charakteristik      = const $ TL.toInt (undefined::p)
+  elemCount           = charakteristik
+  getReprP (P (m:ms)) = m*0
+  
 
-instance (Numeral n) => Fractional (Mod n) where
-  recip          = invMod
-  fromRational _ = error "inappropriate abstraction"
+instance TL.Nat p => Hashable (PrimeField p) where
+  hashWithSalt s (PrimeField a) =
+    s `hashWithSalt` (TL.toInt (undefined :: p) :: Int) `hashWithSalt` a
 
--- Inversion mit erweitertem Euklidischem Algorithmus
--- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
-invMod :: Numeral a => Mod a -> Mod a
-invMod 0 = error "Division by zero"
-invMod x = invMod' (unMod x `mod` p,p,one,zero)
-  where p = modulus x
-        invMod' :: Numeral a => (Int, Int, Mod a, Mod a) -> Mod a
-        divMod' (0,_,_,_) = error "Division by zero"
-        invMod' (u,v,x1,x2)
-          | u == 1     = x1
-          | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
-            where q = v `div` u
 
---------------------------------------------------------------------------------
---  Examples
+-- | Extended GCD algorithm
+exgcd :: (Eq a, Integral a) => a -> a -> (a, a, a)
+exgcd f1 f2 = f $ go f1 f2 1 0 0 1
+  where
+    go !r0 !r1 !s0 !s1 !t0 !t1
+      | r1 == 0   = (r0, s0, t0)
+      | otherwise = go r1 r2 s1 s2 t1 t2
+      where
+        (q, r2) = r0 `divMod` r1
+        s2 = s0 - q*s1
+        t2 = t0 - q*t1
+    f (g,u,v)
+      | g < 0 = (-g, -u, -v)
+      | otherwise = (g,u,v)
 
-#define PFInstance(MName,MValue,PFName) \
-data MName; \
-instance Numeral MName where {numValue x = MValue} ;\
-instance Show MName where {show = show} ;\
-type PFName = Mod MName ;\
 
-PFInstance(Numeral2,2,F2)
-PFInstance(Numeral3,3,F3)
-PFInstance(Numeral5,5,F5)
-PFInstance(Numeral7,7,F7)
-PFInstance(Numeral101,101,F101)
+-- ---------------------------------------------------------------------------
+
+-- | Create a PrimeField type
+primeField :: Integer -> TH.TypeQ
+primeField n
+  | n <= 0    = error "primeField: negative value"
+  | otherwise = [t| PrimeField $(TL.natT n) |]
+
+-- $TH
+-- Here is usage example for primeField:
+--
+-- > a :: $(primeField 15485867)
+-- > a = 1
+
+type F2 = $( [t| PrimeField $(TL.natT 2) |] )
+type F3 = $( [t| PrimeField $(TL.natT 3) |] )
+{-type F7 = primeField 7-}
+{-data F101 = primefield 101-}

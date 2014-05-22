@@ -8,8 +8,8 @@ ghc \
   -outputdir ${DIR}out/Profiling \
   -o ${DIR}out/Profiling/AlgProfiling \
   -fforce-recomp \
-  -prof \
-  -fprof-auto -rtsopts \
+  -rtsopts \
+  -O2 \
     ${DIR}AlgProfiling.hs
 
 if [ $? -eq 0 ]; then
