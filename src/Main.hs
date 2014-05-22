@@ -85,7 +85,7 @@ problem1 e deg = do
 
 -- Speicher gefundene als Liste in eine Datei
 problem1b e deg = do 
-  print "Berechne monischen irred Polynome /=0 bis zu Grad "
+  print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
     ++ show deg
   writeFile "/tmp/irreds" (encode irreds)
   print $ ("Anzahl Irred: " ++) $ show $ length irreds
