@@ -37,9 +37,9 @@ import Projekt.Core.Polynomials
 --  Prime fields
 
 class Numeral a where
-  numValue :: a -> Int
+  numValue :: a -> Integer
 
-newtype Mod n = MkMod { unMod :: Int }
+newtype Mod n = MkMod { unMod :: Integer }
 
 instance (Numeral n, Show n) => Show (Mod n) where
   show x = "\x1B[33m" ++ show (unMod x) ++ "\x1B[39m" ++ showModulus x
@@ -62,7 +62,7 @@ instance (Numeral n, Show n) => Show (Mod n) where
 instance (Numeral n, Show n) => ShowTex (Mod n) where
   showTex x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
 
-getRepr :: (Numeral n) => Mod n -> Int
+getRepr :: (Numeral n) => Mod n -> Integer
 getRepr x = unMod x `mod` modulus x
 
 instance (Numeral n) => Eq (Mod n) where
@@ -71,7 +71,7 @@ instance (Numeral n) => Eq (Mod n) where
 instance (Numeral n) => Num (Mod n) where
   x + y       = add x y 
   x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
-  fromInteger = MkMod . fromIntegral
+  fromInteger = MkMod
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate      = MkMod . negate . unMod
@@ -88,7 +88,7 @@ instance (Numeral n) => FiniteField (Mod n) where
   elemCount           = modulus
   getReprP (P (m:ms)) = m * 0
 
-modulus :: Numeral a => Mod a -> Int
+modulus :: Numeral a => Mod a -> Integer
 modulus x = numValue $ modulus' x
   where modulus' :: Numeral a => Mod a -> a
         modulus' = const undefined
@@ -106,7 +106,7 @@ invMod :: Numeral a => Mod a -> Mod a
 invMod 0 = error "Division by zero"
 invMod x = invMod' (unMod x `mod` p,p,one,zero)
   where p = modulus x
-        invMod' :: Numeral a => (Int, Int, Mod a, Mod a) -> Mod a
+        invMod' :: Numeral a => (Integer, Integer, Mod a, Mod a) -> Mod a
         divMod' (0,_,_,_) = error "Division by zero"
         invMod' (u,v,x1,x2)
           | u == 1     = x1

@@ -119,7 +119,7 @@ getReprP' (P (FFElem f p : ms))         = FFElem 0 p
 -- |Gibt die Charakteristik der Koeffizienten eines Polynoms
 -- TODO: Product sollte nicht nötig sein!
 --       Möglicherweise mit Backtracking
-charOfP :: (Eq a, FiniteField a, Num a) => Polynom a -> Int
+charOfP :: (Eq a, FiniteField a, Num a) => Polynom a -> Integer
 charOfP f = charakteristik $ getReprP f 
 
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist

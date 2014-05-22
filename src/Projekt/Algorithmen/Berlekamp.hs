@@ -28,17 +28,17 @@ import Control.Parallel.Strategies
 --------------------------------------------------------------------------------
 --  Wrapper
 
-berlekamp :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+berlekamp :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
 berlekamp = appFact berlekampFactor . obviousFactor
 
-appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a) => [(Integer,Polynom a)] -> [(Integer,Polynom a)]
 appBerlekamp = appFact berlekamp
 
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 -- Benutzt wird dazu die Quadratfreie Faktorisierung mit anschließendem
 -- Berlekamp
 sffAndBerlekamp :: (Show a, Fractional a, Num a, FiniteField a)
-                                              => Polynom a -> [(Int,Polynom a)]
+                                              => Polynom a -> [(Integer,Polynom a)]
 sffAndBerlekamp f = appBerlekamp $ sff f
 
 -- |Wählt aus einer Liste von Polynomen das erste Irreduzibele Polynom heraus
@@ -64,25 +64,25 @@ findIrreds ps = parMap rpar unFact irreds
 berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a)
                                                        => Polynom a -> Matrix a
 berlekampBasis f = transposeM $ kernelM $ transposeM $
-                        fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n
-  where n     = fromJust $ degP f
+                        fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 (fromIntegral n)
+  where n     = uDegP f
         q     = elemCount a
         a     = prodOfCoeffsP f
-        red i = take n (unP (snd (divP (fromMonomialsP [(i*q,1)]) f))
+        red i = take (fromIntegral n) (unP (snd (divP (fromMonomialsP [(i*q,1)]) f))
                               ++ [0*a | i <- [0..]] )
 
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
 berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
-                                              => Polynom a -> [(Int,Polynom a)]
+                                              => Polynom a -> [(Integer,Polynom a)]
 berlekampFactor (P[]) = [(1,P[])]
 berlekampFactor (P[m]) = [(1,P[m])]
 berlekampFactor (P[m0,m1]) = [(1,P[m0,m1])]
 berlekampFactor f = berlekampFactor' f m
   where m = berlekampBasis f
         berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)
-                                      => Polynom a -> Matrix a -> [(Int,Polynom a)]
+                                      => Polynom a -> Matrix a -> [(Integer,Polynom a)]
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
                              | getNumRowsM m == 1 = [(1,f)]
                              | otherwise         = berlekampFactor' g n

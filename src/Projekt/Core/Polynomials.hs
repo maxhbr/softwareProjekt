@@ -58,7 +58,7 @@ if' True  x _ = x
 if' False _ y = y
 
 -- |Polonoe aus einer Liste von Monomen (dargestellt als Tuppel) erzeugen.
-fromMonomialsP :: (Num a, Eq a) => [(Int,a)] -> Polynom a
+fromMonomialsP :: (Num a, Eq a) => [(Integer,a)] -> Polynom a
 fromMonomialsP []         = P[]
 fromMonomialsP ((i,m):ms) = P ([0 | j <- [1..i]] ++ [m]) + fromMonomialsP ms
 
@@ -67,12 +67,12 @@ instance (Show a, Eq a, Num a) => Show (Polynom a) where
   show (P ms) = intercalate "+" $
                 (\ss -> [s | s <- reverse ss , s /= ""]) $
                 zipWith (curry show') ms [0..]
-    where show' :: (Show a, Eq a, Num a) => (a,Int) -> String
+    where show' :: (Show a, Eq a, Num a) => (a,Integer) -> String
           show' (0,_) = ""
           show' (m,0) = show m
           {-show' (1,i) = showExp i-}
           show' (m,i) = show m ++ "·" ++ showExp i
-          showExp :: Int -> String
+          showExp :: Integer -> String
           showExp 0 = ""
           showExp 1 = "\x1B[04mX\x1B[24m"
           showExp i = "\x1B[04mX" ++ showExp' (show i) ++ "\x1B[24m"
@@ -95,10 +95,10 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (Polynom a) where
   showTex (P ms) = intercalate "+" $
                    (\ss -> [s | s <- reverse ss , s /= ""]) $
                    zipWith (curry showTex') ms [0..]
-    where showTex' :: (ShowTex a, Eq a, Num a) => (a,Int) -> String
+    where showTex' :: (ShowTex a, Eq a, Num a) => (a,Integer) -> String
           showTex' (0,_) = ""
           showTex' (m,i) = showTex m ++ showExp i
-          showExp :: Int -> String
+          showExp :: Integer -> String
           showExp 0 = ""
           showExp 1 = "\\cdot{}X"
           showExp i = "\\cdot{}X^{" ++ show i ++ "}"
@@ -127,10 +127,10 @@ multP' f g  | n >= m    = foldl1' addP [ multMonom f i a | (i,a) <- gz]
         gz = zip [0..] g
 
 -- |Multipliziert f mit a*x^i
-multMonom :: Num a => [a] -> Int -> a -> [a]
+multMonom :: Num a => [a] -> Integer -> a -> [a]
 multMonom f i a  = [0 | i <- [1..i]] ++ map (a*) f
 
-multMonomP :: Num a => Polynom a -> Int -> a -> Polynom a
+multMonomP :: Num a => Polynom a -> Integer -> a -> Polynom a
 multMonomP (P f) i a  = P $ multMonom f i a
 
 -- |Entfernt trailing zeros
@@ -151,17 +151,17 @@ getLcP (P[]) = 0
 getLcP f     = (last . unP . aggP) f
 
 -- |Nimmt ein Polynom und gibt eine liste der Gräder zurrück.
-getDegrees :: (Num a, Eq a) => Polynom a -> [Int]
+getDegrees :: (Num a, Eq a) => Polynom a -> [Integer]
 getDegrees (P ms) = [snd m | m <- zip ms [0..], fst m /= 0]
 {-getDegrees (P ms) = [i | i <- [0..(length ms - 1)] , ms!!i /= 0]-}
 
 -- |Gibt zu einem Polynom den Grad
-degP :: (Num a, Eq a) => Polynom a -> Maybe Int
+degP :: (Num a, Eq a) => Polynom a -> Maybe Integer
 degP f | deg >= 0   = Just deg
        | otherwise = Nothing
-  where deg = (length . unP . aggP) f - 1
+  where deg = (toInteger . length . unP . aggP) f - 1
 
-uDegP :: (Num a, Eq a) => Polynom a -> Int
+uDegP :: (Num a, Eq a) => Polynom a -> Integer
 uDegP = fromJust . degP
 
 -- |Gibt zu einem Polynom das Produkt der Koeffizient
@@ -241,20 +241,20 @@ evalP' x (m:ms) acc = evalP' x ms $ acc*x+m
 -- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome bis zu diesem
 -- Grad.
 -- Das Nullpoylnom (P[]) ist NICHT enthalten
-getAllP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
+getAllP :: (Num a, Fractional a, Eq a) => [a] -> Integer -> [Polynom a]
 getAllP es d = [(P . map (e*) . unP) f | f <- getAllMonicP es d
                                        , e <- es , e /= 0]
 
 -- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle 
 -- Polynome deren Gräder in der Liste enthalten sind
-getAllPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
+getAllPs :: (Num a, Fractional a, Eq a) => [a] -> [Integer] -> [Polynom a]
 getAllPs es ds = [(P . map (e*) . unP) f | f <- getAllMonicPs es ds
                                          , e <- es , e /= 0]
 
-getAllMonicP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
+getAllMonicP :: (Num a, Fractional a, Eq a) => [a] -> Integer -> [Polynom a]
 getAllMonicP es d = getAllMonicPs es [0..d]
 
-getAllMonicPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
+getAllMonicPs :: (Num a, Fractional a, Eq a) => [a] -> [Integer] -> [Polynom a]
 getAllMonicPs es is = map P $ concat [allMonics i | i <- is]
   where allMonics 0 = [[one]]
         allMonics i = [rs++[one] | rs <- ess (i-1)]

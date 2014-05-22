@@ -26,8 +26,8 @@ import Projekt.Core.Polynomials
 class (Eq a) => FiniteField a where
   zero, one      :: a
   elems, units   :: a -> [a]
-  charakteristik :: a -> Int
-  elemCount      :: a -> Int
+  charakteristik :: a -> Integer
+  elemCount      :: a -> Integer
   getReprP       :: Polynom a -> a
 
   units x = [e | e <- elems x, e /= zero]

@@ -130,7 +130,7 @@ testForExceptions a aMipo = do
 furtherTests e = furtherTests' (elems e) (units e) e
 furtherTests' es us e = do
   it "test elemsCount" $
-    elemCount e `shouldBe` length es
+    elemCount e `shouldBe` (toInteger $ length es)
   it "+ is bijektiv" $
     pMapM_ (\ x -> allUnique [x + y | y <- es] `shouldBe` True) es
   it "* is bijektiv" $

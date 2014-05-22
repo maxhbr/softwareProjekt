@@ -17,10 +17,10 @@ import Projekt.Core.Factorization
 --------------------------------------------------------------------------------
 --  Wrapper
 
-sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
 sff = appFact sffFactor . obviousFactor
 
-appSff :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appSff :: (FiniteField a, Num a, Fractional a) => [(Integer,Polynom a)] -> [(Integer,Polynom a)]
 appSff = appFact sff
 
 --------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ appSff = appFact sff
        Seite 345(355)
  -}
 
-sffFactor :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sffFactor :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Integer,Polynom a)]
 sffFactor (P[]) = [(1,P[])]
 sffFactor (P[m]) = [(1,P[m])]
 sffFactor (P[m0,m1]) = [(1,P[m0,m1])]
@@ -86,7 +86,7 @@ sffFactor f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sffFactor $ char
  -        = (x+1)(x²+1)³(x+2)⁴
  -}
 f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
-sqf :: [(Int,Polynom F3)]
+sqf :: [(Integer,Polynom F3)]
 sqf=[(1,P[1::F3,1])
     ,(2,P[1])
     ,(3,P[1::F3,0,1])
