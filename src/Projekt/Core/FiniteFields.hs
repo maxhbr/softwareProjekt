@@ -15,6 +15,7 @@ module Projekt.Core.FiniteFields
 import Data.Maybe
 import Control.Exception
 import Data.Binary
+import Control.Monad
 
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
@@ -123,11 +124,8 @@ instance (Num a, Binary a) => Binary (FFElem a) where
 
   get = do t <- get :: Get Word8
            case t of
-                0 -> do f <- get
-                        return $ FFKonst f
-                1 -> do f  <- get
-                        p <- get
-                        return $ FFElem f p
+                0 -> liftM FFKonst get
+                1 -> liftM2 FFElem get get
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
