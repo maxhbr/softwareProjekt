@@ -32,6 +32,7 @@ module Projekt.Core.PrimeFields
 import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
+import Data.Bits
 
 --------------------------------------------------------------------------------
 --  Prime fields
@@ -69,12 +70,18 @@ instance (Numeral n) => Eq (Mod n) where
   x == y = (unMod x - unMod y) `mod` modulus x == 0
 
 instance (Numeral n) => Num (Mod n) where
-  x + y       = MkMod $ unMod x + unMod y 
-  x * y       = MkMod $ unMod x * unMod y
+  x + y       = betterRem $ MkMod $ unMod x + unMod y 
+  x * y       = betterRem $ MkMod $ unMod x * unMod y
   fromInteger = MkMod . fromIntegral
   abs _       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   negate      = MkMod . negate . unMod
+
+betterRem :: (Numeral n) => Mod n -> Mod n
+betterRem x = MkMod $ unMod x `rem` modulus x
+{-betterRem x | testBit y 10  = MkMod $ y `rem` (modulus x)-}
+            {-| otherwise     = x-}
+  {-where y = unMod x-}
 
 instance (Numeral n) => FiniteField (Mod n) where
   zero                = MkMod 0
