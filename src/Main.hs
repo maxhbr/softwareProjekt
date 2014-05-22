@@ -14,7 +14,7 @@ import Prelude hiding (writeFile)
 import Projekt.Core
 import Projekt.Algorithmen
 import Debug.Trace
-{-import qualified Control.Monad.Parallel as P-}
+import qualified Control.Monad.Parallel as P
 {-import Control.Concurrent.Async (mapConcurrently)-}
 import Control.Parallel
 import Control.Parallel.Strategies
@@ -89,12 +89,25 @@ problem1b e deg = do
     ++ show deg
   writeFile "/tmp/irreds" (encode irreds)
   print $ ("Anzahl Irred: " ++) $ show $ length irreds
-    where irreds = [fs | fs <- parMap rpar appBerlekamp
-                         [fs | fs <- parMap rpar appSff
-                               [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
-                                                  , f /= P[]]
-                             , isTrivialFact fs]
-                       , isTrivialFact fs]
+    where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
+                     [fs | fs <- parMap rpar appSff
+                           [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
+                                              , f /= P[]]
+                         , isTrivialFact fs]
+                   , isTrivialFact fs]
+
+-- Gebe alle gefundenen aus
+problem1c e deg = do
+  print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
+    ++ show deg
+  mapM_ print irreds
+  print $ ("Anzahl Irred: " ++) $ show $ length irreds
+    where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
+                     [fs | fs <- parMap rpar appSff
+                           [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
+                                              , f /= P[]]
+                         , isTrivialFact fs]
+                   , isTrivialFact fs]
 
 --------------------------------------------------------------------------------
 --  Problem2:
@@ -114,13 +127,13 @@ problem2 e deg = do
 
 problem2b e deg = do
   print "Irred:"
-  print $ unFact $ head irreds
-    where irreds = [fs | fs <- parMap rpar appBerlekamp
-                         [fs | fs <- parMap rpar appSff
-                               [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
-                                                  , f /= P[]]
-                             , isTrivialFact fs]
-                       , isTrivialFact fs]
+  print $ head irreds
+    where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
+                     [fs | fs <- parMap rpar appSff
+                           [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
+                                              , f /= P[]]
+                         , isTrivialFact fs]
+                   , isTrivialFact fs]
 
 problem2c e deg = do
   print "Irred:"
@@ -137,6 +150,6 @@ problem3b = print $ length $ elems e5e4f2
 --  Main
 
 main :: IO ()
-main = problem1b e2f2 4
+main = problem1b e2f2 5
 {-main = problem2c e2f2 5-}
 {-main = problem3-}

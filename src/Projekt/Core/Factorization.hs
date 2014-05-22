@@ -31,7 +31,9 @@ toFact f = [(1,f)]
 
 -- |Multipliziert eine Faktoriesierung aus
 unFact :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
-unFact fs = product $ map (\(i,f) -> f^i) fs
+unFact [(1,f)] = f
+unFact [(i,f)] = f^i
+unFact fs      = product $ map (\(i,f) -> f^i) fs
 
 -- |Ersetzt eine Faktoriesierung, durch die n-te Potenz dieser Faktoriesierung
 potFact :: (Num a) => Int -> [(Int,Polynom a)]
