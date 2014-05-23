@@ -109,6 +109,12 @@ problem1c e deg = do
                          , isTrivialFact fs]
                    , isTrivialFact fs]
 
+-- Gebe alle gefundenen aus
+problem1d e deg = do
+  print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
+    ++ show deg
+  print $ findIrreds $ getAllMonicPs (elems e) [deg]
+
 --------------------------------------------------------------------------------
 --  Problem2:
 --      Finde ein irreduziblen Polynom über Endlichem Körper, welcher `e`
@@ -137,7 +143,7 @@ problem2b e deg = do
 
 problem2c e deg = do
   print "Irred:"
-  print $ findIrred $ getAllMonicPs (elems e) [deg]
+  mapM_ print $ findIrreds $ getAllMonicPs (elems e) [deg .. 1]
 
 --------------------------------------------------------------------------------
 --  Problem3:
@@ -150,6 +156,7 @@ problem3b = print $ length $ elems e5e4f2
 --  Main
 
 main :: IO ()
-{-main = problem1b e2f2 5-}
-main = problem2c e2f2 5
+main = problem1d e4f2 4
+{-main = problem2c e4f2 4-}
 {-main = problem3-}
+{-main = print $ length $ take 1000 $ findIrreds (getAllMonicPs (elems e4f2) [3])-}
