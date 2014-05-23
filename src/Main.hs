@@ -9,7 +9,7 @@
 module Main
   where
 
-import Prelude hiding (writeFile)
+import Prelude hiding (writeFile, appendFile)
 
 import Projekt.Core
 import Projekt.Algorithmen
@@ -20,7 +20,7 @@ import Control.Parallel
 import Control.Parallel.Strategies
 
 import Data.Binary
-import Data.ByteString.Lazy (writeFile)
+import Data.ByteString.Lazy (writeFile, appendFile)
 
 --------------------------------------------------------------------------------
 --  Beliebiger Primkörper
@@ -115,11 +115,19 @@ problem1d e deg = do
     ++ show deg
   print $ findIrreds $ getAllMonicPs (elems e) [deg]
 
+problem1e e deg = do
+  print "start"
+  mapM_ (appendFile  "/tmp/irreds" . encode) $
+    findIrreds $
+    getAllMonicPs (elems e) [deg]
+  print "done"
+
 --------------------------------------------------------------------------------
 --  Problem2:
 --      Finde ein irreduziblen Polynom über Endlichem Körper, welcher `e`
 --      enthält, von einem vorgegebenem Grad `deg`.
 
+{-
 problem2 e deg = do
   let es = elems e
   let list = [(toFact . aggP) f | f <- getAllMonicPs es [deg], f /= P[]]
@@ -130,7 +138,9 @@ problem2 e deg = do
 
   print "Irred:"
   print $ snd $ head $ head bList
+ -}
 
+{-
 problem2b e deg = do
   print "Irred:"
   print $ head irreds
@@ -140,10 +150,11 @@ problem2b e deg = do
                                               , f /= P[]]
                          , isTrivialFact fs]
                    , isTrivialFact fs]
+ -}
 
 problem2c e deg = do
   print "Irred:"
-  mapM_ print $ findIrreds $ getAllMonicPs (elems e) [deg .. 1]
+  print $ findIrred $ getAllMonicPs (elems e) deg
 
 --------------------------------------------------------------------------------
 --  Problem3:
@@ -156,7 +167,7 @@ problem3b = print $ length $ elems e5e4f2
 --  Main
 
 main :: IO ()
-main = problem1d e4f2 4
+main = problem1e e4f2 4
 {-main = problem2c e4f2 4-}
 {-main = problem3-}
 {-main = print $ length $ take 1000 $ findIrreds (getAllMonicPs (elems e4f2) [3])-}
