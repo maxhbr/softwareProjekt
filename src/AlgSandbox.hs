@@ -14,7 +14,7 @@ import Debug.Trace
 
 import Projekt.Core
 import Projekt.Algorithmen
-import FFSandbox (e2f2,e2e2f2,e4f2,e4f2Mipo)
+import FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
 
 import SpecCommon
 import PolySandbox hiding (testSize, main)

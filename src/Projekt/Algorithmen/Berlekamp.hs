@@ -8,22 +8,20 @@
 --------------------------------------------------------------------------------
 module Projekt.Algorithmen.Berlekamp
   ( berlekamp, appBerlekamp, sffAndBerlekamp
-  , findIrred, findIrreds
+  , findIrred, findIrreds, findTrivialsB
   -- Algorithmus
   , berlekampBasis
   , berlekampFactor
   )where
 import Data.Maybe
 import Data.List
-import Projekt.Core.FiniteFields
-import Projekt.Core.Polynomials
-import Projekt.Core.Matrix
-import Projekt.Core.Factorization
 import Debug.Trace
-import Projekt.Algorithmen.SFreeFactorization
 
 import Control.Parallel
 import Control.Parallel.Strategies
+
+import Projekt.Core
+import Projekt.Algorithmen.SFreeFactorization
 
 --------------------------------------------------------------------------------
 --  Wrapper
@@ -44,15 +42,24 @@ sffAndBerlekamp f = appBerlekamp $ sff f
 -- |Wählt aus einer Liste von Polynomen das erste Irreduzibele Polynom heraus
 findIrred :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> Polynom a
 findIrred = head . findIrreds
+{-
+  where irreds = [unFact fs | fs <- map appBerlekamp
+                       [fs | fs <- map appSff
+                             [(toFact . aggP) f | f <- ps , f /= P[]]
+                           , isTrivialFact fs]
+                     , isTrivialFact fs]
+ -}
 
 -- |Filtert mittels SFF und Berlekamp aus einer Liste die irreduzibleneiner
 -- liste heraus
 findIrreds :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [Polynom a]
-findIrreds ps = parMap rpar unFact irreds
-  where irreds = [fs | fs <- parMap rpar appBerlekamp
-                       [fs | fs <- parMap rpar appSff
-                             [(toFact . aggP) f | f <- ps , f /= P[]]
-                           , isTrivialFact fs]
+findIrreds ps = parMap rpar unFact $ findTrivialsB ps
+
+-- |Gibt alle Faktorisierungen zurück, welche nach Berlekamp noch trivial sind
+-- Wendet zuvor (die offensichtliche Faktorisierung und) SFF an
+findTrivialsB :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
+findTrivialsB ps = [fs | fs <- parMap rpar appSff
+                       (findTrivialsSff ps)
                      , isTrivialFact fs]
 
 --------------------------------------------------------------------------------

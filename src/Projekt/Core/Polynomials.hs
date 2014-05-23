@@ -25,6 +25,7 @@ module Projekt.Core.Polynomials
 import Data.List
 import qualified Control.Arrow as A
 import Data.Maybe
+import Data.Binary
 
 import Projekt.Core.ShowTex
 
@@ -200,6 +201,11 @@ uDegP = fromJust . degP
 -- |Gibt zu einem Polynom das Produkt der Koeffizient
 prodOfCoeffsP :: Num a => Polynom a -> a
 prodOfCoeffsP = product . unP
+
+instance (Num a, Binary a) => Binary (Polynom a) where
+   put (P x) = put x
+   get       = do x <- get
+                  return $ P x
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen

@@ -14,6 +14,8 @@ module Projekt.Core.FiniteFields
   ) where
 import Data.Maybe
 import Control.Exception
+import Data.Binary
+import Control.Monad
 
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
@@ -120,6 +122,18 @@ getReprP' (P [])             = error "Insufficient information in empty Polynomi
 getReprP' (P (FFKonst _:ms)) = getReprP $ P ms
 getReprP' (P (FFElem f p : ms))         = FFElem 0 p
 
+instance (Num a, Binary a) => Binary (FFElem a) where
+  put (FFKonst f)  = do put (0 :: Word8)
+                        put f
+  put (FFElem f p) = do put (1 :: Word8)
+                        put f
+                        put p
+
+  get = do t <- get :: Get Word8
+           case t of
+                0 -> liftM FFKonst get
+                1 -> liftM2 FFElem get get
+
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
 
@@ -129,7 +143,7 @@ getReprP' (P (FFElem f p : ms))         = FFElem 0 p
 -- TODO: Product sollte nicht nötig sein!
 --       Möglicherweise mit Backtracking
 charOfP :: (Eq a, FiniteField a, Num a) => Polynom a -> Int
-charOfP f = charakteristik $ getReprP f 
+charOfP f = charakteristik $ getReprP f
 
 {-# INLINE charRootP #-}
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist

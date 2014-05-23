@@ -33,6 +33,11 @@ import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
 
+-- import qualified Data.Serialize as DS -- (Serialize, get, put)
+-- import GHC.Generics -- (Generic)
+-- import Data.Serialize.Derive -- (derivePut, deriveGet)
+import Data.Binary
+
 --------------------------------------------------------------------------------
 --  Prime fields
 
@@ -122,9 +127,13 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
           | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
             where q = v `div` u
 
-
 instance (Numeral n) => Ord (Mod n) where
   (<=) x y  = (getRepr x) <= (getRepr y)
+
+instance (Numeral a) => Binary (Mod a) where
+   put (MkMod x) = put x
+   get           = do x <- get
+                      return $ MkMod x
 
 --------------------------------------------------------------------------------
 --  Examples

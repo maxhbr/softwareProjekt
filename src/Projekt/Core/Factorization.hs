@@ -11,12 +11,15 @@ module Projekt.Core.Factorization
   , potFact, appFact, aggFact
   , isTrivialFact
   -- Faktoriesierungen
-  , obviousFactor, appObFact
+  , obviousFactor, appObFact, findTrivialsOb
   )where
+import Data.List
+
+import Control.Parallel
+import Control.Parallel.Strategies
+
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
-
-import Data.List
 
 --------------------------------------------------------------------------------
 -- Eine Faktoriesierung wird dargestellt als Liste von Paaren (Int, Polynom a)
@@ -31,7 +34,9 @@ toFact f = [(1,f)]
 
 -- |Multipliziert eine Faktoriesierung aus
 unFact :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
-unFact fs = product $ map (\(i,f) -> f^i) fs
+unFact [(1,f)] = f
+unFact [(i,f)] = f^i
+unFact fs      = product $ map (\(i,f) -> f^i) fs
 
 -- |Ersetzt eine Faktoriesierung, durch die n-te Potenz dieser Faktoriesierung
 potFact :: (Num a) => Int -> [(Int,Polynom a)]
@@ -41,10 +46,10 @@ potFact n ((i,f):ts) = (i*n,f) : potFact n ts
 
 -- |Nimmt eine Faktoriesierung und wendet auf diese einen gegebenen
 -- Faktoriesierungsalgorithmus an
-appFact :: (Num a) => 
+appFact :: (Num a) =>
   (Polynom a -> [(Int,Polynom a)]) -> [(Int,Polynom a)] -> [(Int,Polynom a)]
-appFact _ []           = []
-appFact alg ((i,f):ts) = potFact i (alg f) ++ appFact alg ts
+appFact alg = withStrategy (parList rpar) . concatMap
+  (\(i,f) -> potFact i (alg f))
 
 -- |Fasst in einer Faktoriesierung gleiche Funktionen Zusammen
 aggFact :: (Num a, Eq a) => [(Int,Polynom a)]
@@ -55,12 +60,12 @@ isTrivialFact :: [(Int,a)] -> Bool
 isTrivialFact [] = error "[] is not a factorization"
 isTrivialFact ms = sum (map fst ms) == 1
 
-{-
-getFirstTrivial :: (Num a) => [[(Int,a)]] -> a
-getFirstTrivial [] = error "no irred Poly found"
-getFirstTrivial (m:ms) | isTrivialFact m = (snd . head) m
-                       | otherwise       = getFirstTrivial ms
- -}
+-- |Gibt alle Faktorisierungen zurück, welche nach der offensichtlichen
+-- Faktoriesierung noch trivial sind
+findTrivialsOb :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
+findTrivialsOb ps = [fs | fs <- parMap rpar appObFact
+                        [(toFact . aggP) f | f <- ps , f /= P[]]
+                      , isTrivialFact fs]
 
 --------------------------------------------------------------------------------
 --  Einfache / offensichtliche Faktorisierungen

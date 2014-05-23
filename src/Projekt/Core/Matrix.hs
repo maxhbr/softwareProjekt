@@ -18,6 +18,8 @@ module Projekt.Core.Matrix
 import Data.List
 import Data.Array
 import Data.Array.IArray (amap)
+import Data.Binary
+import Control.Monad
 import Debug.Trace
 
 import Projekt.Core.ShowTex
@@ -140,6 +142,17 @@ multM (M m)     (M n)     | k' == l    = M $ array ((1,1),(k,l'))
                           | otherwise = error "not the same Dimensions"
   where ((_,_),(k,l))   = bounds m
         ((_,_),(k',l')) = bounds n
+
+instance (Num a, Binary a) => Binary (Matrix a) where
+  put (Mdiag m) = do put (0 :: Word8)
+                     put m
+  put (M x)     = do put (1 :: Word8)
+                     put x
+
+  get = do t <- get :: Get Word8
+           case t of
+                0 -> liftM Mdiag get
+                1 -> liftM M get
 
 --------------------------------------------------------------------------------
 --  Grundlegende Operationen
@@ -300,7 +313,7 @@ kernelM m     = M $ array ((1,1), (k,lzs))
                 transposeM $ m <-> genDiagM 1 k
         a     = subArr (1,1) (k,l) $ unM mfull
         b     = subArr (k+1,1) (k+k,l) $ unM mfull
-        zs    = [j | j <- [1..l], (and [a!(i',j) == 0 | i' <- [j..k]])]
+        zs    = [j | j <- [1..l], and [a!(i',j) == 0 | i' <- [j..k]]]
         lzs   = length zs
 
 

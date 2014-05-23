@@ -8,7 +8,8 @@
 --------------------------------------------------------------------------------
 
 module FFSandbox
-  ( e2f2Mipo, e2f2
+  ( f2
+  , e2f2Mipo, e2f2
   , e2e2f2Mipo, e2e2f2
   , e4f2Mipo, e4f2
   , e2f3Mipo, e2f3
@@ -26,6 +27,8 @@ pp =  mapM_ print
 
 ppTex :: (ShowTex a) => [a] -> IO()
 ppTex = mapM_ (putStrLn . showTex)
+
+f2 = 1::F2
 
 {- F4=E2 als Grad 2 Erweiterung von F2
  -
