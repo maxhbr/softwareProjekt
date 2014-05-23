@@ -43,6 +43,7 @@ sQuadraticM (Mdiag a) = True
 isQuadraticM (M m) = uncurry (==) b
   where b = snd $ bounds m
 
+{-# INLINE genDiagM #-}
 genDiagM :: Num a => a -> Int -> Matrix a
 genDiagM x n = M $ array ((1,1),(n,n)) $ fillList [((i,i),x) | i <- [1..n]] n n
 
@@ -60,23 +61,30 @@ toListsM (M m) = [[m!(i,j) | j <- [1..l]] | i <- [1..k]]
 --------------------------------------------------------------------------------
 --  Getter
 
+
+{-# INLINE atM #-}
 atM :: Matrix a -> Int -> Int -> a
 atM (M m) row col = m!(row,col)
 
+{-# INLINE getNumRowsM #-}
 getNumRowsM :: Matrix a -> Int
 getNumRowsM (M m) = fst $ snd $ bounds m
 
+{-# INLINE getNumColsM #-}
 getNumColsM :: Matrix a -> Int
 getNumColsM (M m) = snd $ snd $ bounds m
 
+{-# INLINE getColM #-}
 getColM :: Matrix a -> Int -> [a]
 getColM (M m) i = [m!(j,i) | j <- [1..k]]
   where (k,l) = snd $ bounds m
 
+{-# INLINE getRowM #-}
 getRowM :: Matrix a -> Int -> [a]
 getRowM (M m) i = [m!(i,j) | j <- [1..l]]
   where (k,l) = snd $ bounds m
 
+{-# INLINE boundsM #-}
 boundsM :: Matrix a -> (Int,Int)
 boundsM (M m) = snd $ bounds m
 --------------------------------------------------------------------------------
@@ -110,6 +118,7 @@ instance (Num a, Eq a) => Num (Matrix a) where
   negate        = negateM
 
 
+{-# INLINE addM #-}
 addM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 addM (Mdiag x) (Mdiag y) = Mdiag (x+y)
 addM (Mdiag x) m         = addM m (genDiagM x (getNumRowsM m))
@@ -123,6 +132,7 @@ negateM :: (Num a) => Matrix a -> Matrix a
 negateM (Mdiag x) = Mdiag $ negate x
 negateM (M m)     = M $ amap negate m
 
+{-# INLINE multM #-}
 multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
 multM (Mdiag x) (Mdiag y) = Mdiag (x*y)
 multM (Mdiag x) m         = multM (genDiagM x (getNumRowsM m)) m
