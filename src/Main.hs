@@ -150,6 +150,6 @@ problem3b = print $ length $ elems e5e4f2
 --  Main
 
 main :: IO ()
-main = problem1b e2f2 5
-{-main = problem2c e2f2 5-}
+{-main = problem1b e2f2 5-}
+main = problem2c e2f2 5
 {-main = problem3-}

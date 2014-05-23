@@ -43,7 +43,12 @@ sffAndBerlekamp f = appBerlekamp $ sff f
 
 -- |Wählt aus einer Liste von Polynomen das erste Irreduzibele Polynom heraus
 findIrred :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> Polynom a
-findIrred = head . findIrreds
+findIrred ps = head irreds
+  where irreds = [unFact fs | fs <- map appBerlekamp
+                       [fs | fs <- map appSff
+                             [(toFact . aggP) f | f <- ps , f /= P[]]
+                           , isTrivialFact fs]
+                     , isTrivialFact fs]
 
 -- |Filtert mittels SFF und Berlekamp aus einer Liste die irreduzibleneiner
 -- liste heraus
