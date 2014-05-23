@@ -12,6 +12,7 @@ module Projekt.Core.Factorization
   , isTrivialFact
   -- Faktoriesierungen
   , obviousFactor, appObFact, findTrivialsOb
+  , findTrivialsNs
   )where
 import Data.List
 
@@ -58,7 +59,7 @@ aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], f /= P
 
 isTrivialFact :: [(Int,a)] -> Bool
 isTrivialFact [] = error "[] is not a factorization"
-isTrivialFact [(1,_)] > True
+isTrivialFact [(1,_)] = True
 isTrivialFact ms = sum (map fst ms) == 1
 
 -- |Gibt alle Faktorisierungen zurück, welche nach der offensichtlichen
@@ -67,6 +68,11 @@ findTrivialsOb :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] ->
 findTrivialsOb ps = [fs | fs <- parMap rpar appObFact
                         [(toFact . aggP) f | f <- ps , f /= P[]]
                       , isTrivialFact fs]
+
+findTrivialsNs :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
+findTrivialsNs ps = [toFact f | f <- ps,
+    not (hasNs f es) || uDegP f < 2]
+  where es = elems $ getReprP $ head ps
 
 --------------------------------------------------------------------------------
 --  Einfache / offensichtliche Faktorisierungen

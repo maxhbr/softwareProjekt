@@ -18,7 +18,7 @@ module Projekt.Core.Polynomials
   -- binär
   , divP, (@/), modByP, ggTP, eekP
   -- weiteres
-  , evalP, hasNS
+  , evalP, hasNs
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
   ) where
@@ -283,8 +283,8 @@ evalP x f = evalP' x (reverse (unP f)) 0
 evalP' x [] acc = acc
 evalP' x (m:ms) acc = evalP' x ms $ acc*x+m
 
-hasNS :: (Eq a, Fractional a) => Polynom a -> [a] -> Bool
-hasNS f es = not (null [f | e <- es, evalP e f == 0])
+hasNs :: (Eq a, Fractional a) => Polynom a -> [a] -> Bool
+hasNs f es = not (null [f | e <- es, evalP e f == 0])
 
 --------------------------------------------------------------------------------
 --  liste alle möglichen Polynome auf
