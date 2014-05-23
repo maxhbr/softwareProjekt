@@ -64,18 +64,21 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (FFElem a) where
 instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
 
+  {-# INLINE (+) #-}
   (FFKonst x)  + (FFKonst y)              = FFKonst (x+y)
   (FFElem f p) + (FFKonst x)              = FFElem (f+P[x]) p
   (FFKonst x)  + (FFElem f p)             = FFElem (f+P[x]) p
   (FFElem f p) + (FFElem g q) | p==q       = aggF $ FFElem (f+g) p
                               | otherwise = error "Not the same mod"
 
+  {-# INLINE (*) #-}
   (FFKonst x)  * (FFKonst y)              = FFKonst (x*y)
   (FFElem f p) * (FFKonst x)              = FFElem (f*P [x]) p
   (FFKonst x)  * (FFElem f p)             = FFElem (f*P [x]) p
   (FFElem f p) * (FFElem g q) | p==q       = aggF $ FFElem (f*g) p
                               | otherwise = error "Not the same mod"
 
+  {-# INLINE negate #-}
   negate (FFKonst x)                      = FFKonst (negate x)
   negate (FFElem f p)                     = FFElem (negate f) p
 
@@ -84,6 +87,7 @@ instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
 
 instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
   fromRational _     = error "inappropriate abstraction"
+  {-# INLINE recip #-}
   recip (FFKonst x)  = FFKonst (recip x)
   recip (FFElem f p) | FFElem f p == FFElem (P []) p = error "Division by zero"
                      | otherwise                    = FFElem s p
@@ -93,11 +97,13 @@ instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) wh
   zero                        = FFKonst zero
   one                         = FFKonst one
   elems                       = elems'
+  {-# INLINE charakteristik #-}
   charakteristik (FFElem (P []) m) = charakteristik $ getReprP m
   charakteristik (FFElem f _) = charakteristik $ getReprP f
   charakteristik (FFKonst x)  = charakteristik x
   elemCount (FFKonst _)       = error "Insufficient information in FFKonst"
   elemCount (FFElem _ m)      = elemCount (getReprP m) ^ uDegP m
+  {-# INLINE getReprP #-}
   getReprP                    = getReprP'
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
@@ -109,6 +115,7 @@ elems' (FFKonst x)  = error "Insufficient information in FFKonst"
 elems' (FFElem f p) = map (`FFElem` p) (P[] : getAllP (elems e) (uDegP p -1))
   where e = product (unP f) * product (unP p)
 
+{-# INLINE getReprP' #-}
 getReprP' (P [])             = error "Insufficient information in empty Polynomial"
 getReprP' (P (FFKonst _:ms)) = getReprP $ P ms
 getReprP' (P (FFElem f p : ms))         = FFElem 0 p
@@ -116,12 +123,15 @@ getReprP' (P (FFElem f p : ms))         = FFElem 0 p
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
 
+  
+{-# INLINE charOfP #-}
 -- |Gibt die Charakteristik der Koeffizienten eines Polynoms
 -- TODO: Product sollte nicht nötig sein!
 --       Möglicherweise mit Backtracking
 charOfP :: (Eq a, FiniteField a, Num a) => Polynom a -> Int
 charOfP f = charakteristik $ getReprP f 
 
+{-# INLINE charRootP #-}
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
 charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
 charRootP (P []) = P []

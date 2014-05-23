@@ -70,7 +70,7 @@ problem1 e deg = do
   {-let bList = parMap rpar (\(f,i) -> trace ("b " ++ show i) (appBerlekamp f)) (zip sffList [1..])-}
   let bList = [fs | fs <- parMap rpar appBerlekamp sffList, isTrivialFact fs]
 
-  print $ ("Anzahl Irred: " ++) $ show $ length bList
+  print $ ("Anzahl Irred: " ++) $ show $ length sffList
 
   {-
   if length bListIrred < 100

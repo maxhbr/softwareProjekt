@@ -39,10 +39,14 @@ import Projekt.Core.Polynomials
 class Numeral a where
   numValue :: a -> Int
 
+{-# RULES "MkMod/unMod"   forall x. MkMod (unMod x) = x #-}
+{-# RULES "unMod/MkMod"   forall x. unMod (MkMod x) = x #-}
+{-# RULES "MkMod.unMod"   MkMod . unMod = id #-}
+{-# RULES "unMod.MkMod"   unMod . MkMod = id #-}
 newtype Mod n = MkMod { unMod :: Int }
 
 instance (Numeral n, Show n) => Show (Mod n) where
-  show x = "\x1B[33m" ++ show (unMod x) ++ "\x1B[39m" ++ showModulus x
+  show x = "\x1B[33m" ++ show (getRepr x) ++ "\x1B[39m" ++ showModulus x
     where showModulus :: (Numeral n) => Mod n -> String
           showModulus = showModulus' . show . modulus
           showModulus' :: String -> String
@@ -70,15 +74,20 @@ instance (Numeral n) => Eq (Mod n) where
 
 instance (Numeral n) => Num (Mod n) where
   x + y       = add x y 
-  x * y       = MkMod $ (unMod x * unMod y) `mod` modulus x
+  x * y       = mult x y 
   fromInteger = MkMod . fromIntegral
-  abs _       = error "Prelude.Num.abs: inappropriate abstraction"
+  abs x       = x --error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
+  {-# INLINE negate #-}
   negate      = MkMod . negate . unMod
 
+{-# INLINE add #-}
 add x y  | z <= 10000 = MkMod z
          | otherwise = MkMod $ z `rem` modulus x
   where z = (unMod x) + (unMod y)
+
+{-# INLINE mult #-}
+mult x y = MkMod $ (unMod x * unMod y) `mod` modulus x 
 
 instance (Numeral n) => FiniteField (Mod n) where
   zero                = MkMod 0
@@ -112,6 +121,10 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
           | u == 1     = x1
           | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
             where q = v `div` u
+
+
+instance (Numeral n) => Ord (Mod n) where
+  (<=) x y  = (getRepr x) <= (getRepr y)
 
 --------------------------------------------------------------------------------
 --  Examples

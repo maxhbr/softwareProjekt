@@ -105,19 +105,22 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (Polynom a) where
 
 instance (Num a, Eq a) => Num (Polynom a) where
   (P ms) + (P ns) = P $ addP ms ns
-  (P ms) * (P ns) = P $ multP' ms ns
+  (P ms) * (P ns) = P $ multP'' ms ns
   fromInteger i   = P [fromInteger i]
   abs _           = error "Prelude.Num.abs: inappropriate abstraction"
   signum (P ms)   = P $ map signum ms
   negate (P ms)   = P $ map negate ms
 
+{-# INLINE addP #-}
 addP [] gs          = gs
 addP fs []          = fs
 addP (f:fs) (g:gs)  = f+g : addP fs gs
 
+{-# INLINE multP #-}
 multP (f:fs) (g:gs) = f*g : addP (multP [f] gs) (multP fs(g:gs))
 multP _ _           = []
 
+{-# INLINE multP' #-}
 multP' f []             = []
 multP' [] f             = []
 multP' f g  | n >= m    = foldl1' addP [ multMonom f i a | (i,a) <- gz]
@@ -126,13 +129,39 @@ multP' f g  | n >= m    = foldl1' addP [ multMonom f i a | (i,a) <- gz]
         m  = length g
         gz = zip [0..] g
 
+{-# INLINE multMonom #-}
 -- |Multipliziert f mit a*x^i
 multMonom :: Num a => [a] -> Int -> a -> [a]
 multMonom f i a  = [0 | i <- [1..i]] ++ map (a*) f
 
+{-# INLINE multMonomP #-}
 multMonomP :: Num a => Polynom a -> Int -> a -> Polynom a
 multMonomP (P f) i a  = P $ multMonom f i a
 
+
+-- |Aus Math.Polynomial
+{-# INLINE multP'' #-}
+multP'' :: (Eq a, Num a) => [a] -> [a] -> [a]
+multP''  _  []     = []
+multP''  []  _     = []
+multP''  xs (y:ys) = foldr mul [] xs
+    where
+        mul x bs
+            | x == 0      = 0 : bs
+            | otherwise  = (x * y) : zipSum (map (*x) ys) bs
+
+
+{-# INLINE zipSum #-}
+-- like @zipWith (+)@ except that when the end of either list is
+-- reached, the rest of the output is the rest of the longer input list.
+zipSum :: Num t => [t] -> [t] -> [t]
+zipSum xs [] = xs
+zipSum [] ys = ys
+zipSum (x:xs) (y:ys) = (x+y) : zipSum xs ys
+
+
+
+{-# INLINE aggP #-}
 -- |Entfernt trailing zeros
 aggP :: (Num a, Eq a) => Polynom a -> Polynom a
 aggP (P ms) = P $ aggP' ms []
@@ -146,21 +175,25 @@ aggP (P ms) = P $ take l ms
   where l = maximum $ 0:[i+1 | i <- [0..(length ms - 1)] , ms!!i /= 0]
  -}
 
+{-# INLINE getLcP #-}
 getLcP :: (Num a, Eq a) => Polynom a -> a
 getLcP (P[]) = 0
 getLcP f     = (last . unP . aggP) f
 
+{-# INLINE getDegrees #-}
 -- |Nimmt ein Polynom und gibt eine liste der Gräder zurrück.
 getDegrees :: (Num a, Eq a) => Polynom a -> [Int]
 getDegrees (P ms) = [snd m | m <- zip ms [0..], fst m /= 0]
 {-getDegrees (P ms) = [i | i <- [0..(length ms - 1)] , ms!!i /= 0]-}
 
+{-# INLINE degP #-}
 -- |Gibt zu einem Polynom den Grad
 degP :: (Num a, Eq a) => Polynom a -> Maybe Int
 degP f | deg >= 0   = Just deg
        | otherwise = Nothing
   where deg = (length . unP . aggP) f - 1
 
+{-# INLINE uDegP #-}
 uDegP :: (Num a, Eq a) => Polynom a -> Int
 uDegP = fromJust . degP
 
@@ -188,6 +221,8 @@ deriveP :: (Num a, Eq a) => Polynom a -> Polynom a
 deriveP (P [])     = P[]
 deriveP (P (_:ms)) = P[m * fromInteger i | (i,m) <- zip [(1::Integer)..] ms]
 
+
+{-# INLINE divP #-}
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
 --  Teilen mit Rest durch erweitertem euklidischem Algorithmus
 divP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
@@ -200,12 +235,15 @@ divP a b | a == 0       = (P [], P [])
         monom     = fromMonomialsP [(degDiff,lcQuot)]
         newA      = a - multMonomP b degDiff lcQuot
 
+{-# INLINE divP' #-}
 divP' :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 divP' a b = fst $ divP a b
 
+{-# INLINE (@/) #-}
 (@/) :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 (@/) = divP'
 
+{-# INLINE modByP #-}
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
 --
@@ -213,6 +251,8 @@ divP' a b = fst $ divP a b
 modByP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 modByP f p = snd $ divP f p
 
+
+{-# INLINE eekP #-}
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit
 --  ggT(a,b) = d = s*a + t*b
 eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a
@@ -222,6 +262,7 @@ eekP f g | g == 0     = (moniP f ,P[recip $ getLcP f] ,P[])
   where (q,r)   = divP f g
         (d,s,t) = eekP g r
 
+{-# INLINE ggTP #-}
 -- |Algorithmus für ggT
 ggTP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 ggTP f g = (\ (x,_,_) -> x) $ eekP f g
@@ -229,6 +270,7 @@ ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 --------------------------------------------------------------------------------
 --  Weiteres
 
+{-# INLINE evalP #-}
 -- |Nimmt einen Wert und ein Polynom umd wertet das Polynom an dem Wert aus.
 -- Mittels Horner Schema
 evalP x f = evalP' x (unP f) 0
