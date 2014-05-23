@@ -18,7 +18,7 @@ module Projekt.Core.Polynomials
   -- binär
   , divP, (@/), modByP, ggTP, eekP
   -- weiteres
-  , evalP
+  , evalP, hasNS
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
   ) where
@@ -279,9 +279,12 @@ ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 {-# INLINE evalP #-}
 -- |Nimmt einen Wert und ein Polynom umd wertet das Polynom an dem Wert aus.
 -- Mittels Horner Schema
-evalP x f = evalP' x (unP f) 0
+evalP x f = evalP' x (reverse (unP f)) 0
 evalP' x [] acc = acc
 evalP' x (m:ms) acc = evalP' x ms $ acc*x+m
+
+hasNS :: (Eq a, Fractional a) => Polynom a -> [a] -> Bool
+hasNS f es = not (null [f | e <- es, evalP e f == 0])
 
 --------------------------------------------------------------------------------
 --  liste alle möglichen Polynome auf

@@ -9,7 +9,8 @@
 module Main
   where
 
-import Prelude hiding (writeFile, appendFile)
+import Prelude hiding (writeFile, readFile, appendFile)
+import qualified Prelude as P
 
 import Projekt.Core
 import Projekt.Algorithmen
@@ -20,7 +21,7 @@ import Control.Parallel
 import Control.Parallel.Strategies
 
 import Data.Binary
-import Data.ByteString.Lazy (writeFile, appendFile)
+import Data.ByteString.Lazy (writeFile, readFile, appendFile)
 
 --------------------------------------------------------------------------------
 --  Beliebiger Primkörper
@@ -57,6 +58,7 @@ e5e4f2 = FFElem (P[0,e4f2]) e5e4f2MiPo
 --      Finde alle irreduziblen Polynome über Endlichem Körper, welcher `e`
 --      enthält, bis zu einem vorgegebenem Grad `deg`.
 
+{-
 problem1 e deg = do
   let es = elems e
   print $ ("Anzahl aller Elemente im Galoiskörper: " ++) $ show $ length es
@@ -82,7 +84,9 @@ problem1 e deg = do
     then do print "die irreduziblen Polynome"
             mapM_ (print . snd . head) bListIrred
    -}
+ -}
 
+{-
 -- Speicher gefundene als Liste in eine Datei
 problem1b e deg = do 
   print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
@@ -95,7 +99,9 @@ problem1b e deg = do
                                               , f /= P[]]
                          , isTrivialFact fs]
                    , isTrivialFact fs]
+ -}
 
+{-
 -- Gebe alle gefundenen aus
 problem1c e deg = do
   print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
@@ -108,19 +114,25 @@ problem1c e deg = do
                                               , f /= P[]]
                          , isTrivialFact fs]
                    , isTrivialFact fs]
+ -}
 
 -- Gebe alle gefundenen aus
 problem1d e deg = do
   print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
     ++ show deg
-  print $ findIrreds $ getAllMonicPs (elems e) [deg]
+  print $ length $ findIrreds $ getAllMonicPs (elems e) [deg]
 
 problem1e e deg = do
+  P.writeFile "/tmp/irreds" ""
   print "start"
-  mapM_ (appendFile  "/tmp/irreds" . encode) $
+  mapM_ (appendFile "/tmp/irreds" . encode) $
     findIrreds $
     getAllMonicPs (elems e) [deg]
   print "done"
+
+problem1eRead = do
+  r <- readFile "/tmp/irreds"
+  print (decode r:: Polynom (FFElem F2))
 
 --------------------------------------------------------------------------------
 --  Problem2:
@@ -167,7 +179,7 @@ problem3b = print $ length $ elems e5e4f2
 --  Main
 
 main :: IO ()
-main = problem1e e4f2 4
+main = problem1e e4f2 3
 {-main = problem2c e4f2 4-}
 {-main = problem3-}
 {-main = print $ length $ take 1000 $ findIrreds (getAllMonicPs (elems e4f2) [3])-}

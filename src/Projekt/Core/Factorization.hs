@@ -58,6 +58,7 @@ aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], f /= P
 
 isTrivialFact :: [(Int,a)] -> Bool
 isTrivialFact [] = error "[] is not a factorization"
+isTrivialFact [(1,_)] > True
 isTrivialFact ms = sum (map fst ms) == 1
 
 -- |Gibt alle Faktorisierungen zurück, welche nach der offensichtlichen
