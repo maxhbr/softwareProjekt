@@ -58,7 +58,7 @@ findIrreds ps = parMap rpar unFact $ findTrivialsB ps
 -- |Gibt alle Faktorisierungen zurück, welche nach Berlekamp noch trivial sind
 -- Wendet zuvor (die offensichtliche Faktorisierung und) SFF an
 findTrivialsB :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
-findTrivialsB ps = [fs | fs <- parMap rpar appSff
+findTrivialsB ps = [fs | fs <- map appBerlekamp
                        (findTrivialsSff ps)
                      , isTrivialFact fs]
 
@@ -92,8 +92,8 @@ berlekampFactor f = berlekampFactor' f m
                                       => Polynom a -> Matrix a -> [(Int,Polynom a)]
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
                              | getNumRowsM m == 1 = [(1,f)]
-                             | otherwise         = berlekampFactor' g n
-                                                 ++ berlekampFactor' g' n'
+                             | otherwise         = 
+                              (berlekampFactor' g n ++ berlekampFactor' g' n')
           where g  = head [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
                              , x /= 1]
                 g' = f @/ g
@@ -102,10 +102,14 @@ berlekampFactor f = berlekampFactor' f m
                 n' = newKer m g'
                 newKer m g  = fromListsM $ take r m'
                   where (k,l) = boundsM m
-                        m'    = toListsM $ echelonM $ fromListsM $ take r'' m''
-                        m''   = [take l $ unP $ modByP (P (getRowM m i)) g
-                                                                | i <- [1..k]]
+                        m'    = toListsM $ echelonM $ fromListsM
+                              [takeFill 0 l $ unP $ modByP (P (getRowM m i)) g
+                                   | i <- [1..k]]
                         r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
-                        r''   = k-1- fromMaybe (-1) (findIndex (all (==0))
-                                                        $ reverse m'')
+
+
+takeFill :: Num a => a -> Int -> [a] -> [a]
+takeFill a n [] = take n $ cycle [a]
+takeFill a n (x:xs) = x : (takeFill a (n-1) xs)
+

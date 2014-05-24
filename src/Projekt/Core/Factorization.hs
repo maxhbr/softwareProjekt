@@ -40,8 +40,7 @@ unFact [(i,f)] = f^i
 unFact fs      = product $ map (\(i,f) -> f^i) fs
 
 -- |Ersetzt eine Faktoriesierung, durch die n-te Potenz dieser Faktoriesierung
-potFact :: (Num a) => Int -> [(Int,Polynom a)]
-                                                           -> [(Int,Polynom a)]
+potFact :: (Num a) => Int -> [(Int,Polynom a)] -> [(Int,Polynom a)]
 potFact _ []         = []
 potFact n ((i,f):ts) = (i*n,f) : potFact n ts
 
@@ -53,8 +52,7 @@ appFact alg = withStrategy (parList rpar) . concatMap
   (\(i,f) -> potFact i (alg f))
 
 -- |Fasst in einer Faktoriesierung gleiche Funktionen Zusammen
-aggFact :: (Num a, Eq a) => [(Int,Polynom a)]
-                                                            -> [(Int,Polynom a)]
+aggFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], f /= P[1]]
 
 isTrivialFact :: [(Int,a)] -> Bool

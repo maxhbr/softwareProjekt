@@ -69,12 +69,25 @@ genBigM n = replicate n $ take n $ cycle $ elems (1::F101)
 m = fromListsM $ genBigM 100
 m' = M.fromLists $ genBigM 100
 
+problem1d e deg = do
+  print $ "Berechne monischen irred Polynome /=0 von Grad "
+    ++ show deg
+  print $ length $ findIrreds $ getAllMonicPs (elems e) [deg]
+
+prob1d e deg = map (\x -> map (\(i,f) -> berlekamp f) x) $ findTrivialsSff $ getAllMonicPs (elems e) [deg] 
+
+fFail = fromMonomialsP [(0,1::F2),(3,1),(5,1),(7,1),(9,1)]
+
+
 main :: IO ()
-main = print $ map fst $ sffAndBerlekamp testPoly
+{-main = print $ map fst $ sffAndBerlekamp testPoly-}
 {-main = print $ berlekampBasis testPoly-}
 {-main = print $ multMyPoly f 400-}
 {-main = print $ multMyPoly' f' 400-}
 {-main = print $ multMyPoly m' 10000-}
 {-main = print $ echelonM m-}
 {-main = print $ luDecomp' m'-}
-
+{-main = print $ map (\n -> (length $ prob1d (1::F2) n)) [1..10]-}
+{-main = print $ prob1d (1::F2) 9-}
+main = problem1d (1::F2) 9
+{-main = print $ berlekamp fFail-}
