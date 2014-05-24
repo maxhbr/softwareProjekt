@@ -17,11 +17,11 @@ module Projekt.Core.Polynomials
   , moniP, reziprokP, deriveP
   -- binär
   , divP, (@/), modByP, ggTP, eekP
+  , divPHorner, divPHorner'
   -- weiteres
   , evalP, hasNs
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
-  , divPHorner, divPHorner'
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -249,12 +249,12 @@ divPHorner a b | a == 0        = (P[],P[])
                | b == 0        = error "Division by zero"
                | degDiff <= 0  = (P[],P[])
                | otherwise    = (P $ take degDiff horn, P $ drop degDiff horn)
-  where horn = reverse $ divPHorner' bs as 
+  where horn = reverse $ divPHorner' bs as
         degDiff   = uDegP a - uDegP b + 1
-        bs = tail $ reverse $ unP $ negate $ moniP b 
+        bs = tail $ reverse $ unP $ negate $ moniP b
         as = reverse $ unP a
 
-divPHorner' divs ff@(f:fs) 
+divPHorner' divs ff@(f:fs)
   | length fs == length divs = ff
   | otherwise               = f : (divPHorner' divs hs)
   where hs = zipWith (+) fs $ (map (f*) divs) ++ cycle [0]
@@ -315,7 +315,7 @@ getAllP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
 getAllP es d = [(P . map (e*) . unP) f | f <- getAllMonicP es d
                                        , e <- es , e /= 0]
 
--- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle 
+-- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle
 -- Polynome deren Gräder in der Liste enthalten sind
 getAllPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
 getAllPs es ds = [(P . map (e*) . unP) f | f <- getAllMonicPs es ds
