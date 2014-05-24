@@ -23,8 +23,7 @@ import Control.Parallel.Strategies
 
 import Debug.Trace
 
-import Projekt.Core
-import Projekt.Algorithmen
+import Projekt.Projekt
 
 --------------------------------------------------------------------------------
 --  Beliebiger Primkörper mit Charakteristik `c`
@@ -41,13 +40,13 @@ type PF = Mod PfNumeral
 pf = 1::PF
 
 e2fpMipo = $([|findIrred (getAllMonicPs (elems pf) [2])|])
-e2pf = FFElem (P[0,1::PF]) e2fpMipo
+e2pf = FFElem (P[0,pf]) e2fpMipo
 
 e2e2pfMipo = $([|findIrred (getAllMonicPs (elems e2pf) [2])|])
 e2e2pf = FFElem (P[0,e2pf]) e2e2pfMipo
 
 e4pfMipo = $([|findIrred (getAllMonicPs (elems pf) [4])|])
-e4pf = FFElem (P[0,1::PF]) e4pfMipo
+e4pf = FFElem (P[0,pf]) e4pfMipo
 
 e5e2pfMiPo = findIrred $ getAllMonicPs (elems e2pf) [5]
 e5e2pf = FFElem (P[0,e2pf]) e5e2pfMiPo
@@ -125,22 +124,25 @@ problem1d e deg = do
   print $ length $ findIrreds $ getAllMonicPs (elems e) [deg]
 
 problem1e e deg = do
-  P.writeFile "/tmp/irreds" ""
+  P.writeFile file ""
   print "start"
-  writeFile "/tmp/irreds" $ encode $ findIrreds $ getAllMonicPs (elems e) [deg]
+  writeFile file $ encode $ findIrreds $ getAllMonicPs (elems e) [deg]
   print "done"
+    where file = "/tmp/irreds" ++ show c
 
 problem1eMap e deg = do
-  P.writeFile "/tmp/irreds" ""
+  P.writeFile file ""
   print "start"
-  mapM_ (appendFile "/tmp/irreds" . encode) $
+  mapM_ (appendFile file . encode) $
     findIrreds $
     getAllMonicPs (elems e) [deg]
   print "done"
+    where file = "/tmp/irreds" ++ show c
 
 problem1eRead = do
-  r <- readFile "/tmp/irreds"
+  r <- readFile file
   print (decode r:: Polynom (FFElem PF))
+    where file = "/tmp/irreds" ++ show c
 
 --------------------------------------------------------------------------------
 --  Problem2:
