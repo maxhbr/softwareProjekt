@@ -89,5 +89,6 @@ main :: IO ()
 {-main = print $ luDecomp' m'-}
 {-main = print $ map (\n -> (length $ prob1d (1::F2) n)) [1..10]-}
 {-main = print $ prob1d (1::F2) 9-}
-main = problem1d (1::F2) 13
+{-main = problem1d (1::F2) 13-}
 {-main = print $ berlekamp fFail-}
+main = print $ length $ filter (\x -> x) $ map (\f -> rabin f) $ getAllMonicPs (elems (1::F3)) [8]

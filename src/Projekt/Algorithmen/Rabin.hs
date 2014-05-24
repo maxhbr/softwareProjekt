@@ -50,7 +50,7 @@ rabin f = rabin' f d q ns
         d  = uDegP f
         q  = elemCount $ getReprP f
         rabin' f d q []                 = g == P []
-          where g = (ggTP f $ h`modByP` f)
+          where g = (ggTP f $ h `modByP` f)
                 h = fromMonomialsP [(q^d,1),(1,-1)]
         rabin' f d q (n:ns) | g /= P[1]  = False
                             | otherwise = rabin' f d q ns

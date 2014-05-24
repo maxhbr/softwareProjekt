@@ -21,6 +21,7 @@ module Projekt.Core.Polynomials
   , evalP, hasNs
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
+  , divPHorner, divPHorner'
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -29,7 +30,7 @@ import Data.Binary
 
 import Projekt.Core.ShowTex
 
---import Debug.Trace
+import Debug.Trace
 
 --------------------------------------------------------------------------------
 --  Data Definition
@@ -162,7 +163,7 @@ zipSum (x:xs) (y:ys) = (x+y) : zipSum xs ys
 
 
 
-{-# INLINE aggP #-}
+{-[># INLINE aggP #<]-}
 -- |Entfernt trailing zeros
 aggP :: (Num a, Eq a) => Polynom a -> Polynom a
 aggP (P ms) = P $ aggP' ms []
@@ -241,9 +242,27 @@ divP a b | a == 0       = (P [], P [])
         monom     = fromMonomialsP [(degDiff,lcQuot)]
         newA      = a - multMonomP b degDiff lcQuot
 
+-- |divP mit Horner Schema
+--  siehe http://en.wikipedia.org/wiki/Synthetic_division
+divPHorner :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a,Polynom a)
+divPHorner a b | a == 0        = (P[],P[])
+               | b == 0        = error "Division by zero"
+               | degDiff <= 0  = (P[],P[])
+               | otherwise    = (P $ take degDiff horn, P $ drop degDiff horn)
+  where horn = reverse $ divPHorner' bs as 
+        degDiff   = uDegP a - uDegP b + 1
+        bs = tail $ reverse $ unP $ negate $ moniP b 
+        as = reverse $ unP a
+
+divPHorner' divs ff@(f:fs) 
+  | length fs == length divs = ff
+  | otherwise               = f : (divPHorner' divs hs)
+  where hs = zipWith (+) fs $ (map (f*) divs) ++ cycle [0]
+
+
 {-# INLINE divP' #-}
 divP' :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
-divP' a b = fst $ divP a b
+divP' a b = fst $ divPHorner a b
 
 {-# INLINE (@/) #-}
 (@/) :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
@@ -255,7 +274,7 @@ divP' a b = fst $ divP a b
 --
 -- mehr Performance durch andere Rechnung?
 modByP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
-modByP f p = snd $ divP f p
+modByP f p = snd $ divPHorner f p
 
 
 {-# INLINE eekP #-}
