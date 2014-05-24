@@ -13,11 +13,15 @@ ghc --make \
   #-fforce-recomp \
 
 if [ $? -eq 0 ]; then
-  if (( $# != 1 )); then
-    time $DIR/../out/Main +RTS -N4
-  else
-    time $DIR/../out/Main +RTS -N${1}
+  if (( $# != 0 )); then
+    if (( $1 == "-N" )); then
+      shift
+      N=$1
+      shift
+    fi
   fi
+
+  time $DIR/../out/Main $@ +RTS -N${N}
 fi
 
 # -fforce-recomp, -O2 and -fllvm are from:

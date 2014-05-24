@@ -1,3 +1,4 @@
+{-# LANGUAGE QuasiQuotes, TemplateHaskell #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Main
@@ -11,47 +12,48 @@ module Main
 
 import Prelude hiding (writeFile, readFile, appendFile)
 import qualified Prelude as P
-
-import Projekt.Core
-import Projekt.Algorithmen
-import Debug.Trace
-import qualified Control.Monad.Parallel as P
-{-import Control.Concurrent.Async (mapConcurrently)-}
-import Control.Parallel
-import Control.Parallel.Strategies
+import System.Environment
+import Data.List
 
 import Data.Binary
 import Data.ByteString.Lazy (writeFile, readFile, appendFile)
+import qualified Control.Monad.Parallel as P
+import Control.Parallel
+import Control.Parallel.Strategies
+
+import Debug.Trace
+
+import Projekt.Core
+import Projekt.Algorithmen
 
 --------------------------------------------------------------------------------
---  Beliebiger Primkörper
+--  Beliebiger Primkörper mit Charakteristik `c`
+c = 3
 
 data PfNumeral
-instance Numeral PfNumeral where
-  numValue x = 2 -- setze die Charakteristik
-instance Show PfNumeral where
-  show = show
+instance Numeral PfNumeral where {numValue x = c}
+instance Show PfNumeral where {show = show}
 type PF = Mod PfNumeral
 
 --------------------------------------------------------------------------------
---  Erweiterungen über F2
+--  Erweiterungen über PF
 
-f2 = 1::F2
+pf = 1::PF
 
-e2f2Mipo = P[1::F2,1,1] -- x²+x+1
-e2f2 = FFElem (P[0,1::F2]) e2f2Mipo
+e2fpMipo = $([|findIrred (getAllMonicPs (elems pf) [2])|])
+e2pf = FFElem (P[0,1::PF]) e2fpMipo
 
-e2e2f2Mipo = P[e2f2,one,one] -- x²+x+e2f2
-e2e2f2 = FFElem (P[0,e2f2]) e2e2f2Mipo
+e2e2pfMipo = $([|findIrred (getAllMonicPs (elems e2pf) [2])|])
+e2e2pf = FFElem (P[0,e2pf]) e2e2pfMipo
 
-e4f2Mipo = P[1::F2,1::F2,0,0,1::F2] -- x⁴+x²+1
-e4f2 = FFElem (P[0,1::F2]) e4f2Mipo
+e4pfMipo = $([|findIrred (getAllMonicPs (elems pf) [4])|])
+e4pf = FFElem (P[0,1::PF]) e4pfMipo
 
-e5e2f2MiPo = findIrred $ getAllMonicPs (elems e2f2) [5]
-e5e2f2 = FFElem (P[0,e2f2]) e5e2f2MiPo
+e5e2pfMiPo = findIrred $ getAllMonicPs (elems e2pf) [5]
+e5e2pf = FFElem (P[0,e2pf]) e5e2pfMiPo
 
-e5e4f2MiPo = findIrred $ getAllMonicPs (elems e4f2) [5]
-e5e4f2 = FFElem (P[0,e4f2]) e5e4f2MiPo
+e5e4pfMiPo = findIrred $ getAllMonicPs (elems e4pf) [5]
+e5e4pf = FFElem (P[0,e4pf]) e5e4pfMiPo
 
 --------------------------------------------------------------------------------
 --  Problem1:
@@ -88,7 +90,7 @@ problem1 e deg = do
 
 {-
 -- Speicher gefundene als Liste in eine Datei
-problem1b e deg = do 
+problem1b e deg = do
   print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
     ++ show deg
   writeFile "/tmp/irreds" (encode irreds)
@@ -138,7 +140,7 @@ problem1eMap e deg = do
 
 problem1eRead = do
   r <- readFile "/tmp/irreds"
-  print (decode r:: Polynom (FFElem F2))
+  print (decode r:: Polynom (FFElem PF))
 
 --------------------------------------------------------------------------------
 --  Problem2:
@@ -176,16 +178,24 @@ problem2c e deg = do
 
 --------------------------------------------------------------------------------
 --  Problem3:
---      Finde den Körper e5e2f2 bzw. e5e4f2
+--      Finde den Körper e5e2pf bzw. e5e4pf
 
-problem3 = print $ length $ elems e5e2f2
-problem3b = print $ length $ elems e5e4f2
+problem3 = print $ length $ elems e5e2pf
+problem3b = print $ length $ elems e5e4pf
 
 --------------------------------------------------------------------------------
 --  Main
 
+dispatch :: [(String, String -> IO ())]
+dispatch =  [ ("1d", \s -> problem1d e4pf (read s :: Int))
+            , ("1e", \s -> problem1e e4pf (read s :: Int))
+            , ("1eRead", const problem1eRead)
+            , ("2c", \s -> problem2c e4pf [read s :: Int])
+            , ("3", const problem3)
+            , ("3b", const problem3) ]
+
 main :: IO ()
-main = problem1e e4f2 3
-{-main = problem2c e4f2 4-}
-{-main = problem3-}
-{-main = print $ length $ take 1000 $ findIrreds (getAllMonicPs (elems e4f2) [3])-}
+main = do
+  (grp:(arg:_)) <- getArgs
+  let (Just action) = lookup grp dispatch
+  action arg
