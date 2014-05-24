@@ -4,9 +4,9 @@ import Projekt.Core
 import Projekt.Algorithmen
 import System.Random
 import Data.List
-import Math.Polynomial (poly, Poly, multPoly, Endianness (LE))
-import Data.Matrix hiding ( (<->), (<|>))
-import qualified Data.Matrix as M
+--import Math.Polynomial (poly, Poly, multPoly, Endianness (LE))
+--import Data.Matrix hiding ( (<->), (<|>))
+--import qualified Data.Matrix as M
 
 {----------------------------------------------------------------------------------}
 {---  Beispiele-}
@@ -34,7 +34,7 @@ e4f2 = FFElem (P[0,1::F2]) e4f2Mipo
  -        = (x+1)(x²+1)³(x+2)⁴
  -}
 f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
-f' = poly LE [1::F3,0,2,2,0,1,1,0,2,2,0,1] 
+{-f' = poly LE [1::F3,0,2,2,0,1,1,0,2,2,0,1] -}
 
 testPoly1 = P $ listFFElem e4f2Mipo [ P[0::F2,0,1,1]
                                     , 1
@@ -54,8 +54,8 @@ testPoly = testPoly1^2 * testPoly2 * testPoly3
 multMyPoly f 1 = f
 multMyPoly f n = f * multMyPoly f (n-1)
 
-multMyPoly' f 1 = f
-multMyPoly' f n = multPoly f $ multMyPoly' f (n-1)
+{-multMyPoly' f 1 = f-}
+{-multMyPoly' f n = multPoly f $ multMyPoly' f (n-1)-}
 
 {-m  = fromListsM [ [0::F5, 1, 0,  1, 0 ]-}
                    {-, [0, -2, 0,  0, 0 ]-}
@@ -67,7 +67,7 @@ genBigM n = replicate n $ take n $ cycle $ elems (1::F101)
 
 
 m = fromListsM $ genBigM 100
-m' = M.fromLists $ genBigM 100
+{-m' = M.fromLists $ genBigM 100-}
 
 problem1d e deg = do
   print $ "Berechne monischen irred Polynome /=0 von Grad "
@@ -89,5 +89,5 @@ main :: IO ()
 {-main = print $ luDecomp' m'-}
 {-main = print $ map (\n -> (length $ prob1d (1::F2) n)) [1..10]-}
 {-main = print $ prob1d (1::F2) 9-}
-main = problem1d (1::F2) 9
+main = problem1d (1::F2) 13
 {-main = print $ berlekamp fFail-}

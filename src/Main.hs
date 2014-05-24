@@ -125,6 +125,12 @@ problem1d e deg = do
 problem1e e deg = do
   P.writeFile "/tmp/irreds" ""
   print "start"
+  writeFile "/tmp/irreds" $ encode $ findIrreds $ getAllMonicPs (elems e) [deg]
+  print "done"
+
+problem1eMap e deg = do
+  P.writeFile "/tmp/irreds" ""
+  print "start"
   mapM_ (appendFile "/tmp/irreds" . encode) $
     findIrreds $
     getAllMonicPs (elems e) [deg]
