@@ -124,22 +124,25 @@ problem1d e deg = do
   print $ length $ findIrreds $ getAllMonicPs (elems e) [deg]
 
 problem1e e deg = do
-  P.writeFile "/tmp/irreds" ""
+  P.writeFile file ""
   print "start"
-  writeFile "/tmp/irreds" $ encode $ findIrreds $ getAllMonicPs (elems e) [deg]
+  writeFile file $ encode $ findIrreds $ getAllMonicPs (elems e) [deg]
   print "done"
+    where file = "/tmp/irreds" ++ show c
 
 problem1eMap e deg = do
-  P.writeFile "/tmp/irreds" ""
+  P.writeFile file ""
   print "start"
-  mapM_ (appendFile "/tmp/irreds" . encode) $
+  mapM_ (appendFile file . encode) $
     findIrreds $
     getAllMonicPs (elems e) [deg]
   print "done"
+    where file = "/tmp/irreds" ++ show c
 
 problem1eRead = do
-  r <- readFile "/tmp/irreds"
+  r <- readFile file
   print (decode r:: Polynom (FFElem PF))
+    where file = "/tmp/irreds" ++ show c
 
 --------------------------------------------------------------------------------
 --  Problem2:
