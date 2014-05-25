@@ -13,8 +13,8 @@ ghc --make \
   #-fforce-recomp \
 
 if [ $? -eq 0 ]; then
-  if (( $# != 0 )); then
-    if (( $1 == "-N" )); then
+  if [[ $# != 0 ]]; then
+    if [[ $1 == "-N" ]]; then
       shift
       N=$1
       shift
