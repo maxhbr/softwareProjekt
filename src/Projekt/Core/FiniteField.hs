@@ -15,7 +15,6 @@ module Projekt.Core.FiniteField
 import Control.Monad
 
 -- from monad-parallel
--- TODO: remove?
 import qualified Control.Monad.Parallel as P
 
 import Projekt.Core.Polynomials
@@ -34,8 +33,6 @@ class (Eq a) => FiniteField a where
 
 --------------------------------------------------------------------------------
 --  Tests
-
-pMapM_  f = P.sequence_ . map f
 
 testHelper f s = liftM and (P.mapM f s)
 
