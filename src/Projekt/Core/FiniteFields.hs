@@ -22,6 +22,8 @@ import Projekt.Core.PrimeFields as X
 import Projekt.Core.Polynomials
 import Projekt.Core.ShowTex
 
+import Debug.Trace
+
 --------------------------------------------------------------------------------
 --  Definition
 
@@ -32,7 +34,7 @@ import Projekt.Core.ShowTex
 -- FFKonst implementiert.
 data FFElem a = FFElem (Polynom a) (Polynom a) | FFKonst a
 
-aggF :: (Eq a, Fractional a) => FFElem a -> FFElem a
+aggF :: (Show a, Eq a, Fractional a) => FFElem a -> FFElem a
 aggF (FFKonst x)  = FFKonst x
 aggF (FFElem f p) = FFElem (modByP f p) p
 
@@ -41,7 +43,7 @@ listFFElem m = map (`FFElem` m)
 --------------------------------------------------------------------------------
 --  Instanzen
 
-instance (Num a, Eq a, Fractional a) => Eq (FFElem a) where
+instance (Show a, Num a, Eq a, Fractional a) => Eq (FFElem a) where
   (FFKonst x)  == (FFKonst y)  = x==y
   (FFElem f p) == (FFKonst y)  = null $ unP $ aggP (f - P[y])
   (FFKonst x)  == (FFElem g p) = null $ unP $ aggP (P[x] - g)
@@ -63,7 +65,7 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (FFElem a) where
     "\\left(\\underline{" ++ showTex f ++ "}_{mod~" ++ showTex p ++"}\\right)"
 
 
-instance (Num a, Eq a, Fractional a) => Num (FFElem a) where
+instance (Show a, Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
 
   {-# INLINE (+) #-}
@@ -95,7 +97,7 @@ instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
                      | otherwise                    = FFElem s p
     where (_,s,_) = eekP f p
 
-instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
+instance (Show a, Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
   zero                        = FFKonst zero
   one                         = FFKonst one
   elems                       = elems'
@@ -112,10 +114,11 @@ instance (Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) wh
 -- anderen Elemente zurrück.
 -- Diese Funktion benötigt ein FFElem, ein FFKonst ist zu universell und
 -- enthält deswegen zu wenig Information, über den Körper in dem es lebt.
-elems' :: (Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
+elems' :: (Show a, Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
 elems' (FFKonst x)  = error "Insufficient information in FFKonst"
-elems' (FFElem f p) = map (`FFElem` p) (P[] : getAllP (elems e) (uDegP p -1))
-  where e = product (unP f) * product (unP p)
+elems' elm@(FFElem f p) = --trace ("elems for "++show elm++"\tf="++show f++"\tp="++show p++" \t=> e="++show e)
+      (map (`FFElem` p) (P[] : getAllP (elems e) (uDegP p -1)))
+  where e = getReprP p
 
 {-# INLINE getReprP' #-}
 getReprP' (P [])             = error "Insufficient information in empty Polynomial"

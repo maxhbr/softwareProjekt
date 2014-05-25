@@ -16,12 +16,12 @@ module Projekt.Core.Polynomials
   -- unär
   , moniP, reziprokP, deriveP
   -- binär
-  , divP, (@/), modByP, ggTP, eekP
+  , divP, divP', (@/), modByP, ggTP, eekP
   -- weiteres
   , evalP, hasNs
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
-  , divPHorner, divPHorner'
+  , divPAgged
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -232,8 +232,8 @@ deriveP (P (_:ms)) = P[m * fromInteger i | (i,m) <- zip [(1::Integer)..] ms]
 {-# INLINE divP #-}
 -- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
 --  Teilen mit Rest durch erweitertem euklidischem Algorithmus
-divP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
-divP a b | a == 0       = (P [], P [])
+divPOld :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
+divPOld a b | a == 0       = (P [], P [])
          | b == 0       = error "Division by zero"
          | degDiff < 0 = (P [], a)
          | otherwise   = A.first (monom +) $ divP newA b
@@ -244,28 +244,44 @@ divP a b | a == 0       = (P [], P [])
 
 -- |divP mit Horner Schema
 --  siehe http://en.wikipedia.org/wiki/Synthetic_division
-divPHorner :: (Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a,Polynom a)
-divPHorner a b | a == 0        = (P[],P[])
-               | b == 0        = error "Division by zero"
-               | degDiff <= 0  = (P[],P[])
-               | otherwise    = (P $ take degDiff horn, P $ drop degDiff horn)
-  where horn = reverse $ divPHorner' bs as 
-        degDiff   = uDegP a - uDegP b + 1
-        bs = tail $ reverse $ unP $ negate $ moniP b 
-        as = reverse $ unP a
+divP :: (Show a, Eq a, Fractional a) => 
+                              Polynom a -> Polynom a -> (Polynom a,Polynom a)
+divP a b = divPAgged (aggP a) (aggP b)
+{-divP a b = trace("divP a="++show a++" b="++show b++-}
+  {-"\n\t => divPH a b= "++show (divPAgged (aggP a) (aggP b))++-}
+  {-"\n\t => divP a b ="++show (divPOld a b)) $-}
+           {-divPOld a b-}
 
-divPHorner' divs ff@(f:fs) 
-  | length fs == length divs = ff
-  | otherwise               = f : (divPHorner' divs hs)
-  where hs = zipWith (+) fs $ (map (f*) divs) ++ cycle [0]
+divPAgged a (P [])   = error "Division by zero" 
+divPAgged a (P [m])  = (P $ map (/m) $ unP a, P[])
+divPAgged a b
+    | nullP a        = (P[],P[])
+    | degDiff <= 0    = (P[],a)
+    | otherwise      = --trace ("horner a="++show a++"\tb="++show b++"\tdegDiff="++show degDiff++"\t=>horn="++show horn
+       -- ++"\n\t=> return "++ show (P $ reverse $ take degDiff horn, P $ reverse $ drop degDiff horn)) 
+            (P $ reverse $ take degDiff horn, P $ reverse $ drop degDiff horn)
+  where horn = divPHorner' bs as lc
+        degDiff   = uDegP a - uDegP b + 1
+        bs = tail $ reverse $ unP $ negate $ b 
+        as = reverse $ unP a
+        lc = getLcP b
+
+divPHorner' divs ff@(f:fs) lc 
+  | length fs < length divs = --trace ("horner end: ff="++show ff) 
+                              ff
+  | otherwise               = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++
+      --" ff="++show ff++"=> "++show (f/lc)) $ 
+      fbar : (divPHorner' divs hs lc)
+  where fbar = f/lc
+        hs = zipWith (+) fs $ (map (fbar*) divs) ++ cycle [0]
 
 
 {-# INLINE divP' #-}
-divP' :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
-divP' a b = fst $ divPHorner a b
+divP' :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+divP' a b = fst $ divP a b
 
 {-# INLINE (@/) #-}
-(@/) :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+(@/) :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 (@/) = divP'
 
 {-# INLINE modByP #-}
@@ -273,14 +289,14 @@ divP' a b = fst $ divPHorner a b
 -- Also Division mit rest und Rüchgabewert ist der Rest.
 --
 -- mehr Performance durch andere Rechnung?
-modByP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
-modByP f p = snd $ divPHorner f p
+modByP :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+modByP f p = snd $ divP f p
 
 
 {-# INLINE eekP #-}
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit
 --  ggT(a,b) = d = s*a + t*b
-eekP :: (Eq a, Fractional a) => Polynom a -> Polynom a
+eekP :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a
                                           -> (Polynom a, Polynom a, Polynom a)
 eekP f g | g == 0     = (moniP f ,P[recip $ getLcP f] ,P[])
          | otherwise = (d,t,s-t*q)
@@ -289,7 +305,7 @@ eekP f g | g == 0     = (moniP f ,P[recip $ getLcP f] ,P[])
 
 {-# INLINE ggTP #-}
 -- |Algorithmus für ggT
-ggTP :: (Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
+ggTP :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 
 --------------------------------------------------------------------------------
@@ -298,13 +314,20 @@ ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 {-# INLINE evalP #-}
 -- |Nimmt einen Wert und ein Polynom umd wertet das Polynom an dem Wert aus.
 -- Mittels Horner Schema
-evalP x f = evalP' x (reverse (unP f)) 0
-evalP' x [] acc = acc
-evalP' x (m:ms) acc = evalP' x ms $ acc*x+m
+{-evalP x f = evalP' x (reverse (unP f)) 0-}
+{-evalP' x [] acc = acc-}
+{-evalP' x (m:ms) acc = evalP' x ms $ acc*x+m-}
+evalP x f = evalP' x (unP f)
+evalP' x []     = 0
+evalP' x (f:fs) = f + x * (evalP' x fs)
+
+evalP'' x []     = 0
+evalP'' x ff@(f:fs) = trace ("x="++show x++" in ff="++show ff) (f + x * (evalP'' x fs))
 
 hasNs :: (Eq a, Fractional a) => Polynom a -> [a] -> Bool
 hasNs f es = not (null [f | e <- es, evalP e f == 0])
 
+hasNs' f es = [evalP e f | e <- es]
 --------------------------------------------------------------------------------
 --  liste alle möglichen Polynome auf
 
