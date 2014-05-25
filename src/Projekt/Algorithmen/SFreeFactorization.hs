@@ -14,14 +14,14 @@ import Control.Parallel
 import Control.Parallel.Strategies
 
 import Projekt.Core
-
+import Debug.Trace
 --------------------------------------------------------------------------------
 --  Wrapper
 
-sff :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sff :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 sff = appFact sffFactor . obviousFactor
 
-appSff :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appSff :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 appSff = appFact sff
 
 -- |Gibt alle Faktorisierungen zurück, welche nach SFF noch trivial sind
@@ -67,7 +67,7 @@ findTrivialsSff ps = [fs | fs <- parMap rpar appSff
        Seite 345(355)
  -}
 
-sffFactor :: (FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
+sffFactor :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 sffFactor (P[]) = [(1,P[])]
 sffFactor (P[m]) = [(1,P[m])]
 sffFactor (P[m0,m1]) = [(1,P[m0,m1])]
@@ -84,7 +84,6 @@ sffFactor f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sffFactor $ char
           where y      = ggTP w c
                 z      = w @/ y
                 (r,c') = sffFactor' (i+1) y (c @/ y)
-
 
 --------------------------------------------------------------------------------
 --  Beispiele

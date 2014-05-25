@@ -92,11 +92,14 @@ berlekampFactor f = berlekampFactor' f m
                                       => Polynom a -> Matrix a -> [(Int,Polynom a)]
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
                              | getNumRowsM m == 1 = [(1,f)]
-                             | otherwise         = 
+                             | otherwise         = --trace ("berlekamp f="++show f++" m=\n"++show m)
                               (berlekampFactor' g n ++ berlekampFactor' g' n')
-          where g  = head [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
+          where g  = --trace ("list="++show [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
+                     --        , x /= 1])$
+                     head [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
                              , x /= 1]
-                g' = f @/ g
+                g' = --trace ("f= "++show f) $ 
+                     f @/ g
                 h  = P $ getRowM m 2
                 n  = newKer m g
                 n' = newKer m g'

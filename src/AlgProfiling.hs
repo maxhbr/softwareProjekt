@@ -91,4 +91,7 @@ main :: IO ()
 {-main = print $ prob1d (1::F2) 9-}
 {-main = problem1d (1::F2) 13-}
 {-main = print $ berlekamp fFail-}
-main = print $ length $ filter (\x -> x) $ map (\f -> rabin f) $ getAllMonicPs (elems (1::F3)) [8]
+{-main = print $ length $ filter (\x -> x) $ map (\f -> rabin f) $ getAllMonicPs (elems (1::F3)) [8]-}
+{-main = print $ map (\f -> hasNs f (elems (1::F3))) $ getAllMonicPs (elems (1::F3)) [2]-}
+{-main = mapM_ print $ map appBerlekamp $ map appSff $ findTrivialsNs $ getAllMonicPs (elems (1::F3)) [2]-}
+main = print $ findIrreds $ getAllMonicPs (elems (1::F3)) [5]
