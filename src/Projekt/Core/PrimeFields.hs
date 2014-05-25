@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE TemplateHaskell #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.PrimeFields
@@ -24,19 +25,18 @@ type F7 = Mod Numeral7
 module Projekt.Core.PrimeFields
   ( Numeral (..)
   -- Endliche Körper
-  , Mod
+  , Mod (..)
   , modulus
   -- Beispiele
   , F2 , F3 , F5 , F7, F101
+  , genFiniteField
   ) where
+import Data.Binary
+import Language.Haskell.TH
+
 import Projekt.Core.FiniteField
 import Projekt.Core.ShowTex
 import Projekt.Core.Polynomials
-
--- import qualified Data.Serialize as DS -- (Serialize, get, put)
--- import GHC.Generics -- (Generic)
--- import Data.Serialize.Derive -- (derivePut, deriveGet)
-import Data.Binary
 
 --------------------------------------------------------------------------------
 --  Prime fields
@@ -128,7 +128,7 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
             where q = v `div` u
 
 instance (Numeral n) => Ord (Mod n) where
-  (<=) x y  = (getRepr x) <= (getRepr y)
+  (<=) x y  = getRepr x <= getRepr y
 
 instance (Numeral a) => Binary (Mod a) where
    put (MkMod x) = put x
@@ -137,7 +137,25 @@ instance (Numeral a) => Binary (Mod a) where
 
 --------------------------------------------------------------------------------
 --  Examples
+ppQ x = putStrLn =<< runQ ((show . ppr) `fmap` x)
 
+genFiniteField :: Int -> Q [Dec]
+genFiniteField i = do
+  d <- dataD (cxt []) (mkName m) [] [] []
+  i1 <- instanceD (cxt [])
+    (appT (conT $ mkName "Numeral") (conT (mkName m)))
+    [funD (mkName "numValue")
+      [clause [] ( normalB $ appsE [conE (mkName (show i))] ) [] ] ] -- TODO
+  i2 <- instanceD (cxt [])
+    (appT (conT $ mkName "Show") (conT (mkName m)))
+    [funD (mkName "show") 
+      [clause [] ( normalB $ appsE [varE (mkName "show")] ) [] ] ]
+  t <- tySynD (mkName ('F' : show i)) []
+    (conT $ mkName $ "Mod " ++ m) -- TODO
+  return [d,i2,t]
+    where m ='M' : show i
+
+-- $( genFiniteField 2 )
 #define PFInstance(MName,MValue,PFName) \
 data MName; \
 instance Numeral MName where {numValue x = MValue} ;\
