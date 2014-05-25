@@ -16,12 +16,11 @@ module Projekt.Core.Polynomials
   -- unär
   , moniP, reziprokP, deriveP
   -- binär
-  , divP, divP', (@/), modByP, ggTP, eekP
+  , divP, (@/), modByP, ggTP, eekP
   -- weiteres
   , evalP, hasNs
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
-  , divPAgged
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -338,7 +337,7 @@ getAllP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
 getAllP es d = [(P . map (e*) . unP) f | f <- getAllMonicP es d
                                        , e <- es , e /= 0]
 
--- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle 
+-- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle
 -- Polynome deren Gräder in der Liste enthalten sind
 getAllPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
 getAllPs es ds = [(P . map (e*) . unP) f | f <- getAllMonicPs es ds
