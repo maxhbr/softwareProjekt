@@ -11,6 +11,7 @@ module Projekt.Algorithmen.Rabin (
 )	where
 
 import Projekt.Core
+import Debug.Trace
 
 -- |Primfaktorzerlegung 
 --  aus http://www.haskell.org/haskellwiki/99_questions/Solutions/35
@@ -45,15 +46,19 @@ factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ from
 --  aus http://en.wikipedia.org/wiki/Factorization_of_polynomials_over_
 --      finite_fields#Irreducible_polynomials
 rabin :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> Bool
-rabin f = rabin' f d q ns
+rabin f = --trace ("rabin with f="++show f++" d="++show d++" q="++show q++" ns="++show ns) $
+    rabin' f d q ns
   where ns = map (\p -> d `quot` p) $ factor d
         d  = uDegP f
         q  = elemCount $ getReprP f
-        rabin' f d q []                 = g == P []
-          where g = (ggTP f $ h `modByP` f)
+        rabin' f d q []                 = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $ 
+                                          nullP g
+          where g = h `modByP` f
                 h = fromMonomialsP [(q^d,1),(1,-1)]
-        rabin' f d q (n:ns) | g /= P[1]  = False
-                            | otherwise = rabin' f d q ns
+        rabin' f d q (n:ns) | g /= P[1]  = --trace ("rabin' n="++show n++" g="++show g) 
+                                          False
+                            | otherwise = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $
+                                          rabin' f d q ns
           where g = (ggTP f $ h `modByP` f)
                 h = fromMonomialsP [(q^n,1),(1,-1)] 
 

@@ -2,7 +2,7 @@ import Debug.Trace
 
 import Projekt.Core
 import Projekt.Algorithmen
-import System.Random
+{-import System.Random-}
 import Data.List
 --import Math.Polynomial (poly, Poly, multPoly, Endianness (LE))
 --import Data.Matrix hiding ( (<->), (<|>))
@@ -78,6 +78,8 @@ prob1d e deg = map (\x -> map (\(i,f) -> berlekamp f) x) $ findTrivialsSff $ get
 
 fFail = fromMonomialsP [(0,1::F2),(3,1),(5,1),(7,1),(9,1)]
 
+l = take 100 $ getAllMonicPs (elems (1::F3)) [100]
+ff = PMS [(9,1::F3),(7,1),(5,1),(3,1),(0,1)] True
 
 main :: IO ()
 {-main = print $ map fst $ sffAndBerlekamp testPoly-}
@@ -94,4 +96,6 @@ main :: IO ()
 {-main = print $ length $ filter (\x -> x) $ map (\f -> rabin f) $ getAllMonicPs (elems (1::F3)) [8]-}
 {-main = print $ map (\f -> hasNs f (elems (1::F3))) $ getAllMonicPs (elems (1::F3)) [2]-}
 {-main = mapM_ print $ map appBerlekamp $ map appSff $ findTrivialsNs $ getAllMonicPs (elems (1::F3)) [2]-}
-main = print $ findIrreds $ getAllMonicPs (elems (1::F3)) [5]
+{-main = print $ length $ filter (\x -> x) $ map (rabin . toPMS) $ getAllMonicPs (elems (1::F3)) [8]-}
+{-main = print $ findIrreds $ getAllMonicPs (elems (1::F3)) [8]-}
+main = print $ length $ filter (\(f,g) -> f==g) $ map(\g -> divP g (toListP ff)) $ concat $ replicate 100 l

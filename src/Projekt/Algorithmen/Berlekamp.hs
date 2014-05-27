@@ -65,6 +65,8 @@ findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp
                        (findTrivialsSff ps)
                      , isTrivialFact fs]
 
+
+
 --------------------------------------------------------------------------------
 --  Algorithmus
 
