@@ -42,23 +42,26 @@ sffAndBerlekamp f = appBerlekamp $ sff f
 -- |Wählt aus einer Liste von Polynomen das erste Irreduzibele Polynom heraus
 findIrred :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> Polynom a
 findIrred = head . findIrreds
-{-
-  where irreds = [unFact fs | fs <- map appBerlekamp
-                       [fs | fs <- map appSff
-                             [(toFact . aggP) f | f <- ps , f /= P[]]
-                           , isTrivialFact fs]
-                     , isTrivialFact fs]
- -}
 
 -- |Filtert mittels SFF und Berlekamp aus einer Liste die irreduzibleneiner
 -- liste heraus
 findIrreds :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [Polynom a]
-findIrreds ps = parMap rpar unFact $ findTrivialsB ps
+findIrreds (f:fs) = findIrreds' (f:fs)
+  where findIrreds' []     = []
+        findIrreds' (f:fs) | (not (hasNs f es)|| uDegP f < 2) &&
+                             isTrivialFact fSff &&
+                             isTrivialFact fB = f : findIrreds' fs
+                           | otherwise = findIrreds' fs
+          where fSff = appSff $ toFact f
+                fB   = appBerlekamp fSff
+        es = elems $ getReprP f
+
+{-findIrreds ps = parMap rpar unFact $ findTrivialsB ps-}
 
 -- |Gibt alle Faktorisierungen zurück, welche nach Berlekamp noch trivial sind
 -- Wendet zuvor (die offensichtliche Faktorisierung und) SFF an
 findTrivialsB :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
-findTrivialsB ps = [fs | fs <- map appBerlekamp
+findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp
                        (findTrivialsSff ps)
                      , isTrivialFact fs]
 
@@ -93,7 +96,7 @@ berlekampFactor f = berlekampFactor' f m
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
                              | getNumRowsM m == 1 = [(1,f)]
                              | otherwise         = --trace ("berlekamp f="++show f++" m=\n"++show m)
-                              (berlekampFactor' g n ++ berlekampFactor' g' n')
+                              berlekampFactor' g n ++ berlekampFactor' g' n'
           where g  = --trace ("list="++show [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
                      --        , x /= 1])$
                      head [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
@@ -111,8 +114,7 @@ berlekampFactor f = berlekampFactor' f m
                         r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
 
-
-takeFill :: Num a => a -> Int -> [a] -> [a]
-takeFill a n [] = take n $ cycle [a]
-takeFill a n (x:xs) = x : (takeFill a (n-1) xs)
+                        takeFill :: Num a => a -> Int -> [a] -> [a]
+                        takeFill a n [] = take n $ cycle [a]
+                        takeFill a n (x:xs) = x : takeFill a (n-1) xs
 

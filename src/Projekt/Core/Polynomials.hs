@@ -340,6 +340,7 @@ getAllP es d = [(P . map (e*) . unP) f | f <- getAllMonicP es d
 -- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle
 -- Polynome deren Gräder in der Liste enthalten sind
 getAllPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
+-- TODO: Man muss nur das letzte Element in der Liste verändern
 getAllPs es ds = [(P . map (e*) . unP) f | f <- getAllMonicPs es ds
                                          , e <- es , e /= 0]
 
@@ -350,7 +351,8 @@ getAllMonicPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
 getAllMonicPs es is = map P $ concat [allMonics i | i <- is]
   where allMonics 0 = [[one]]
         allMonics i = [rs++[one] | rs <- ess (i-1)]
-        ess i       | i == 0     = [[y] | y <- es]
-                    | otherwise = [y:ys | y <- es, ys <- ess (i-1) ]
+        ess i       | i == 0     = [[y] | y <- swpes]
+                    | otherwise = [y:ys | y <- swpes, ys <- ess (i-1) ]
+        swpes       = tail es ++ [head es]
         one         = head [e | e <- es, e == 1]
         {-one         = (\ x -> x / x) $ head [e | e <- es, e /= 0]-}

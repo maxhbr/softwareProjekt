@@ -54,6 +54,9 @@ e5e2pf = FFElem (P[0,e2pf]) e5e2pfMiPo
 e5e4pfMiPo = findIrred $ getAllMonicPs (elems e4pf) [5]
 e5e4pf = FFElem (P[0,e4pf]) e5e4pfMiPo
 
+e99fpMipo = findIrred (getAllMonicPs (elems pf) [99])
+e99pf = FFElem (P[0,pf]) e99fpMipo
+
 --------------------------------------------------------------------------------
 --  Problem1:
 --      Finde alle irreduziblen Polynome über Endlichem Körper, welcher `e`
@@ -184,6 +187,7 @@ problem2c e deg = do
 
 problem3 = print $ length $ elems e5e2pf
 problem3b = print $ length $ elems e5e4pf
+problem3c = print $ length $ elems e99pf
 
 --------------------------------------------------------------------------------
 --  Main
@@ -194,7 +198,8 @@ dispatch =  [ ("1d", \s -> problem1d e4pf (read s :: Int))
             , ("1eRead", const problem1eRead)
             , ("2c", \s -> problem2c e4pf [read s :: Int])
             , ("3", const problem3)
-            , ("3b", const problem3) ]
+            , ("3b", const problem3b)
+            , ("3c", const problem3c) ]
 
 main :: IO ()
 main = do
