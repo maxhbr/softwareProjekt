@@ -56,6 +56,9 @@ main = do
   list  <- rndSelect (getAllP (units undefined ::[F5]) 4) (2*testSize)
   wList <- rndSelect (getAllP (units e4f2) 4)            (2*testSize)
   hspec $ do
+    describe "Projekt.Core.Polynomials Basic" $ 
+      it "P[1] == P[1,0]" $
+        P[1] `shouldBe` P[1,0]
     describe "Projekt.Core.Polynomials @F101 (subset)" $ subroutine list
     describe "Projekt.Core.Polynomials @e2f2 (full)" $
       subroutine (getAllP (units e2f2) 4)

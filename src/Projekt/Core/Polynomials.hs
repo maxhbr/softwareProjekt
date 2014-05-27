@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.Polynomials
@@ -7,7 +8,7 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.Polynomials
-  ( Polynom (..)
+  ( Polynom (..), pms
   , toPMS, toListP, nullP
   , fromMonomialsP
   -- getter
@@ -41,15 +42,21 @@ import Projekt.Core.ShowTex
 -- dargestellt werden. In der ersten Stelle steht der Grad, in der zweiten der
 -- Koeffizient.
 data Polynom a = P {unP :: ![a]}
-                | PM { unPM :: ![(Int,a)] } 
-                | PMS { unPMS :: ![(Int,a)], clean :: !Bool} deriving ()
+               | PM { unPM :: ![(Int,a)] }
+               | PMS { unPMS :: ![(Int,a)], clean :: !Bool} deriving ()
+
+#if 1
+pms ms = PMS (toPMS' ms) True -- mit sortieren
+#else
+pms ms = PMS ms False -- nicht sortieren
+#endif
 
 toPMS :: (Num a, Eq a) => Polynom a -> Polynom a
-toPMS f@(P ms)   = PMS (fromList $ zip [0..] ms) True
+toPMS f@(P ms)       = PMS (fromList $ zip [0..] ms) True
   where fromList [] = []
         fromList ((i,0):ms) = fromList ms
         fromList ((i,m):ms) = fromList ms ++ [(i,m)]
-toPMS (PM ms)   = PMS (toPMS' ms) True
+toPMS (PM ms)        = PMS (toPMS' ms) True
 toPMS f@(PMS _ True) = f
 toPMS (PMS ms False) = PMS (toPMS' ms) True
 
@@ -63,9 +70,8 @@ toListP f@(P ms)   = f
 toMonsP :: (Eq a, Num a) => Polynom a -> Polynom a
 toMonsP (P ms) = PM $ toMonsP' ms 0
   where toMonsP' [] n   = []
-        toMonsP' (m:ms) n 
-            | m == 0     = toMonsP' ms (n+1)
-            | otherwise = (n,m) : toMonsP' ms (n+1)
+        toMonsP' (m:ms) n | m == 0     = toMonsP' ms (n+1)
+                          | otherwise = (n,m) : toMonsP' ms (n+1)
 
 
 instance (Eq a, Num a) => Eq (Polynom a) where
@@ -180,7 +186,7 @@ addP (f:fs) (g:gs)  = f+g : addP fs gs
 addPM :: (Eq a,Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 addPM [] gs          = gs
 addPM fs []          = fs
-addPM ff@((i,f):fs) gg@((j,g):gs) 
+addPM ff@((i,f):fs) gg@((j,g):gs)
   | i==j && c/=0  = (i,f+g) : addPM fs gs
   | i==j && c==0  = addPM fs gs
   | i<j         = (j,g) : addPM ff gs
@@ -238,7 +244,7 @@ multPM :: (Show a, Eq a, Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 multPM  ms  []     = []
 multPM  []  ns     = []
 multPM  ((i,m):ms) ns  = addPM (multPM' i m ns) (multPM ms ns)
-  
+
 {-# INLINE multPM' #-}
 multPM' i m []                     = []
 multPM' i m ((j,n):ns) | c == 0     = multPM' i m ns
@@ -361,7 +367,7 @@ divPOld a b | a == 0       = (P [], P [])
 
 -- |divP mit Horner Schema
 --  siehe http://en.wikipedia.org/wiki/Synthetic_division
-divP :: (Show a, Eq a, Fractional a) => 
+divP :: (Show a, Eq a, Fractional a) =>
                               Polynom a -> Polynom a -> (Polynom a,Polynom a)
 divP a@(P _) b@(P _) = divPAgged (aggP a) (aggP b)
 divP a b           = divPAgged a b
@@ -380,11 +386,11 @@ divPAgged a@(P _) b@(P _)
     | nullP a        = (P[],P[])
     | degDiff <= 0    = (P[],a)
     | otherwise      = --trace ("horner a="++show a++"\tb="++show b++"\tdegDiff="++show degDiff++"\t=>horn="++show horn
-        -- ++"\n\t=> return "++ show (P $ reverse $ take degDiff horn, P $ reverse $ drop degDiff horn)) 
+        -- ++"\n\t=> return "++ show (P $ reverse $ take degDiff horn, P $ reverse $ drop degDiff horn))
             (P $ reverse $ take degDiff horn, P $ reverse $ drop degDiff horn)
   where horn = divPHorner' bs as lc
         degDiff   = uDegP a - uDegP b + 1
-        bs = tail $ reverse $ unP $ negate b 
+        bs = tail $ reverse $ unP $ negate b
         as = reverse $ unP a
         lc = getLcP b
 divPAgged a@(PMS as True) b@(PMS bs True)
@@ -401,11 +407,11 @@ divPAgged a@(PMS as True) b@(PMS bs True)
         toP (a,b)  = (PMS a True, PMS b True)
 divPAgged a b = divPAgged (toPMS a) (toPMS b)
 
-divPHorner' divs ff@(f:fs) lc 
-  | length fs < length divs = --trace ("horner end: ff="++show ff) 
+divPHorner' divs ff@(f:fs) lc
+  | length fs < length divs = --trace ("horner end: ff="++show ff)
                               ff
   | otherwise               = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++
-      --" ff="++show ff++"=> "++show (f/lc)) $ 
+      --" ff="++show ff++"=> "++show (f/lc)) $
       fbar : divPHorner' divs hs lc
   where fbar = f/lc
         hs = zipWith (+) fs $ map (fbar*) divs ++ cycle [0]
@@ -415,8 +421,8 @@ divPHorner' divs ff@(f:fs) lc
 divPHornerM' _  [] _ _ = []
 divPHornerM' divs ff@((i,f):fs) lc n
   | n > fst (head ff)  = ff
-  | otherwise            = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++ 
-      --" ff="++show ff++"\n-> i="++show i++" n="++show n++" => (i,fbar)="++show (i,fbar)++" hs="++show hs) $ 
+  | otherwise            = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++
+      --" ff="++show ff++"\n-> i="++show i++" n="++show n++" => (i,fbar)="++show (i,fbar)++" hs="++show hs) $
         (i,fbar) : divPHornerM' divs hs lc n
   where fbar = f/lc
         hs   = addPM fs $ map ( (+) (i-n) A.*** (*) fbar) divs
