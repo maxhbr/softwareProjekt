@@ -72,6 +72,7 @@ findTrivialsNs :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a]
 findTrivialsNs ps = [toFact f | f <- ps, not (hasNs f es) || uDegP f < 2]
   where es = elems $ getReprP $ head ps
 
+
 --------------------------------------------------------------------------------
 --  Einfache / offensichtliche Faktorisierungen
 

@@ -7,7 +7,6 @@ mkdir -p ${DIR}out/Profiling
 ghc \
   -outputdir ${DIR}out/Profiling \
   -o ${DIR}out/Profiling/AlgProfiling \
-  -fforce-recomp \
   -prof \
   -fprof-auto -rtsopts \
   -O2 \

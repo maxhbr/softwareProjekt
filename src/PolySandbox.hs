@@ -26,7 +26,8 @@ exmpPolyMod = aggP $ P[5::F101,0,0,04::F101,2::F101,5::F101]
 exmpPolyMod' = aggP $ P[5::F101,4::F101,0,0,0,0,0,2::F101,5::F101]
 
 --------------------------------------------------------------------------------
-exmpPolyMod3  = fromMonomialsP [(0,2::F3), (3,1::F3), (9,1::F3)]
+exmpPolyMod3  = toPMS $ PM [(0,2::F3), (3,1::F3), (9,1::F3)]
+exmpPolyMod3'  = toPMS $ PM [(0,2::F3), (3,1::F3)]
 
 exmpPolyMod5  = P [4::F5, 1, 0, 0, 4, 1]
 
@@ -50,13 +51,16 @@ subroutine e3f3 = do
     pMapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
           zip (take testSize e3f3) (drop testSize e3f3)
 
+l = getAllMonicPs (elems (1::F3)) [10]
+l' = reverse l
 main :: IO ()
-main = do
-  list  <- rndSelect (getAllP (units undefined ::[F5]) 4) (2*testSize)
-  wList <- rndSelect (getAllP (units e4f2) 4)            (2*testSize)
-  hspec $ do
-    describe "Projekt.Core.Polynomials @F101 (subset)" $ subroutine list
-    describe "Projekt.Core.Polynomials @e2f2 (full)" $
-      subroutine (getAllP (units e2f2) 4)
-    --describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList
-    describe "Projekt.Core.Polynomials @e4f2 (subset)" $ subroutine wList
+{-main = do-}
+  {-list  <- rndSelect (getAllP (units undefined ::[F5]) 4) (2*testSize)-}
+  {-wList <- rndSelect (getAllP (units e4f2) 4)            (2*testSize)-}
+  {-hspec $ do-}
+    {-describe "Projekt.Core.Polynomials @F101 (subset)" $ subroutine list-}
+    {-describe "Projekt.Core.Polynomials @e2f2 (full)" $-}
+      {-subroutine (getAllP (units e2f2) 4)-}
+    {---describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList-}
+    {-describe "Projekt.Core.Polynomials @e4f2 (subset)" $ subroutine wList-}
+main = print $ filter (\x->not x) $ map (\(f,g) -> (divP f g) == (divP (toPMS f) (toPMS g)))  $ zip l l'
