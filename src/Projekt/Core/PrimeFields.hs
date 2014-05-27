@@ -173,7 +173,7 @@ genPrimeField i pf = do
 data MName; \
 instance Numeral MName where {numValue x = MValue} ;\
 instance Show MName where {show = show} ;\
-type PFName = Mod MName ;\
+type PFName = Mod MName
 
 PFInstance(Numeral2,2,F2)
 PFInstance(Numeral3,3,F3)
