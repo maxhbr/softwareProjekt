@@ -15,7 +15,6 @@ module Projekt.Core.Factorization
   , findTrivialsNs
   )where
 import Data.List
-
 import Control.Parallel
 import Control.Parallel.Strategies
 

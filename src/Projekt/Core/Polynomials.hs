@@ -29,11 +29,10 @@ import qualified Control.Arrow as A
 import Data.Maybe
 import Data.Binary
 import Data.Ord
-import Data.Tuple.Helpers
-
-import Projekt.Core.ShowTex
 
 import Debug.Trace
+
+import Projekt.Core.ShowTex
 
 --------------------------------------------------------------------------------
 --  Data Definition
@@ -49,7 +48,7 @@ toPMS :: (Num a, Eq a) => Polynom a -> Polynom a
 toPMS f@(P ms)   = PMS (fromList $ zip [0..] ms) True
   where fromList [] = []
         fromList ((i,0):ms) = fromList ms
-        fromList ((i,m):ms) = (fromList ms) ++ [(i,m)]
+        fromList ((i,m):ms) = fromList ms ++ [(i,m)]
 toPMS (PM ms)   = PMS (toPMS' ms) True
 toPMS f@(PMS _ True) = f
 toPMS (PMS ms False) = PMS (toPMS' ms) True
@@ -66,7 +65,7 @@ toMonsP (P ms) = PM $ toMonsP' ms 0
   where toMonsP' [] n   = []
         toMonsP' (m:ms) n 
             | m == 0     = toMonsP' ms (n+1)
-            | otherwise = (n,m) : (toMonsP' ms (n+1))
+            | otherwise = (n,m) : toMonsP' ms (n+1)
 
 
 instance (Eq a, Num a) => Eq (Polynom a) where
@@ -167,8 +166,8 @@ instance (Num a, Eq a) => Num (Polynom a) where
   abs _             = error "Prelude.Num.abs: inappropriate abstraction"
   signum _          = error "Prelude.Num.signum: inappropriate abstraction"
   negate (P ms)     = P   (map negate ms)
-  negate (PM ms)    = PM  (mapSnd negate ms)
-  negate (PMS ms b) = PMS (mapSnd negate ms) b
+  negate (PM ms)    = PM  ((map . A.second) negate ms)
+  negate (PMS ms b) = PMS ((map . A.second) negate ms) b
 
 {-# INLINE addP #-}
 addP [] gs          = gs
@@ -343,7 +342,7 @@ deriveP' ((i,m):ms) | j<0       = deriveP' ms
                     | c==0       = deriveP' ms
                     | otherwise = (j,c) : deriveP' ms
   where j=i-1
-        c=m*(fromInteger $ fromIntegral i)
+        c=m*fromInteger (fromIntegral i)
 
 
 
@@ -391,11 +390,10 @@ divPAgged a@(P _) b@(P _)
 divPAgged a@(PMS as True) b@(PMS bs True)
     | nullP a        = (PMS [] True,PMS [] True)
     | degDiff <= 0    = (PMS [] True,a)
-    | otherwise      = --trace ("horner a="++show a++"\tb="++show b++"\tdegDiff="++show degDiff++"\t=>horn="++show horn++" splitPoint="++show splitPoint)
-        toP $ onFst (mapFst (\i -> i-degB)) $ splitAt splitPoint horn
+    | otherwise      = toP $ A.first (map (A.first (\i -> i-degB))) $ splitAt splitPoint horn
   where horn       = divPHornerM' bs as lc degB
         degDiff    = uDegP a - uDegP b + 1
-        bs         = tail $ unPMS $ negate $ b
+        bs         = tail $ unPMS $ negate b
         as         = unPMS a
         lc         = getLcP b
         degB       = uDegP b
@@ -416,13 +414,13 @@ divPHorner' divs ff@(f:fs) lc
 -- |Horner für absteigend sortierte [(Int,a)] Paare
 divPHornerM' _  [] _ _ = []
 divPHornerM' divs ff@((i,f):fs) lc n
-  | n > (fst $ head ff)  = ff
+  | n > fst (head ff)  = ff
   | otherwise            = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++ 
       --" ff="++show ff++"\n-> i="++show i++" n="++show n++" => (i,fbar)="++show (i,fbar)++" hs="++show hs) $ 
-        (i,fbar) : (divPHornerM' divs hs lc n)
+        (i,fbar) : divPHornerM' divs hs lc n
   where fbar = f/lc
-        hs   = addPM fs $ map (\(j,m) -> (i-n+j,fbar*m)) divs
-
+        hs   = addPM fs $ map ( (+) (i-n) A.*** (*) fbar) divs
+                             -- \(j,m) -> (i-n+j,fbar*m)
 
 {-# INLINE divP' #-}
 divP' :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a

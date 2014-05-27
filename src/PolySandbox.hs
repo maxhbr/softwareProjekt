@@ -37,30 +37,30 @@ testSize = 10
 unDivP (q,r) a b = a == q * b + r
 unEekP (d,s,t) a b = d == s*a + t*b
 
-subroutine e3f3 = do
+subroutine list = do
   it "test * (x*1=x)" $
-    pMapM_ (\ x -> x * P[1] `shouldBe` x) e3f3
+    pMapM_ (\ x -> x * P[1] `shouldBe` x) list
   it "test divP (x/x=1)" $
-    pMapM_ (\ x -> divP x x `shouldBe` (P[1], P[])) e3f3
+    pMapM_ (\ x -> divP x x `shouldBe` (P[1], P[])) list
   it "test divP generally" $
     pMapM_ (\ (x,y) -> unDivP (divP x y) x y `shouldBe` True) $
-          zip (take testSize e3f3) (drop testSize e3f3)
+          zip (take testSize list) (drop testSize list)
   it "x/0 throws exception" $
-    pMapM_ (\x -> evaluate (divP x (P[])) `shouldThrow` anyException) e3f3
+    pMapM_ (\x -> evaluate (divP x (P[])) `shouldThrow` anyException) list
   it "test eekP" $
     pMapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
-          zip (take testSize e3f3) (drop testSize e3f3)
+          zip (take testSize list) (drop testSize list)
 
 l = getAllMonicPs (elems (1::F3)) [10]
 l' = reverse l
 main :: IO ()
-{-main = do-}
-  {-list  <- rndSelect (getAllP (units undefined ::[F5]) 4) (2*testSize)-}
-  {-wList <- rndSelect (getAllP (units e4f2) 4)            (2*testSize)-}
-  {-hspec $ do-}
-    {-describe "Projekt.Core.Polynomials @F101 (subset)" $ subroutine list-}
-    {-describe "Projekt.Core.Polynomials @e2f2 (full)" $-}
-      {-subroutine (getAllP (units e2f2) 4)-}
-    {---describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList-}
-    {-describe "Projekt.Core.Polynomials @e4f2 (subset)" $ subroutine wList-}
-main = print $ filter (\x->not x) $ map (\(f,g) -> (divP f g) == (divP (toPMS f) (toPMS g)))  $ zip l l'
+main = do
+  list  <- rndSelect (getAllP (units undefined ::[F5]) 4) (2*testSize)
+  wList <- rndSelect (getAllP (units e4f2) 4)            (2*testSize)
+  hspec $ do
+    describe "Projekt.Core.Polynomials @F101 (subset)" $ subroutine list
+    describe "Projekt.Core.Polynomials @e2f2 (full)" $
+      subroutine (getAllP (units e2f2) 4)
+    --describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList
+    describe "Projekt.Core.Polynomials @e4f2 (subset)" $ subroutine wList
+{-main = print $ filter (\x->not x) $ map (\(f,g) -> (divP f g) == (divP (toPMS f) (toPMS g)))  $ zip l l'-}

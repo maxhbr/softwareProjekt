@@ -138,7 +138,6 @@ instance (Num a, Binary a) => Binary (FFElem a) where
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
 
-
 {-# INLINE charOfP #-}
 -- |Gibt die Charakteristik der Koeffizienten eines Polynoms
 charOfP :: (Eq a, FiniteField a, Num a) => Polynom a -> Int
