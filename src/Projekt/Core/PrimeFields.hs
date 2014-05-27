@@ -95,9 +95,12 @@ instance (Numeral n) => Num (Mod n) where
   negate      = MkMod . negate . unMod
 
 {-# INLINE add #-}
-add x y  | z <= 10000 = MkMod z
-         | otherwise = MkMod $ z `rem` modulus x
-  where z = (unMod x) + (unMod y)
+add x y = MkMod $ unMod x + unMod y `rem` modulus x
+{-
+add x y | z <= 10000 = MkMod z
+        | otherwise = MkMod $ z `rem` modulus x
+  where z = unMod x + unMod y
+ -}
 
 {-# INLINE mult #-}
 mult x y = MkMod $ (unMod x * unMod y) `mod` modulus x 
@@ -145,8 +148,8 @@ instance (Numeral a) => Binary (Mod a) where
 
 --------------------------------------------------------------------------------
 --  Erzeugen von prim Körpern
-ppQ x = putStrLn =<< runQ ((show . ppr) `fmap` x)
 
+-- |Erzeugen von Primkörpern durch TemplateHaskell
 genPrimeField :: Integer -> String -> Q [Dec]
 genPrimeField i pf = do
   d <- dataD (cxt []) (mkName m) [] [] []
@@ -160,10 +163,12 @@ genPrimeField i pf = do
     [funD (mkName "show") 
       [clause [] ( normalB $ appsE [varE (mkName "show")] ) [] ] ]
   t <- tySynD (mkName pf) []
-    (appT (conT ''Mod) (conT $ mkName m)) -- TODO
+    (appT (conT ''Mod) (conT $ mkName m))
   return [d,i1,i2,t]
     where m ='M' : show i
+{-ppQ x = putStrLn =<< runQ ((show . ppr) `fmap` x)-}
 
+-- Erzeugen von Primkörpern mittels CPP Compiler Befehlen
 #define PFInstance(MName,MValue,PFName) \
 data MName; \
 instance Numeral MName where {numValue x = MValue} ;\
