@@ -102,8 +102,7 @@ instance (Show a, Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFEl
   one                         = FFKonst one
   elems                       = elems'
   {-# INLINE charakteristik #-}
-  charakteristik (FFElem (P []) m) = charakteristik $ getReprP m
-  charakteristik (FFElem f _) = charakteristik $ getReprP f
+  charakteristik (FFElem _ m) = charakteristik $ getReprP m
   charakteristik (FFKonst x)  = charakteristik x
   elemCount (FFKonst _)       = error "Insufficient information in FFKonst"
   elemCount (FFElem _ m)      = elemCount (getReprP m) ^ uDegP m
@@ -116,14 +115,13 @@ instance (Show a, Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFEl
 -- enthält deswegen zu wenig Information, über den Körper in dem es lebt.
 elems' :: (Show a, Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
 elems' (FFKonst x)  = error "Insufficient information in FFKonst"
-elems' elm@(FFElem f p) = --trace ("elems for "++show elm++"\tf="++show f++"\tp="++show p++" \t=> e="++show e)
-      (map (`FFElem` p) (P[] : getAllP (elems e) (uDegP p -1)))
+elems' elm@(FFElem f p) = map (`FFElem` p) (P[] : getAllP (elems e) (uDegP p -1))
   where e = getReprP p
 
 {-# INLINE getReprP' #-}
-getReprP' (P [])             = error "Insufficient information in empty Polynomial"
-getReprP' (P (FFKonst _:ms)) = getReprP $ P ms
-getReprP' (P (FFElem f p : ms))         = FFElem 0 p
+getReprP' (P [])                = error "Insufficient information in this Polynomial"
+getReprP' (P (FFKonst _:ms))    = getReprP' $ P ms
+getReprP' (P (FFElem f p : ms)) = FFElem 0 p
 
 instance (Num a, Binary a) => Binary (FFElem a) where
   put (FFKonst f)  = do put (0 :: Word8)
@@ -140,11 +138,9 @@ instance (Num a, Binary a) => Binary (FFElem a) where
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern
 
-  
+
 {-# INLINE charOfP #-}
 -- |Gibt die Charakteristik der Koeffizienten eines Polynoms
--- TODO: Product sollte nicht nötig sein!
---       Möglicherweise mit Backtracking
 charOfP :: (Eq a, FiniteField a, Num a) => Polynom a -> Int
 charOfP f = charakteristik $ getReprP f
 

@@ -385,7 +385,7 @@ divPAgged a@(P _) b@(P _)
             (P $ reverse $ take degDiff horn, P $ reverse $ drop degDiff horn)
   where horn = divPHorner' bs as lc
         degDiff   = uDegP a - uDegP b + 1
-        bs = tail $ reverse $ unP $ negate $ b 
+        bs = tail $ reverse $ unP $ negate b 
         as = reverse $ unP a
         lc = getLcP b
 divPAgged a@(PMS as True) b@(PMS bs True)
@@ -408,9 +408,9 @@ divPHorner' divs ff@(f:fs) lc
                               ff
   | otherwise               = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++
       --" ff="++show ff++"=> "++show (f/lc)) $ 
-      fbar : (divPHorner' divs hs lc)
+      fbar : divPHorner' divs hs lc
   where fbar = f/lc
-        hs = zipWith (+) fs $ (map (fbar*) divs) ++ cycle [0]
+        hs = zipWith (+) fs $ map (fbar*) divs ++ cycle [0]
 
 {-# INLINE divPHornerM' #-}
 -- |Horner für absteigend sortierte [(Int,a)] Paare
@@ -467,10 +467,10 @@ ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 {-evalP' x (m:ms) acc = evalP' x ms $ acc*x+m-}
 evalP x f = evalP' x (unP f)
 evalP' x []     = 0
-evalP' x (f:fs) = f + x * (evalP' x fs)
+evalP' x (f:fs) = f + x * evalP' x fs
 
 evalP'' x []     = 0
-evalP'' x ff@(f:fs) = trace ("x="++show x++" in ff="++show ff) (f + x * (evalP'' x fs))
+evalP'' x ff@(f:fs) = trace ("x="++show x++" in ff="++show ff) (f + x * evalP'' x fs)
 
 hasNs :: (Eq a, Fractional a) => Polynom a -> [a] -> Bool
 hasNs f es = not (null [f | e <- es, evalP e f == 0])
@@ -502,5 +502,4 @@ getAllMonicPs es is = map P $ concat [allMonics i | i <- is]
         ess i       | i == 0     = [[y] | y <- es]
                     | otherwise = [y:ys | y <- es, ys <- ess (i-1) ]
         one         = head [e | e <- es, e == 1]
-        {-one         = onefy $ head [e | e <- es, e /= 0]-}
-        {-onefy x     = x/x-}
+        {-one         = (\ x -> x / x) $ head [e | e <- es, e /= 0]-}
