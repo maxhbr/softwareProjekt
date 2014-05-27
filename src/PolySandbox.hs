@@ -51,8 +51,6 @@ subroutine list = do
     pMapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
           zip (take testSize list) (drop testSize list)
 
-l = getAllMonicPs (elems (1::F3)) [10]
-l' = reverse l
 main :: IO ()
 main = do
   list  <- rndSelect (getAllP (units undefined ::[F5]) 4) (2*testSize)
@@ -63,4 +61,10 @@ main = do
       subroutine (getAllP (units e2f2) 4)
     --describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList
     describe "Projekt.Core.Polynomials @e4f2 (subset)" $ subroutine wList
-{-main = print $ filter (\x->not x) $ map (\(f,g) -> (divP f g) == (divP (toPMS f) (toPMS g)))  $ zip l l'-}
+    describe "test (Was macht der?)" $
+      it "test is done" $
+        test `shouldBe` []
+
+test = filter not $ map (\(f,g) -> divP f g == divP (toPMS f) (toPMS g))  $ zip l l'
+  where l = getAllMonicPs (elems (1::F3)) [10]
+        l' = reverse l
