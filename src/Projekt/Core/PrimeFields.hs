@@ -56,7 +56,11 @@ class Numeral a where
 {-# RULES "unMod/MkMod"   forall x. unMod (MkMod x) = x #-}
 {-# RULES "MkMod.unMod"   MkMod . unMod = id #-}
 {-# RULES "unMod.MkMod"   unMod . MkMod = id #-}
-newtype Mod n = MkMod { unMod :: Int }
+newtype Mod n = MkMod Int
+
+{-# INLINE unMod #-}
+unMod :: Mod n -> Int
+unMod (MkMod k) = k
 
 instance (Numeral n, Show n) => Show (Mod n) where
   show x = "\x1B[33m" ++ show (getRepr x) ++ "\x1B[39m" ++ showModulus x
@@ -79,14 +83,18 @@ instance (Numeral n, Show n) => Show (Mod n) where
 instance (Numeral n, Show n) => ShowTex (Mod n) where
   showTex x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
 
+{-# INLINE getRepr #-}
 getRepr :: (Numeral n) => Mod n -> Int
 getRepr x = unMod x `mod` modulus x
 
 instance (Numeral n) => Eq (Mod n) where
-  x == y = (unMod x - unMod y) `mod` modulus x == 0
+  {-# INLINE (==) #-}
+  x == y = (unMod x - unMod y) `rem` modulus x == 0
 
 instance (Numeral n) => Num (Mod n) where
+  {-# INLINE (+) #-} 
   x + y       = add x y 
+  {-# INLINE (*) #-} 
   x * y       = mult x y 
   fromInteger = MkMod . fromIntegral
   abs x       = x --error "Prelude.Num.abs: inappropriate abstraction"
@@ -103,7 +111,7 @@ add x y | z <= 10000 = MkMod z
  -}
 
 {-# INLINE mult #-}
-mult x y = MkMod $ (unMod x * unMod y) `mod` modulus x 
+mult x y = MkMod $ (unMod x * unMod y) `rem` modulus x 
 
 instance (Numeral n) => FiniteField (Mod n) where
   zero                = MkMod 0
@@ -113,6 +121,7 @@ instance (Numeral n) => FiniteField (Mod n) where
   elemCount           = modulus
   getReprP f          = 0 * (snd $ head $ p2Tup f)
 
+{-# INLINE modulus #-}
 modulus :: Numeral a => Mod a -> Int
 modulus x = numValue $ modulus' x
   where modulus' :: Numeral a => Mod a -> a

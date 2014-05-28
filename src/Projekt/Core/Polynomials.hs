@@ -286,7 +286,6 @@ divPHorner a@(PMS as True) b@(PMS bs True)
         toP (a,b)  = (PMS a True, PMS b True)
 divPHorner a b = divPHorner (cleanP a) (cleanP b)
 
-{-# INLINE divPHornerM' #-}
 -- |Horner für absteigend sortierte [(Int,a)] Paare
 divPHornerM' _  [] _ _ = []
 divPHornerM' divs ff@((i,f):fs) lc n
@@ -296,7 +295,6 @@ divPHornerM' divs ff@((i,f):fs) lc n
         (i,fbar) : divPHornerM' divs hs lc n
   where fbar = f/lc
         hs   = addPM fs $ map ( (+) (i-n) A.*** (*) fbar) divs
-                             -- \(j,m) -> (i-n+j,fbar*m)
 
 {-# INLINE divP' #-}
 divP' :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a

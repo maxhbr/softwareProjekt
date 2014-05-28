@@ -8,20 +8,22 @@
 
 module Projekt.Algorithmen.Rabin (
   rabin
+  , findIrredsRabin
 )	where
 
 import Projekt.Core
 import Debug.Trace
 
--- |Primfaktorzerlegung 
---  aus http://www.haskell.org/haskellwiki/99_questions/Solutions/35
-factor :: Integral a => a -> [a]
-factor 1 = []
-factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ fromIntegral n]
-           in let prime = if null divisors then n else head divisors
-              in (prime :) $ factor $ div n prime
 
-
+-- |Filtert mittels Rabin aus einer Liste irreduziblen Polynome heraus
+findIrredsRabin :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [Polynom a]
+findIrredsRabin ff@(f:fs) = findIrreds' ff
+  where findIrreds' []     = []
+        findIrreds' (f:fs) 
+          | (not (hasNs f es)|| uDegP f < 2) && fR = f : findIrreds' fs
+          | otherwise                              = findIrreds' fs
+          where fR = rabin f
+                es = elems $ getReprP f
 
 -- |Rabin's Irreduzibilitätstest
 --  Ausgabe: True, falls f irreduzibel, False, falls f reduzibel
@@ -47,20 +49,21 @@ factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ from
 --      finite_fields#Irreducible_polynomials
 rabin :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> Bool
 rabin f = --trace ("rabin with f="++show f++" d="++show d++" q="++show q++" ns="++show ns) $
-    rabin' f d q ns
+    rabin' f ns 0 pX
   where ns = map (\p -> d `quot` p) $ factor d
         d  = uDegP f
         q  = elemCount $ getReprP f
-        rabin' f d q []                 = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $ 
+        pX = pTupUnsave [(1,1)]
+        rabin' f [] m h                = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $ 
                                           isNullP g
-          where g = h `modByP` f
-                h =  pTupUnsave [(q^d,1),(1,-1)]
-        rabin' f d q (n:ns) | g /= pKonst 1  = --trace ("rabin' n="++show n++" g="++show g) 
+          where g = h' `modByP` f
+                h' = h^(q^(d-m)) - pX
+        rabin' f (n:ns) m h | g /= pKonst 1  = --trace ("rabin' n="++show n++" g="++show g) 
                                           False
                             | otherwise = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $
-                                          rabin' f d q ns
-          where g = (ggTP f $ h `modByP` f)
-                h = pTupUnsave [(q^n,1),(1,-1)] 
+                                          rabin' f ns n h'
+          where g  = (ggTP f $ (h' `modByP` f)- pX)
+                h' = h^(q^(n-m))
 
 
 {-rabin :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> Bool-}
@@ -69,3 +72,13 @@ rabin f = --trace ("rabin with f="++show f++" d="++show d++" q="++show q++" ns="
   {-where d  = uDegP f -}
         {-q  = elemCount $ getReprP f-}
         {-rab p = (ggTP f $ fromMonomialsP [(q^(d `quot` p),1),(1,-1)]) `modByP` f /= 1-}
+
+
+-- |Primfaktorzerlegung 
+--  aus http://www.haskell.org/haskellwiki/99_questions/Solutions/35
+factor :: Integral a => a -> [a]
+factor 1 = []
+factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ fromIntegral n]
+           in let prime = if null divisors then n else head divisors
+              in (prime :) $ factor $ div n prime
+

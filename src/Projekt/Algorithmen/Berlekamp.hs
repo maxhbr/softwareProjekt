@@ -56,7 +56,6 @@ findIrreds (f:fs) = findIrreds' (f:fs)
                 fB   = appBerlekamp fSff
         es = elems $ getReprP f
 
-{-findIrreds ps = parMap rpar unFact $ findTrivialsB ps-}
 
 -- |Gibt alle Faktorisierungen zurück, welche nach Berlekamp noch trivial sind
 -- Wendet zuvor (die offensichtliche Faktorisierung und) SFF an
