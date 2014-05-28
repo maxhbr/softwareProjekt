@@ -52,15 +52,15 @@ rabin f = --trace ("rabin with f="++show f++" d="++show d++" q="++show q++" ns="
         d  = uDegP f
         q  = elemCount $ getReprP f
         rabin' f d q []                 = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $ 
-                                          nullP g
+                                          isNullP g
           where g = h `modByP` f
-                h = fromMonomialsP [(q^d,1),(1,-1)]
-        rabin' f d q (n:ns) | g /= P[1]  = --trace ("rabin' n="++show n++" g="++show g) 
+                h =  pTupUnsave [(q^d,1),(1,-1)]
+        rabin' f d q (n:ns) | g /= pKonst 1  = --trace ("rabin' n="++show n++" g="++show g) 
                                           False
                             | otherwise = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $
                                           rabin' f d q ns
           where g = (ggTP f $ h `modByP` f)
-                h = fromMonomialsP [(q^n,1),(1,-1)] 
+                h = pTupUnsave [(q^n,1),(1,-1)] 
 
 
 {-rabin :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> Bool-}

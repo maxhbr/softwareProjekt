@@ -22,6 +22,7 @@ import Control.Arrow as A
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 
+import Debug.Trace
 --------------------------------------------------------------------------------
 -- Eine Faktoriesierung wird dargestellt als Liste von Paaren (Int, Polynom a)
 -- wobei ein Paar (i,f) den Faktor f^i repräsentiert.
@@ -46,10 +47,13 @@ potFact n ((i,f):ts) = (i*n,f) : potFact n ts
 
 -- |Nimmt eine Faktoriesierung und wendet auf diese einen gegebenen
 -- Faktoriesierungsalgorithmus an
-appFact :: (Num a) =>
+appFact :: (Eq a, Num a) =>
   (Polynom a -> [(Int,Polynom a)]) -> [(Int,Polynom a)] -> [(Int,Polynom a)]
 appFact alg = withStrategy (parList rpar) . concatMap
-  (\(i,f) -> potFact i (alg f))
+  (\(i,f) -> appFact' i f)
+  where appFact' i f  | isNullP f   = [(i,nullP)]
+                      | uDegP f <= 1 = [(i,f)]
+                      | otherwise   = potFact i (alg f)
 
 -- |Fasst in einer Faktoriesierung gleiche Funktionen Zusammen
 aggFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
@@ -77,23 +81,22 @@ findTrivialsNs ps = [toFact f | f <- ps, not (hasNs f es) || uDegP f < 2]
 --------------------------------------------------------------------------------
 --  Einfache / offensichtliche Faktorisierungen
 
-obviousFactor :: (Num a, Eq a) => Polynom a -> [(Int,Polynom a)]
+obviousFactor :: (Show a, Num a, Eq a) => Polynom a -> [(Int,Polynom a)]
 obviousFactor f | isNullP f     = [(1,nullP)]
-                | isTrivial fs  = [(1,f)]
+                | uDegP f <= 1   = [(1,f)]
                 | hasNoKonst fs = factorX
                 | otherwise     = toFact f
   where fs = p2Tup f
-        -- Teste, ob das Polynom entweder konstant oder ein linear ist
-        isTrivial [(0,_)] = True
-        isTrivial [(1,_),(0,_)] = True
-        isTrivial _  = False
         -- Teste, ob ein konstanter Term vorhanden ist
         hasNoKonst ms | (fst $ last ms) == 0  = False
                       | otherwise          = True
         -- Hier kann man d mal X ausklammern
-        factorX  = [(d,pTupUnsave [(d,1)] ), (1,g)]
+        factorX | g == 1     = [(d,pTupUnsave [(1,1)])]
+                | otherwise = [(d,pTupUnsave [(1,1)]), (1,g)]
           where d = fst $ last fs
-                g = pTupUnsave $ map (A.first ((-) d)) fs
+                g = --trace ("ob f="++show f++" -> d="++show d++" fs="++show fs
+                    -- ++" mapped="++show(map (A.first (\x -> x- d)) fs ))$
+                    pTupUnsave $ map (A.first (\x -> x-d)) fs
 
-appObFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appObFact :: (Show a, Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 appObFact = appFact obviousFactor

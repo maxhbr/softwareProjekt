@@ -79,19 +79,23 @@ berlekampBasis f = transposeM $ kernelM $ transposeM $
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n
   where n     = fromJust $ degP f
         q     = elemCount a
-        a     = prodOfCoeffsP f
-        red i = take n (unP (snd (divP (fromMonomialsP [(i*q,1)]) f))
-                              ++ [0*a | i <- [0..]] )
+        a     = getReprP f
+        red i = takeFill 0 n $ p2List $ modByP (pTupUnsave [(i*q,1)]) f
 
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
 berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
                                               => Polynom a -> [(Int,Polynom a)]
-berlekampFactor (P[]) = [(1,P[])]
-berlekampFactor (P[m]) = [(1,P[m])]
-berlekampFactor (P[m0,m1]) = [(1,P[m0,m1])]
-berlekampFactor f = berlekampFactor' f m
+berlekampFactor f 
+    | length triv == 1 = triv
+    | length triv == 2 = (head triv) : (doBerlekamp $ snd $ last triv)
+    | otherwise       = error "obviousFactor malefunction"
+  where triv = obviousFactor f
+ 
+doBerlekamp :: (Show a, Fractional a, Num a, FiniteField a)
+                                              => Polynom a -> [(Int,Polynom a)]
+doBerlekamp f = berlekampFactor' f m
   where m = berlekampBasis f
         berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)
                                       => Polynom a -> Matrix a -> [(Int,Polynom a)]
@@ -101,22 +105,22 @@ berlekampFactor f = berlekampFactor' f m
                               berlekampFactor' g n ++ berlekampFactor' g' n'
           where g  = --trace ("list="++show [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
                      --        , x /= 1])$
-                     head [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
+                     head [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
                              , x /= 1]
                 g' = --trace ("f= "++show f) $ 
                      f @/ g
-                h  = P $ getRowM m 2
+                h  = pList $ getRowM m 2
                 n  = newKer m g
                 n' = newKer m g'
                 newKer m g  = fromListsM $ take r m'
                   where (k,l) = boundsM m
                         m'    = toListsM $ echelonM $ fromListsM
-                              [takeFill 0 l $ unP $ modByP (P (getRowM m i)) g
+                              [takeFill 0 l $ p2List $ modByP (pList (getRowM m i)) g
                                    | i <- [1..k]]
                         r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
 
-                        takeFill :: Num a => a -> Int -> [a] -> [a]
-                        takeFill a n [] = take n $ cycle [a]
-                        takeFill a n (x:xs) = x : takeFill a (n-1) xs
+takeFill :: Num a => a -> Int -> [a] -> [a]
+takeFill a n [] = take n $ cycle [a]
+takeFill a n (x:xs) = x : takeFill a (n-1) xs
 
