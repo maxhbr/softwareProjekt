@@ -8,22 +8,20 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.Polynomials
-  ( Polynom (..), pms
-  , toPMS, toListP, nullP
-  , fromMonomialsP
+  ( Polynom, pList, pTup, pTupUnsave, pKonst, p2Tup, p2List
+  , nullP, isNullP
   -- getter
   , getDegrees, getLcP
   -- Operationen auf Polynomen
-  , aggP, degP, uDegP, prodOfCoeffsP
+  , degP, uDegP
   -- unär
-  , moniP, reziprokP, deriveP
+  , moniP, deriveP
   -- binär
   , divP, (@/), modByP, ggTP, eekP
   -- weiteres
   , evalP, hasNs
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
-  , multPM, addPM, multPM'
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -41,87 +39,89 @@ import Projekt.Core.ShowTex
 -- |Polynome sind Listen von Monomen, welche durch Paare (Integer,a)
 -- dargestellt werden. In der ersten Stelle steht der Grad, in der zweiten der
 -- Koeffizient.
-data Polynom a = P {unP :: ![a]}
-               | PM { unPM :: ![(Int,a)] }
-               | PMS { unPMS :: ![(Int,a)], clean :: !Bool} deriving ()
+data Polynom a = PMS { unPMS :: ![(Int,a)], clean :: !Bool} deriving ()
 
-#if 1
-pms ms = PMS (toPMS' ms) True -- mit sortieren
-#else
-pms ms = PMS ms False -- nicht sortieren
-#endif
+-- |Das Nullpoylnom
+nullP = PMS [] True
 
-toPMS :: (Num a, Eq a) => Polynom a -> Polynom a
-toPMS f@(P ms)       = PMS (fromList $ zip [0..] ms) True
-  where fromList [] = []
-        fromList ((i,0):ms) = fromList ms
-        fromList ((i,m):ms) = fromList ms ++ [(i,m)]
-toPMS (PM ms)        = PMS (toPMS' ms) True
-toPMS f@(PMS _ True) = f
-toPMS (PMS ms False) = PMS (toPMS' ms) True
+-- |Erzeuge ein Polynom aus einer Liste von Koeffizienten
+pList :: (Num a, Eq a) => [a] -> Polynom a
+pList ms = PMS (list2TupleSave ms) True
 
-toPMS' ms = filter (\(_,m) -> m/=0) $ sortBy (flip (comparing fst)) ms
+-- |Erzeugt ein Polynom aus einer Liste von Monomen
+pTup :: (Num a, Eq a) => [(Int,a)] -> Polynom a
+pTup ms = cleanP $ PMS ms False
 
-toListP :: (Num a, Eq a) => Polynom a -> Polynom a
-toListP (PM ms)    = fromMonomialsP ms
-toListP (PMS ms _) = fromMonomialsP ms
-toListP f@(P ms)   = f
+-- |Erzeugt ein Polynom aus einer Liste von Monomen
+--  Unsichere Variante: Es wird angenommen, dass die Monome
+--  in dem Grade nach absteigend sortierter Reihenfolge auftreten!
+pTupUnsave :: [(Int,a)] -> Polynom a
+pTupUnsave ms = PMS ms True
 
-toMonsP :: (Eq a, Num a) => Polynom a -> Polynom a
-toMonsP (P ms) = PM $ toMonsP' ms 0
-  where toMonsP' [] n   = []
-        toMonsP' (m:ms) n | m == 0     = toMonsP' ms (n+1)
-                          | otherwise = (n,m) : toMonsP' ms (n+1)
+-- |Erzeugt ein konstantes Polynom, d.h. ein Polynom von Grad 0
+pKonst :: a -> Polynom a
+pKonst x = PMS [(0,x)] True
+
+p2Tup :: (Num a, Eq a) => Polynom a -> [(Int,a)]
+p2Tup = unPMS . cleanP
+
+p2List :: (Num a, Eq a) => Polynom a -> [a]
+p2List = tuple2List . unPMS . cleanP
+
+-- |Lösche (i,0) Paare und sortiere dem Grade nach absteigend
+cleanP :: (Num a, Eq a) => Polynom a -> Polynom a
+cleanP f@(PMS ms True)  = f
+cleanP   (PMS ms False) = PMS (clean' ms) True
+  where clean' ms = filter (\(_,m) -> m/=0) $ sortBy (flip (comparing fst)) ms
+
+-- |Erzeugt aus einer Liste von Monomen eine Liste von Koeffizienten.
+tuple2List :: (Num a) => [(Int,a)]-> [a]
+tuple2List ms = tuple2List' ms
+  where tuple2List' [] = []
+        tuple2List' ((i,m):ms) = zipSum ([0 | j <- [1..i]] ++ [m]) $ tuple2List' ms
+
+-- |Wandelt eine Liste von Koeffizienten in eine Liste von Monomen.
+--  Diese ist bereits dem Grade nach absteigend sortiert.
+list2TupleSave :: (Eq a, Num a) => [a] -> [(Int,a)]
+list2TupleSave ms = list2Tuple' ms 0
+  where list2Tuple' [] n                 = []
+        list2Tuple' (m:ms) n | m == 0     = list2Tuple' ms (n+1)
+                             | otherwise = (list2Tuple' ms (n+1)) ++ [(n,m)]
 
 
 instance (Eq a, Num a) => Eq (Polynom a) where
   {-f == g = unP (aggP f) == unP (aggP g)-}
   f == g = eqP f g
 
-eqP (P ms) (P ns) = eqP' ms ns
-  where eqP' [] ns = nullP' ns
-        eqP' ms [] = nullP' ms
-        eqP' (m:ms) (n:ns) = m==n && eqP' ms ns
-eqP (PM ms) (PM ns) = eqP' ms ns
-  where eqP' [] ns = nullPM' ns
-        eqP' ms [] = nullPM' ms
+eqP :: (Eq a, Num a) => Polynom a -> Polynom a -> Bool
+eqP (PMS ms True) (PMS ns True)  = eqP' ms ns 
+  where eqP' [] ns = isNullP' ns
+        eqP' ms [] = isNullP' ms
         eqP' ((i,m):ms) ((j,n):ns) =  i==j && m==n && eqP' ms ns
-eqP (PMS ms _) (PMS ns _)  = eqP (PM ms) (PM ns)
-eqP f g  = eqP (toPMS f) (toPMS g)
+eqP f g  = eqP (cleanP f) (cleanP g)
 
-nullP (P ms)     = nullP' ms
-nullP (PM ms)    = nullPM' ms
-nullP (PMS ms _) = nullPM' ms
-nullP' []     = True
-nullP' (m:ms) | m /= 0     = False
-              | otherwise = nullP' ms
-nullPM' []     = True
-nullPM' ((i,m):ms) | m /= 0     = False
-                   | otherwise = nullPM' ms
+isNullP (PMS ms _) = isNullP' ms
+isNullP' []     = True
+isNullP' ((i,m):ms) | m /= 0     = False
+                  | otherwise = isNullP' ms
 
 
 if' :: Bool -> a -> a -> a
 if' True  x _ = x
 if' False _ y = y
 
--- |Polonoe aus einer Liste von Monomen (dargestellt als Tuppel) erzeugen.
-fromMonomialsP :: (Num a, Eq a) => [(Int,a)] -> Polynom a
-fromMonomialsP []         = P[]
-fromMonomialsP ((i,m):ms) = P ([0 | j <- [1..i]] ++ [m]) + fromMonomialsP ms
-
 
 instance (Show a, Eq a, Num a) => Show (Polynom a) where
-  show f@(PM ms) = show $ toListP f
-  show f@(PMS ms _) = show $ toListP f
-  show (P []) = "0"
-  show (P ms) = intercalate "+" $
-                (\ss -> [s | s <- reverse ss , s /= ""]) $
-                zipWith (curry show') ms [0..]
-    where show' :: (Show a, Eq a, Num a) => (a,Int) -> String
-          show' (0,_) = ""
-          show' (m,0) = show m
+  show (PMS [] _) = "0"
+  show (PMS ms True) = show' $ tuple2List ms
+    where show' ms = intercalate "+" $
+                     (\ss -> [s | s <- reverse ss , s /= ""]) $
+                     zipWith (curry show'') ms [0..]
+          show'' :: (Show a, Eq a, Num a) => (a,Int) -> String
+          show'' (0,_) = ""
+          show'' (m,0) = show m
           {-show' (1,i) = showExp i-}
-          show' (m,i) = show m ++ "·" ++ showExp i
+          show'' (m,i) = show m ++ "·" ++ showExp i
           showExp :: Int -> String
           showExp 0 = ""
           showExp 1 = "\x1B[04mX\x1B[24m"
@@ -139,46 +139,34 @@ instance (Show a, Eq a, Num a) => Show (Polynom a) where
                        | c == '7' = '⁷'
                        | c == '8' = '⁸'
                        | c == '9' = '⁹'
+  show f   = show $ cleanP f
 
 instance (ShowTex a, Num a, Eq a) => ShowTex (Polynom a) where
-  showTex f@(PM ms) = showTex $ toListP f
-  showTex f@(PMS ms _) = showTex $ toListP f
-  showTex (P []) = "0"
-  showTex (P ms) = intercalate "+" $
-                   (\ss -> [s | s <- reverse ss , s /= ""]) $
-                   zipWith (curry showTex') ms [0..]
-    where showTex' :: (ShowTex a, Eq a, Num a) => (a,Int) -> String
+  showTex (PMS [] _) = "0"
+  showTex (PMS ms True) = show' $ tuple2List ms
+    where show' ms = intercalate "+" $
+                     (\ss -> [s | s <- reverse ss , s /= ""]) $
+                     zipWith (curry showTex') ms [0..]
+          showTex' :: (ShowTex a, Eq a, Num a) => (a,Int) -> String
           showTex' (0,_) = ""
           showTex' (m,i) = showTex m ++ showExp i
           showExp :: Int -> String
           showExp 0 = ""
           showExp 1 = "\\cdot{}X"
           showExp i = "\\cdot{}X^{" ++ show i ++ "}"
+  showTex f = showTex $ cleanP f
 
 instance (Num a, Eq a) => Num (Polynom a) where
   {-# INLINE (+) #-}
-  (P ms) + (P ns)           = P $ addP ms ns
-  f@(PM _) + g@(PM _)       = PMS hs True
-    where hs = addPM (unPMS $ toPMS f) (unPMS $ toPMS g)
   f@(PMS _ _) + g@(PMS _ _) = PMS hs True
-    where hs = addPM (unPMS $ toPMS f) (unPMS $ toPMS g)
+    where hs = addPM (unPMS $ cleanP f) (unPMS $ cleanP g)
   {-# INLINE (*) #-}
-  (P ms)      * (P ns)      = P $ multP'' ms ns
-  f@(PM _)    * g@(PM _)    = PMS hs True
-    where hs = addPM (unPMS $ toPMS f) (unPMS $ toPMS g)
   f@(PMS _ _) * g@(PMS _ _) = PMS hs True
-    where hs = addPM (unPMS $ toPMS f) (unPMS $ toPMS g)
-  fromInteger i     = P [fromInteger i]
+    where hs = multPM (unPMS $ cleanP f) (unPMS $ cleanP g)
+  fromInteger i     = PMS [(0,fromInteger i)] True
   abs _             = error "Prelude.Num.abs: inappropriate abstraction"
   signum _          = error "Prelude.Num.signum: inappropriate abstraction"
-  negate (P ms)     = P   (map negate ms)
-  negate (PM ms)    = PM  ((map . A.second) negate ms)
   negate (PMS ms b) = PMS ((map . A.second) negate ms) b
-
-{-# INLINE addP #-}
-addP [] gs          = gs
-addP fs []          = fs
-addP (f:fs) (g:gs)  = f+g : addP fs gs
 
 {-# INLINE addPM #-}
 -- | addiere Polynome in Monomdarstellung, d.h
@@ -193,41 +181,6 @@ addPM ff@((i,f):fs) gg@((j,g):gs)
   | i>j         = (i,f) : addPM fs gg
    where c = f+g
 
-{-# INLINE multP #-}
-multP (f:fs) (g:gs) = f*g : addP (multP [f] gs) (multP fs(g:gs))
-multP _ _           = []
-
-{-# INLINE multP' #-}
-multP' f []             = []
-multP' [] f             = []
-multP' f g  | n >= m    = foldl1' addP [ multMonom f i a | (i,a) <- gz]
-            | otherwise = multP' g f
-  where n  = length f
-        m  = length g
-        gz = zip [0..] g
-
-{-# INLINE multMonom #-}
--- |Multipliziert f mit a*x^i
-multMonom :: Num a => [a] -> Int -> a -> [a]
-multMonom f i a  = [0 | i <- [1..i]] ++ map (a*) f
-
-{-# INLINE multMonomP #-}
-multMonomP :: Num a => Polynom a -> Int -> a -> Polynom a
-multMonomP (P f) i a  = P $ multMonom f i a
-
-
--- |Aus Math.Polynomial
-{-# INLINE multP'' #-}
-multP'' :: (Eq a, Num a) => [a] -> [a] -> [a]
-multP''  _  []     = []
-multP''  []  _     = []
-multP''  xs (y:ys) = foldr mul [] xs
-    where
-        mul x bs
-            | x == 0      = 0 : bs
-            | otherwise  = (x * y) : zipSum (map (*x) ys) bs
-
-
 
 {-# INLINE zipSum #-}
 -- like @zipWith (+)@ except that when the end of either list is
@@ -240,7 +193,7 @@ zipSum (x:xs) (y:ys) = (x+y) : zipSum xs ys
 
 {-# INLINE multPM #-}
 -- | Multiplikation von absteigend sortierten [(Int,a)] Listen
-multPM :: (Show a, Eq a, Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+multPM :: (Eq a, Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 multPM  ms  []     = []
 multPM  []  ns     = []
 multPM  ((i,m):ms) ns  = addPM (multPM' i m ns) (multPM ms ns)
@@ -252,36 +205,15 @@ multPM' i m ((j,n):ns) | c == 0     = multPM' i m ns
   where c = n*m
 
 
-
-{-[># INLINE aggP #<]-}
--- |Entfernt trailing zeros
-aggP :: (Num a, Eq a) => Polynom a -> Polynom a
-aggP (P ms) = P $ aggP' ms []
-  where aggP' [] ns     = []
-        aggP' (m:ms) ns | m /= 0     = ns ++ [m] ++ aggP' ms []
-                        | otherwise = aggP' ms (ns ++ [m])
-{-
- - Alt:
-aggP :: (Num a, Eq a) => Polynom a -> Polynom a
-aggP (P ms) = P $ take l ms
-  where l = maximum $ 0:[i+1 | i <- [0..(length ms - 1)] , ms!!i /= 0]
- -}
-
 {-# INLINE getLcP #-}
 getLcP :: (Num a, Eq a) => Polynom a -> a
-getLcP (P[]) = 0
-getLcP (PM []) = 0
-getLcP (PMS [] _) = 0
-getLcP f@(P _)   = (last . unP . aggP) f
-getLcP f@(PM _)  = getLcP $ toPMS f
-getLcP f@(PMS _ False)  = getLcP $ toPMS f
-getLcP (PMS fs True)  = snd $ head fs
+getLcP (PMS [] _)    = 0
+getLcP (PMS fs True) = snd $ head fs
+getLcP f             = getLcP $ cleanP f
 
 {-# INLINE getDegrees #-}
 -- |Nimmt ein Polynom und gibt eine liste der Gräder zurrück.
 getDegrees :: (Num a, Eq a) => Polynom a -> [Int]
-getDegrees (P ms) = [snd m | m <- zip ms [0..], fst m /= 0]
-getDegrees (PM ms) = [fst m | m <- ms]
 getDegrees (PMS ms _ ) = [fst m | m <- ms]
 
 
@@ -289,28 +221,20 @@ getDegrees (PMS ms _ ) = [fst m | m <- ms]
 {-# INLINE degP #-}
 -- |Gibt zu einem Polynom den Grad
 degP :: (Num a, Eq a) => Polynom a -> Maybe Int
-degP f@(P _) | deg >= 0   = Just deg
-             | otherwise = Nothing
-  where deg = (length . unP . aggP) f - 1
-degP f@(PM [])       = Nothing
 degP f@(PMS [] _)    = Nothing
-degP f@(PM _)        = degP $ toPMS f
-degP f@(PMS _ False) = degP $ toPMS f
-degP f@(PMS ms True) = Just $ fst $ head ms
+degP (PMS ms True)   = Just $ fst $ head ms
+degP f               = degP $ cleanP f
 
 
 {-# INLINE uDegP #-}
 uDegP :: (Num a, Eq a) => Polynom a -> Int
 uDegP = fromJust . degP
 
--- |Gibt zu einem Polynom das Produkt der Koeffizient
-prodOfCoeffsP :: Num a => Polynom a -> a
-prodOfCoeffsP = product . unP
 
 instance (Num a, Binary a) => Binary (Polynom a) where
-   put (P x) = put x
+   put (PMS x _) = put $ x
    get       = do x <- get
-                  return $ P x
+                  return $ (PMS x False)
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen
@@ -319,84 +243,39 @@ instance (Num a, Binary a) => Binary (Polynom a) where
 --
 
 moniP :: (Num a, Eq a, Fractional a) => Polynom a -> Polynom a
-moniP (P ms) | last ms == 1 = P ms
-             | otherwise   = P [m / getLcP (P ms) | m <- ms]
-moniP f@(PM [])       = f
 moniP f@(PMS [] _)    = f
-moniP f@(PM _)        = moniP $ toPMS f
-moniP f@(PMS _ False) = moniP $ toPMS f
 moniP f@(PMS ms True) = PMS ns True
   where ns = map (\(i,m) -> (i,m/l)) ms
         l  = snd $ head ms
+moniP f               = moniP $ cleanP f
 
--- |Gibt das reziproke Polynom zurrück
--- TODO: Inverses des konstanten Terms ranmultiplizieren???
-reziprokP :: (Num a, Fractional a, Eq a) => Polynom a -> Polynom a
-reziprokP (P ms) = moniP $ P $ reverse ms
 
 -- |Nimmt ein Polynom und leitet dieses ab.
 deriveP :: (Num a, Eq a) => Polynom a -> Polynom a
-deriveP (P [])     = P []
-deriveP (PM [])     = PM []
-deriveP (PMS [] _)     = PMS [] True
-deriveP (P (_:ms)) = P[m * fromInteger i | (i,m) <- zip [(1::Integer)..] ms]
-deriveP (PM ms) = PM $ deriveP' ms
+deriveP (PMS [] _) = PMS [] True
 deriveP (PMS ms b) = PMS (deriveP' ms) b
-
-deriveP' [] = []
-deriveP' ((i,m):ms) | j<0       = deriveP' ms
-                    | c==0       = deriveP' ms
-                    | otherwise = (j,c) : deriveP' ms
-  where j=i-1
-        c=m*fromInteger (fromIntegral i)
-
+  where deriveP' [] = []
+        deriveP' ((i,m):ms) | j<0       = deriveP' ms
+                            | c==0       = deriveP' ms
+                            | otherwise = (j,c) : deriveP' ms
+          where j=i-1
+                c=m*fromInteger (fromIntegral i)
 
 
-{-# INLINE divP #-}
--- | nimmt a und b und gibt (q,r) zurrück, so dass a = q*b+r
---  Teilen mit Rest durch erweitertem euklidischem Algorithmus
-divPOld :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> (Polynom a, Polynom a)
-divPOld a b | a == 0       = (P [], P [])
-         | b == 0       = error "Division by zero"
-         | degDiff < 0 = (P [], a)
-         | otherwise   = A.first (monom +) $ divP newA b
-  where degDiff   = (fromJust . degP) a - (fromJust . degP) b
-        lcQuot    = getLcP a / getLcP b
-        monom     = fromMonomialsP [(degDiff,lcQuot)]
-        newA      = a - multMonomP b degDiff lcQuot
+
 
 -- |divP mit Horner Schema
 --  siehe http://en.wikipedia.org/wiki/Synthetic_division
 divP :: (Show a, Eq a, Fractional a) =>
                               Polynom a -> Polynom a -> (Polynom a,Polynom a)
-divP a@(P _) b@(P _) = divPAgged (aggP a) (aggP b)
-divP a b           = divPAgged a b
+divP a b           = divPHorner a b
 
-{-divP a b = trace("divP a="++show a++" b="++show b++-}
-  {-"\n\t => divPH a b= "++show (divPAgged (aggP a) (aggP b))++-}
-  {-"\n\t => divP a b ="++show (divPOld a b)) $-}
-           {-divPOld a b-}
-
-divPAgged a (P [])        = error "Division by zero"
-divPAgged a (PM [])       = error "Division by zero"
-divPAgged a (PMS [] _)    = error "Division by zero"
-divPAgged a (P [m])       = (P $ map (/m) $ unP a, P[])
-divPAgged a (PM [(0,m)])  = (PM $ map (\(i,n) -> (i,n/m)) $ unPM a, P[])
-divPAgged a@(P _) b@(P _)
-    | nullP a        = (P[],P[])
-    | degDiff <= 0    = (P[],a)
-    | otherwise      = --trace ("horner a="++show a++"\tb="++show b++"\tdegDiff="++show degDiff++"\t=>horn="++show horn
-        -- ++"\n\t=> return "++ show (P $ reverse $ take degDiff horn, P $ reverse $ drop degDiff horn))
-            (P $ reverse $ take degDiff horn, P $ reverse $ drop degDiff horn)
-  where horn = divPHorner' bs as lc
-        degDiff   = uDegP a - uDegP b + 1
-        bs = tail $ reverse $ unP $ negate b
-        as = reverse $ unP a
-        lc = getLcP b
-divPAgged a@(PMS as True) b@(PMS bs True)
-    | nullP a        = (PMS [] True,PMS [] True)
-    | degDiff <= 0    = (PMS [] True,a)
-    | otherwise      = toP $ A.first (map (A.first (\i -> i-degB))) $ splitAt splitPoint horn
+divPHorner a (PMS [] _)    = error "Division by zero"
+divPHorner a@(PMS as True) b@(PMS bs True)
+    | isNullP a        = (PMS [] True,PMS [] True)
+    | degDiff <= 0      = (PMS [] True,a)
+    | otherwise        = toP $ A.first (map (A.first (\i -> i-degB))) $ 
+                                                      splitAt splitPoint horn
   where horn       = divPHornerM' bs as lc degB
         degDiff    = uDegP a - uDegP b + 1
         bs         = tail $ unPMS $ negate b
@@ -405,16 +284,7 @@ divPAgged a@(PMS as True) b@(PMS bs True)
         degB       = uDegP b
         splitPoint = length [i | (i,j) <- horn, i >= degB]
         toP (a,b)  = (PMS a True, PMS b True)
-divPAgged a b = divPAgged (toPMS a) (toPMS b)
-
-divPHorner' divs ff@(f:fs) lc
-  | length fs < length divs = --trace ("horner end: ff="++show ff)
-                              ff
-  | otherwise               = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++
-      --" ff="++show ff++"=> "++show (f/lc)) $
-      fbar : divPHorner' divs hs lc
-  where fbar = f/lc
-        hs = zipWith (+) fs $ map (fbar*) divs ++ cycle [0]
+divPHorner a b = divPHorner (cleanP a) (cleanP b)
 
 {-# INLINE divPHornerM' #-}
 -- |Horner für absteigend sortierte [(Int,a)] Paare
@@ -450,7 +320,7 @@ modByP f p = snd $ divP f p
 --  ggT(a,b) = d = s*a + t*b
 eekP :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a
                                           -> (Polynom a, Polynom a, Polynom a)
-eekP f g | g == 0     = (moniP f ,P[recip $ getLcP f] ,P[])
+eekP f g | g == 0     = (moniP f, PMS [(0,recip $ getLcP f)] True, PMS [] True)
          | otherwise = (d,t,s-t*q)
   where (q,r)   = divP f g
         (d,s,t) = eekP g r
@@ -466,15 +336,11 @@ ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 {-# INLINE evalP #-}
 -- |Nimmt einen Wert und ein Polynom umd wertet das Polynom an dem Wert aus.
 -- Mittels Horner Schema
-{-evalP x f = evalP' x (reverse (unP f)) 0-}
-{-evalP' x [] acc = acc-}
-{-evalP' x (m:ms) acc = evalP' x ms $ acc*x+m-}
-evalP x f = evalP' x (unP f)
-evalP' x []     = 0
-evalP' x (f:fs) = f + x * evalP' x fs
-
-evalP'' x []     = 0
-evalP'' x ff@(f:fs) = trace ("x="++show x++" in ff="++show ff) (f + x * evalP'' x fs)
+evalP :: (Eq a, Num a) => a -> Polynom a -> a
+evalP x f = evalP' x (unPMS $ cleanP f)
+evalP' :: (Num a) => a -> [(Int,a)] -> a
+evalP' x []   = 0
+evalP' x fs   = foldl' (\a -> \(_,m) -> a*x+m) 0 fs
 
 hasNs :: (Eq a, Fractional a) => Polynom a -> [a] -> Bool
 hasNs f es = not (null [f | e <- es, evalP e f == 0])
@@ -487,25 +353,25 @@ hasNs' f es = [evalP e f | e <- es]
 -- Grad.
 -- Das Nullpoylnom (P[]) ist NICHT enthalten
 getAllP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
-getAllP es d = [(P . map (e*) . unP) f | f <- getAllMonicP es d
+getAllP es d = [PMS (map (A.second (e*)) $ unPMS f) True | f <- getAllMonicP es d
                                        , e <- es , e /= 0]
 
 -- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle
 -- Polynome deren Gräder in der Liste enthalten sind
 getAllPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
 -- TODO: Man muss nur das letzte Element in der Liste verändern
-getAllPs es ds = [(P . map (e*) . unP) f | f <- getAllMonicPs es ds
+getAllPs es ds = [PMS (map (A.second (e*))$ unPMS f) True | f <- getAllMonicPs es ds
                                          , e <- es , e /= 0]
 
 getAllMonicP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
 getAllMonicP es d = getAllMonicPs es [0..d]
 
 getAllMonicPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
-getAllMonicPs es is = map P $ concat [allMonics i | i <- is]
-  where allMonics 0 = [[one]]
-        allMonics i = [rs++[one] | rs <- ess (i-1)]
-        ess i       | i == 0     = [[y] | y <- swpes]
-                    | otherwise = [y:ys | y <- swpes, ys <- ess (i-1) ]
-        swpes       = tail es ++ [head es]
-        one         = head [e | e <- es, e == 1]
+getAllMonicPs es is = map (\x -> PMS x True) $ concat [allMonics i | i <- is]
+  where allMonics 0 = [[(0,1)]]
+        allMonics i = [[(i,1)]] ++ [(i,1):rs | rs <- ess (i-1)]
+        ess i       | i == 0     = [[(0,y)] | y <- swpes]
+                    | otherwise = [[(i,y)] | y <- swpes] ++ (ess (i-1)) ++ 
+                              [(i,y):ys | y <- swpes, ys <- ess (i-1)]
+        swpes       = filter (/=0) es
         {-one         = (\ x -> x / x) $ head [e | e <- es, e /= 0]-}

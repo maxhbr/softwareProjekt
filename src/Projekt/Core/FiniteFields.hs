@@ -45,24 +45,22 @@ listFFElem m = map (`FFElem` m)
 
 instance (Show a, Num a, Eq a, Fractional a) => Eq (FFElem a) where
   (FFKonst x)  == (FFKonst y)  = x==y
-  (FFElem f p) == (FFKonst y)  = null $ unP $ aggP (f - P[y])
-  (FFKonst x)  == (FFElem g p) = null $ unP $ aggP (P[x] - g)
-  (FFElem f p) == (FFElem g q) | p==q       = null $ unP $ aggP (f - g)
+  (FFElem f p) == (FFKonst y)  = isNullP $ f-(pKonst y)
+  (FFKonst x)  == (FFElem g p) = isNullP $ g-(pKonst x)
+  (FFElem f p) == (FFElem g q) | p==q       = isNullP $ f-g
                               | otherwise = error "Not the same mod"
 
 instance (Show a, Num a, Eq a) => Show (FFElem a) where
-  show (FFKonst x)       = "(" ++ show x ++ " mod ...)"
-  show (FFElem (P []) p) = "(0 mod " ++ show p ++ ")"
-  show (FFElem f p)      = "(" ++ show f ++ " mod " ++ show p ++")"
+  show (FFKonst x)                = "(" ++ show x ++ " mod ...)"
+  show (FFElem f p) | isNullP f   = "(0 mod " ++ show p ++ ")"
+                    | otherwise   = "(" ++ show f ++ " mod " ++ show p ++")"
 
 instance (ShowTex a, Num a, Eq a) => ShowTex (FFElem a) where
-  showTex (FFKonst x)       = showTex x
-  showTex (FFElem (P []) p) =
-    --"\\left(\\underline{0}_{mod~" ++ showTex p ++ "}\\right)"
-    "\\left(\\underline{0}_{mod~" ++ showTex p ++ "}\\right)"
-  showTex (FFElem f p)      =
-    --"\\left(\\underline{" ++ showTex f ++ "}_{mod~" ++ showTex p ++"}\\right)"
-    "\\left(\\underline{" ++ showTex f ++ "}_{mod~" ++ showTex p ++"}\\right)"
+  showTex (FFKonst x) = showTex x
+  showTex (FFElem f p) 
+    | isNullP f   = "\\left(\\underline{0}_{mod~" ++ showTex p ++ "}\\right)" 
+    | otherwise   =
+      "\\left(\\underline{" ++ showTex f ++ "}_{mod~" ++ showTex p ++"}\\right)"
 
 
 instance (Show a, Num a, Eq a, Fractional a) => Num (FFElem a) where
@@ -70,15 +68,15 @@ instance (Show a, Num a, Eq a, Fractional a) => Num (FFElem a) where
 
   {-# INLINE (+) #-}
   (FFKonst x)  + (FFKonst y)              = FFKonst (x+y)
-  (FFElem f p) + (FFKonst x)              = FFElem (f+P[x]) p
-  (FFKonst x)  + (FFElem f p)             = FFElem (f+P[x]) p
+  (FFElem f p) + (FFKonst x)              = FFElem (f+(pKonst x)) p
+  (FFKonst x)  + (FFElem f p)             = FFElem (f+(pKonst x)) p
   (FFElem f p) + (FFElem g q) | p==q       = aggF $ FFElem (f+g) p
                               | otherwise = error "Not the same mod"
 
   {-# INLINE (*) #-}
   (FFKonst x)  * (FFKonst y)              = FFKonst (x*y)
-  (FFElem f p) * (FFKonst x)              = FFElem (f*P [x]) p
-  (FFKonst x)  * (FFElem f p)             = FFElem (f*P [x]) p
+  (FFElem f p) * (FFKonst x)              = FFElem (f*(pKonst x)) p
+  (FFKonst x)  * (FFElem f p)             = FFElem (f*(pKonst x)) p
   (FFElem f p) * (FFElem g q) | p==q       = aggF $ FFElem (f*g) p
                               | otherwise = error "Not the same mod"
 
@@ -93,8 +91,8 @@ instance (Show a, Eq a, Fractional a) => Fractional (FFElem a) where
   fromRational _     = error "inappropriate abstraction"
   {-# INLINE recip #-}
   recip (FFKonst x)  = FFKonst (recip x)
-  recip (FFElem f p) | FFElem f p == FFElem (P []) p = error "Division by zero"
-                     | otherwise                    = FFElem s p
+  recip (FFElem f p) | isNullP f     = error "Division by zero"
+                     | otherwise     = FFElem s p
     where (_,s,_) = eekP f p
 
 instance (Show a, Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFElem a) where
@@ -114,14 +112,17 @@ instance (Show a, Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFEl
 -- Diese Funktion benötigt ein FFElem, ein FFKonst ist zu universell und
 -- enthält deswegen zu wenig Information, über den Körper in dem es lebt.
 elems' :: (Show a, Num a, Fractional a, FiniteField a) => FFElem a -> [FFElem a]
-elems' (FFKonst x)  = error "Insufficient information in FFKonst"
-elems' elm@(FFElem f p) = map (`FFElem` p) (P[] : getAllP (elems e) (uDegP p -1))
+elems' (FFKonst x)      = error "Insufficient information in FFKonst"
+elems' elm@(FFElem f p) = 
+                map (`FFElem` p) (nullP : getAllP (elems e) (uDegP p -1))
   where e = getReprP p
 
 {-# INLINE getReprP' #-}
-getReprP' (P [])                = error "Insufficient information in this Polynomial"
-getReprP' (P (FFKonst _:ms))    = getReprP' $ P ms
-getReprP' (P (FFElem f p : ms)) = FFElem 0 p
+getReprP' f = getReprP'' $ p2Tup f 
+getReprP'' []                   = 
+                            error "Insufficient information in this Polynomial"
+getReprP'' ((i,FFKonst _):ms)   = getReprP'' ms
+getReprP'' ((i,FFElem f p): ms) = FFElem 0 p
 
 instance (Num a, Binary a) => Binary (FFElem a) where
   put (FFKonst f)  = do put (0 :: Word8)
@@ -145,12 +146,18 @@ charOfP f = charakteristik $ getReprP f
 
 {-# INLINE charRootP #-}
 -- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
-charRootP :: (FiniteField a, Num a) => Polynom a -> Polynom a
-charRootP (P []) = P []
-charRootP (P [1]) = P [1]
-charRootP (P ms) = P[m^l | (m,i) <- zip ms [0..] , i `mod` p == 0]
-  where p = charOfP $ P ms
-        q = elemCount $ getReprP (P ms)
+charRootP :: (Show a, FiniteField a, Num a) => Polynom a -> Polynom a
+charRootP f | isNullP f     = --trace ("charRootP f="++show f++" => "++show nullP) $ 
+                              nullP
+            | f == pKonst 1  = --trace ("charRootP f="++show f++" => "++show (pKonst 1)) $ 
+                              pKonst 1
+            | otherwise     = --trace ("charRootP f="++show f++" => "++
+                              --show (pTupUnsave 
+                              --    [(i,m^l) | (i,m) <- p2Tup f, i `rem` p == 0]))$
+                              pTupUnsave 
+                          [(i `quot` p,m^l) | (i,m) <- p2Tup f]
+  where p = charOfP f
+        q = elemCount $ getReprP f
         l = max (quot q p) 1
 
 hasNSInFF :: (Eq a, Num a, FiniteField a) => Polynom a -> Bool

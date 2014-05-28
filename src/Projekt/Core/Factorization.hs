@@ -17,6 +17,7 @@ module Projekt.Core.Factorization
 import Data.List
 import Control.Parallel
 import Control.Parallel.Strategies
+import Control.Arrow as A
 
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
@@ -52,7 +53,8 @@ appFact alg = withStrategy (parList rpar) . concatMap
 
 -- |Fasst in einer Faktoriesierung gleiche Funktionen Zusammen
 aggFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
-aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], f /= P[1]]
+aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], 
+                                                                f /= pKonst 1]
 
 isTrivialFact :: [(Int,a)] -> Bool
 isTrivialFact [] = error "[] is not a factorization"
@@ -61,10 +63,10 @@ isTrivialFact ms = sum (map fst ms) == 1
 
 -- |Gibt alle Faktorisierungen zurück, welche nach der offensichtlichen
 -- Faktoriesierung noch trivial sind
-findTrivialsOb :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
+findTrivialsOb :: (Show a, Fractional a, Num a, FiniteField a) => 
+                                          [Polynom a] -> [[(Int,Polynom a)]]
 findTrivialsOb ps = [fs | fs <- parMap rpar appObFact
-                        [(toFact . aggP) f | f <- ps , f /= P[]]
-                      , isTrivialFact fs]
+                     [toFact f | f <- ps , not (isNullP f)], isTrivialFact fs]
 
 findTrivialsNs :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a]
   -> [[(Int,Polynom a)]]
@@ -76,11 +78,22 @@ findTrivialsNs ps = [toFact f | f <- ps, not (hasNs f es) || uDegP f < 2]
 --  Einfache / offensichtliche Faktorisierungen
 
 obviousFactor :: (Num a, Eq a) => Polynom a -> [(Int,Polynom a)]
-obviousFactor (P[])      = [(1,P[])]
-obviousFactor (P[m])     = [(1,P[m])]
-obviousFactor (P[m0,m1]) = [(1,P[m0,m1])]
-obviousFactor (P (0:ms)) = aggFact $ (1,P[0,1]) : obviousFactor (P ms)
-obviousFactor f          = toFact f
+obviousFactor f | isNullP f     = [(1,nullP)]
+                | isTrivial fs  = [(1,f)]
+                | hasNoKonst fs = factorX
+                | otherwise     = toFact f
+  where fs = p2Tup f
+        -- Teste, ob das Polynom entweder konstant oder ein linear ist
+        isTrivial [(0,_)] = True
+        isTrivial [(1,_),(0,_)] = True
+        isTrivial _  = False
+        -- Teste, ob ein konstanter Term vorhanden ist
+        hasNoKonst ms | (fst $ last ms) == 0  = False
+                      | otherwise          = True
+        -- Hier kann man d mal X ausklammern
+        factorX  = [(d,pTupUnsave [(d,1)] ), (1,g)]
+          where d = fst $ last fs
+                g = pTupUnsave $ map (A.first ((-) d)) fs
 
 appObFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 appObFact = appFact obviousFactor
