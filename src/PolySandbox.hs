@@ -26,8 +26,8 @@ exmpPolyMod = aggP $ P[5::F101,0,0,04::F101,2::F101,5::F101]
 exmpPolyMod' = aggP $ P[5::F101,4::F101,0,0,0,0,0,2::F101,5::F101]
 
 --------------------------------------------------------------------------------
-exmpPolyMod3  = toPMS $ PM [(0,2::F3), (3,1::F3), (9,1::F3)]
-exmpPolyMod3'  = toPMS $ PM [(0,2::F3), (3,1::F3)]
+exmpPolyMod3  = fromMonomialsP [(0,2::F3), (3,1::F3), (9,1::F3)]
+exmpPolyMod3'  = fromMonomialsP [(0,2::F3), (3,1::F3)]
 
 exmpPolyMod5  = P [4::F5, 1, 0, 0, 4, 1]
 
