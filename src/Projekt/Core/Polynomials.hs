@@ -264,7 +264,6 @@ divPOld a b | a == 0       = (P [], P [])
 --  siehe http://en.wikipedia.org/wiki/Synthetic_division
 divP :: (Show a, Eq a, Fractional a) =>
                               Polynom a -> Polynom a -> (Polynom a,Polynom a)
-divP a@(P _) b@(P _) = divPAgged (aggP a) (aggP b)
 divP a b           = divPAgged a b
 
 {-divP a b = trace("divP a="++show a++" b="++show b++-}
