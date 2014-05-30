@@ -147,26 +147,26 @@ instance (Numeral a) => Binary (Mod a) where
                       return $ MkMod x
 
 --------------------------------------------------------------------------------
---  Erzeugen von prim Körpern
+--  Erzeugen von Primkörpern
 
 -- |Erzeugen von Primkörpern durch TemplateHaskell
 genPrimeField :: Integer -> String -> Q [Dec]
-genPrimeField i pf = do
-  d <- dataD (cxt []) (mkName m) [] [] []
+genPrimeField p pfName = do
+  d <- dataD (cxt []) (mkName mName) [] [] []
   i1 <- instanceD (cxt [])
-    (appT (conT ''Numeral) (conT (mkName m)))
+    (appT (conT ''Numeral) (conT (mkName mName)))
     [funD (mkName "numValue")
       [clause [varP $ mkName "x"] 
-        (normalB $ litE $ IntegerL i) [] ] ]
+        (normalB $ litE $ IntegerL p) [] ] ]
   i2 <- instanceD (cxt [])
-    (appT (conT ''Show) (conT (mkName m)))
+    (appT (conT ''Show) (conT (mkName mName)))
     [funD (mkName "show") 
       [clause [] ( normalB $ appsE [varE (mkName "show")] ) [] ] ]
-  t <- tySynD (mkName pf) []
-    (appT (conT ''Mod) (conT $ mkName m))
+  t <- tySynD (mkName pfName) []
+    (appT (conT ''Mod) (conT $ mkName mName))
   return [d,i1,i2,t]
-    where m ='M' : show i
-{-ppQ x = putStrLn =<< runQ ((show . ppr) `fmap` x)-}
+    where mName ='M' : show p
+ppQ x = putStrLn =<< runQ ((show . ppr) `fmap` x)
 
 -- Erzeugen von Primkörpern mittels CPP Compiler Befehlen
 #define PFInstance(MName,MValue,PFName) \
