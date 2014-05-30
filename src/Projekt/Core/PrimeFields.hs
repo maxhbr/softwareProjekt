@@ -5,6 +5,8 @@
 -- Module      : Projekt.Core.PrimeFields
 -- Note        : Einfache prim Körper
 --
+-- Die Charakteristik eines (Prim-)Körpers muss immer eine Primzahl sein!
+--
 -- Ein Primkörper wird wie Folgt definiert (Am Beispiel F7):
 -- Man benötigt einen Datentyp, der sich den Modulus merkt
 --      data Numeral7

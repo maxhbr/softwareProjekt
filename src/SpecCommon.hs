@@ -25,12 +25,12 @@ pMapM_  f = P.sequence_ . map f
 testFieldSpec e = testFieldSpec' $ elems e
 testFieldSpec' es = do
   it "Assoziativität"
-    (testAsso es >>= (`shouldBe` True))
+    (testAsso es `shouldBe` True)
   it "Kommutativität"
-    (testKommu es >>= (`shouldBe` True))
+    (testKommu es `shouldBe` True)
   it "Einheiten"
-    (testEinh es >>= (`shouldBe` True))
+    (testEinh es `shouldBe` True)
   it "Inversen"
-    (testInv es >>= (`shouldBe` True))
+    (testInv es `shouldBe` True)
   it "Distributivität"
-    (testDist es >>= (`shouldBe` True))
+    (testDist es `shouldBe` True)

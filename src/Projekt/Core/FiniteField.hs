@@ -14,6 +14,8 @@ module Projekt.Core.FiniteField
   ) where
 import Control.Monad
 
+import Control.Parallel
+import Control.Parallel.Strategies
 -- from monad-parallel
 import qualified Control.Monad.Parallel as P
 
@@ -34,44 +36,38 @@ class (Eq a) => FiniteField a where
 --------------------------------------------------------------------------------
 --  Tests
 
-testHelper f s = liftM and (P.mapM f s)
+testHelper f es = and $ parMap rpar f es
 
 testAsso es = testHelper
-  (\(x,y,z) -> return $ x+(y+z)==(x+y)+z && x*(y*z)==(x*y)*z)
+  (\(x,y,z) -> x+(y+z)==(x+y)+z && x*(y*z)==(x*y)*z)
   [(x,y,z) | x<-es, y<-es, z<-es]
 
 testKommu es = testHelper
-  (\(x,y) -> return $ x+y==y+x && x*y==y*x)
+  (\(x,y) -> x+y==y+x && x*y==y*x)
   [(x,y) | x<-es, y<-es]
 
 testEinh es = testHelper
-  (\x -> return $ x+zero==x && (x*one==x || x==zero))
+  (\x -> x+zero==x && (x*one==x || x==zero))
   es
 
 testInv es = testHelper
-  (\x -> return $ x+(-x)==zero && (x==zero || x*recip x==one))
+  (\x -> x+(-x)==zero && (x==zero || x*recip x==one))
   es
 
 testDist es = testHelper
-  (\(x,y,z) -> return $ x*(y+z)==(x*y)+(x*z))
+  (\(x,y,z) -> x*(y+z)==(x*y)+(x*z))
   [(x,y,z) | x<-es, y<-es, z<-es]
 
 testForField e = do
   putStrLn "teste Körper Axiome:"
   putStr "Assoziativität ist "
-  t <- testAsso es
-  putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
+  putStrLn (if testAsso es then "erfüllt!" else "NICHT erfüllt!")
   putStr "Kommutativität ist "
-  t <- testKommu es
-  putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
+  putStrLn (if testKommu es then "erfüllt!" else "NICHT erfüllt!")
   putStr "Einheiten sind "
-  t <- testEinh es
-  putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
+  putStrLn (if testEinh es then "erfüllt!" else "NICHT erfüllt!")
   putStr "Inversen sind "
-  t <- testInv es
-  putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
+  putStrLn (if testInv es then "erfüllt!" else "NICHT erfüllt!")
   putStr "Distributivität ist "
-  t <- testDist es
-  putStrLn (if t then "erfüllt!" else "NICHT erfüllt!")
+  putStrLn (if testDist es then "erfüllt!" else "NICHT erfüllt!")
     where es = elems e
-
