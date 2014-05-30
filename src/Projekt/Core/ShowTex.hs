@@ -4,9 +4,9 @@
 -- Note        :
 --
 -- Benötigt die Programme:
---      * latex
---      * dvipng
---      * sxiv
+--      * latex     zum rendern des Latex Codes
+--      * dvipng    um aus dem erstelltem DVI ein PNG zu erstellen
+--      * sxiv      für das schnelle öffnen durch viewRendered
 --
 -- Dies sollte so hauptsächlich unter Linux laffähig sein
 --
@@ -27,9 +27,13 @@ instance ShowTex Integer where
 --------------------------------------------------------------------------------
 --  Nutze latex und dvipng um Latex schnipsel in ein PNG zu rendern
 
+-- |wie renderRawTex, nur dass zunächst ShowTex aufgerufen wird.
 renderTex :: (ShowTex a) => a -> IO ()
 renderTex = renderRawTex . showTex
 
+-- |Nimmt einen Latex-String und packt diesen in ein minimales Latex Dokument,
+-- rendert dieses und wandelt es danach in ein Bild um, wobei unnötiger Rand
+-- entfernt wird
 renderRawTex :: String -> IO ()
 renderRawTex x = do createProcess (shell cmd)
                     return ()
@@ -51,7 +55,6 @@ renderRawTex x = do createProcess (shell cmd)
               ++ " > /dev/null"
 
 --------------------------------------------------------------------------------
---  Nutze sxiv um das erzeugte Bild anzuzeigen
-
+-- |Nutze sxiv um das erzeugte Bild anzuzeigen
 viewRendered = do createProcess (shell "sxiv /tmp/snipet.png")
                   return ()

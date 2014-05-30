@@ -3,8 +3,12 @@
 -- Module      : Project.Core.Factorization
 -- Note        : Ein paar kleine Funktionen, um mit Faktorisierungen zu Arbeiten
 --
+-- Eine Faktoriesierung wird dargestellt als Liste von Paaren (Int, Polynom a)
+-- wobei ein Paar (i,f) den Faktor f^i repräsentiert.
 --
---
+-- Ein Faktoriesierungsalgorithmus ist also gegeben durch eine Funktion:
+--      Polynom a -> [(Int,Polynom a)]
+
 --------------------------------------------------------------------------------
 module Projekt.Core.Factorization
   ( toFact, unFact
@@ -22,18 +26,13 @@ import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 
 --------------------------------------------------------------------------------
--- Eine Faktoriesierung wird dargestellt als Liste von Paaren (Int, Polynom a)
--- wobei ein Paar (i,f) den Faktor f^i repräsentiert.
---
--- Ein Faktoriesierungsalgorithmus ist also gegeben durch eine Funktion:
---      Polynom a -> [(Int,Polynom a)]
-
 -- |Erzeugt eine triviale Faktoriesierung zu einem Polynom
 toFact :: Polynom a -> [(Int,Polynom a)]
 toFact f = [(1,f)]
 
 -- |Multipliziert eine Faktoriesierung aus
 unFact :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
+unFact []      = P[1]
 unFact [(1,f)] = f
 unFact [(i,f)] = f^i
 unFact fs      = product $ map (\(i,f) -> f^i) fs
@@ -54,8 +53,10 @@ appFact alg = withStrategy (parList rpar) . concatMap
 aggFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], f /= P[1]]
 
+-- |Sagt, ob die gegebene Faktoriesierung trivial ist, also aus nur einem
+-- Echten Faktor vom Grad 1 besteht
 isTrivialFact :: [(Int,a)] -> Bool
-isTrivialFact [] = error "[] is not a factorization"
+isTrivialFact [] = error "A unit has no welldefined factorization"
 isTrivialFact [(1,_)] = True
 isTrivialFact ms = sum (map fst ms) == 1
 
@@ -66,6 +67,7 @@ findTrivialsOb ps = [fs | fs <- parMap rpar appObFact
                         [(toFact . aggP) f | f <- ps , f /= P[]]
                       , isTrivialFact fs]
 
+-- |Gibt alle Polynome zurück, die keine Nullstellen haben.
 findTrivialsNs :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a]
   -> [[(Int,Polynom a)]]
 findTrivialsNs ps = [toFact f | f <- ps, not (hasNs f es) || uDegP f < 2]
@@ -75,6 +77,7 @@ findTrivialsNs ps = [toFact f | f <- ps, not (hasNs f es) || uDegP f < 2]
 --------------------------------------------------------------------------------
 --  Einfache / offensichtliche Faktorisierungen
 
+-- |Versucht an der Darstellung des Polynoms eine Faktoriesierung zu erahnen
 obviousFactor :: (Num a, Eq a) => Polynom a -> [(Int,Polynom a)]
 obviousFactor (P[])      = [(1,P[])]
 obviousFactor (P[m])     = [(1,P[m])]
@@ -82,5 +85,6 @@ obviousFactor (P[m0,m1]) = [(1,P[m0,m1])]
 obviousFactor (P (0:ms)) = aggFact $ (1,P[0,1]) : obviousFactor (P ms)
 obviousFactor f          = toFact f
 
+-- |Wendet die offensichtliche Faktoriesierung an
 appObFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 appObFact = appFact obviousFactor

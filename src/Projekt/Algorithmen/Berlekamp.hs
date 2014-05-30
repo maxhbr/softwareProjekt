@@ -3,7 +3,10 @@
 -- Module      : Project.Algorithmen.Berlekamp
 -- Note        : Implementiert eine Berlekamp Faktorisierung
 --
--- Funktioniert nur auf Quadratfreien Polynomen
+-- Funktioniert nur auf Quadratfreien Polynomen!
+--
+-- Enthält den 1967 von Elwyn Berlekamp enwickelten Berlekamp-Algorithmus zur
+-- Faktorisierung von Polynomen über endlichen Körpern.
 --
 --------------------------------------------------------------------------------
 module Projekt.Algorithmen.Berlekamp
@@ -15,8 +18,6 @@ module Projekt.Algorithmen.Berlekamp
   )where
 import Data.Maybe
 import Data.List
-import Debug.Trace
-
 import Control.Parallel
 import Control.Parallel.Strategies
 
@@ -44,7 +45,9 @@ findIrred :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> Poly
 findIrred = head . findIrreds
 
 -- |Filtert mittels SFF und Berlekamp aus einer Liste die irreduzibleneiner
--- liste heraus
+-- liste heraus.
+--
+-- Ist lazy.
 findIrreds :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [Polynom a]
 findIrreds (f:fs) = findIrreds' (f:fs)
   where findIrreds' []     = []
@@ -56,16 +59,14 @@ findIrreds (f:fs) = findIrreds' (f:fs)
                 fB   = appBerlekamp fSff
         es = elems $ getReprP f
 
-{-findIrreds ps = parMap rpar unFact $ findTrivialsB ps-}
-
 -- |Gibt alle Faktorisierungen zurück, welche nach Berlekamp noch trivial sind
 -- Wendet zuvor (die offensichtliche Faktorisierung und) SFF an
+--
+-- Ist parallelisiert mittels Strategie rpar.
 findTrivialsB :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
 findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp
                        (findTrivialsSff ps)
                      , isTrivialFact fs]
-
-
 
 --------------------------------------------------------------------------------
 --  Algorithmus
