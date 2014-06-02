@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Project.Algorithmen.Berlekamp
@@ -18,6 +19,7 @@ module Projekt.Algorithmen.Berlekamp
   )where
 import Data.Maybe
 import Data.List
+import Control.Monad
 import Control.Parallel
 import Control.Parallel.Strategies
 
@@ -47,6 +49,7 @@ findIrred = head . findIrreds
 -- |Filtert mittels SFF und Berlekamp aus einer Liste die irreduzibleneiner
 -- liste heraus.
 --
+#if 0
 -- Ist lazy.
 findIrreds :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [Polynom a]
 findIrreds (f:fs) = findIrreds' (f:fs)
@@ -58,6 +61,16 @@ findIrreds (f:fs) = findIrreds' (f:fs)
           where fSff = appSff $ toFact f
                 fB   = appBerlekamp fSff
         es = elems $ getReprP f
+#else
+-- mit backtracking
+findIrreds fs = do
+  f <- fs
+  let fSff = appSff $ toFact f
+  guard (isTrivialFact fSff)
+  let fB = appBerlekamp fSff
+  guard (isTrivialFact fB)
+  return f
+#endif
 
 -- |Gibt alle Faktorisierungen zurück, welche nach Berlekamp noch trivial sind
 -- Wendet zuvor (die offensichtliche Faktorisierung und) SFF an
