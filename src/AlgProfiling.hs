@@ -101,4 +101,4 @@ main :: IO ()
 {-main = print $ length $ filter (\x -> x) $ map (rabin . toPMS) $ getAllMonicPs (elems (1::F3)) [8]-}
 {-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [7]-}
 {-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [7]-}
-main = print $ snd $ (divP (pTupUnsave [(3^11,1),(1,-1)]) f)
+main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)

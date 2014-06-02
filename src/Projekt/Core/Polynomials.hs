@@ -207,8 +207,7 @@ multPM' i m ((j,n):ns) | c == 0     = multPM' i m ns
 {-# INLINE multMonomP #-}
 -- |Multipliziert f mit x^i
 multMonomP :: (Eq a, Num a) => Int -> Polynom a -> Polynom a
-multMonomP i f@(PMS _ False) = multMonomP i $ cleanP f
-multMonomP i (PMS ms True)   = PMS (map (A.first (+i)) ms) True
+multMonomP i (PMS ms b)   = PMS (map (A.first (+i)) ms) b
 
 {-# INLINE multKonstP #-}
 multKonstP :: (Eq a, Num a) => a -> Polynom a -> Polynom a
@@ -216,26 +215,54 @@ multKonstP a f  = PMS (map (A.second (*a)) ms) True
   where ms = unPMS $ cleanP f
 
 
-{-# INLINE multShortP #-}
+{-# INLINE multPShortDown #-}
 -- |Multipliziert 2 Polynome miteinander, bei
 --  gleichzeitiger Reduktion mod x^l, d.h.
 --  schneidet alle Terme >= x^l ab
-multShortP :: (Eq a, Num a) => Int -> Polynom a -> Polynom a -> Polynom a
-multShortP l f g  = PMS c True
-  where c = multPM_Short l (unPMS $ cleanP f) (unPMS $ cleanP g)
+multPShortDown :: (Eq a, Num a) => Int -> Polynom a -> Polynom a -> Polynom a
+multPShortDown l f g  = PMS c True
+  where c = multPM_ShortDown l (unPMS $ cleanP f) (unPMS $ cleanP g)
 
-{-# INLINE multPM_Short #-}
+{-# INLINE multPShortUp #-}
+-- |Multipliziert 2 Polynome miteinander, bei
+--  gleichzeitiger Reduktion mod x^l, d.h.
+--  schneidet alle Terme < x^l ab
+multPShortUp :: (Eq a, Num a) => Int -> Polynom a -> Polynom a -> Polynom a
+multPShortUp l f g  = PMS c True
+  where c = multPM_ShortUp l (unPMS $ cleanP f) (unPMS $ cleanP g)
+
+{-# INLINE multPM_ShortDown #-}
 -- | Multiplikation von absteigend sortierten [(Int,a)] Listen
-multPM_Short :: (Eq a, Num a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
-multPM_Short l ms  []     = []
-multPM_Short l []  ns     = []
-multPM_Short l ((i,m):ms) ns  
-                    = addPM (multPM'_Short l i m ns) (multPM_Short l ms ns)
+multPM_ShortDown :: (Eq a, Num a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+multPM_ShortDown l ms  []     = []
+multPM_ShortDown l []  ns     = []
+multPM_ShortDown l ((i,m):ms) ns  
+                    = addPM (multPM'_ShortDown l i m ns) 
+                            (multPM_ShortDown l ms ns)
 
-{-# INLINE multPM'_Short #-}
-multPM'_Short l i m []                          = []
-multPM'_Short l i m ((j,n):ns) | c == 0 || k >= l = multPM'_Short l i m ns
-                               | otherwise      = (k,c) : multPM'_Short l i m ns
+{-# INLINE multPM_ShortUp #-}
+-- | Multiplikation von absteigend sortierten [(Int,a)] Listen
+multPM_ShortUp :: (Eq a, Num a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+multPM_ShortUp l ms  []     = []
+multPM_ShortUp l []  ns     = []
+multPM_ShortUp l ((i,m):ms) ns  
+                    = addPM (multPM'_ShortUp l i m ns) 
+                            (multPM_ShortUp l ms ns)
+
+
+{-# INLINE multPM'_ShortDown #-}
+multPM'_ShortDown l i m []  = []
+multPM'_ShortDown l i m ((j,n):ns) 
+    | c == 0 || k >= l = multPM'_ShortDown l i m ns
+    | otherwise      = (k,c) : multPM'_ShortDown l i m ns
+  where c = n*m
+        k = i+j
+
+{-# INLINE multPM'_ShortUp #-}
+multPM'_ShortUp l i m []  = []
+multPM'_ShortUp l i m ((j,n):ns) 
+    | c == 0 || k < l = multPM'_ShortUp l i m ns
+    | otherwise      = (k,c) : multPM'_ShortUp l i m ns
   where c = n*m
         k = i+j
 
@@ -319,7 +346,7 @@ reciprocP2 k f = cleanP $ PMS ms False
 --  siehe http://en.wikipedia.org/wiki/Synthetic_division
 divP :: (Show a, Eq a, Fractional a) =>
                               Polynom a -> Polynom a -> (Polynom a,Polynom a)
-divP a b           = divPHensel a b
+divP a b           = divPHorner a b
 
 divPHorner a (PMS [] _)    = error "Division by zero"
 divPHorner a@(PMS as True) b@(PMS bs True)
@@ -369,12 +396,27 @@ modByP f p = snd $ divP f p
 --  Output: h^(-1) mod x^k
 invHensel :: (Show a, Num a, Eq a, Fractional a) => Polynom a -> Int -> Polynom a
 invHensel h k  | isNullP h  = nullP
-               | otherwise  = invHensel' (pKonst 1) 1
-  where invHensel' !a !l  
-          | l >= k     = trace ("invHensel' done l="++show l++" a="++show (length $ unPMS a))$ modMonomP k a
-          | otherwise = trace ("invHensel' l="++show l++" a="++show (length (unPMS a)))$ invHensel' a' l'
-          where a' = (multKonstP 2 a) - (multShortP l' h $ multShortP l' a a)
+               | otherwise  = invHensel' (pKonst 1) 1 1 [] (unPMS h)
+  where invHensel' !a !l !lold !h0 !h1 
+          | l >= k     = -- trace ("invHensel' done l="++show l++" a="++show (length $ unPMS a))$ 
+                        modMonomP k a
+          | otherwise = --trace ("invHensel' l="++show l++" a="++show a
+                        {-++ ", h0="++show h0++", h1="++show h1++"\n"-}
+                        {-++ ", h0'="++show h0'++", h1'="++show h1'-}
+                        {-++ ", a*h0="++show (a*(PMS h0' True))-}
+                        {-++ ", c="++show c ++", b="++show b++"\n")$-}
+                        invHensel' (a+a') l' l h0' h1'
+          where b = negate $ multPShortDown l a $!
+                            (multPShortDown l a (PMS h1' True)) + (PMS c True)
+                a' = multMonomP l b
                 l' = 2*l
+                h1' = map (\(i,m) -> (i-lold,m)) $ takeWhile (\(i,_) -> i>=lold) h1
+                h0'' = filter (\(i,_) -> i<lold) h1
+                h0''' | lold==1 = h0''
+                      | otherwise = map (\(i,m) -> (i+lold,m)) h0''
+                h0' = h0''' ++ h0
+                c   = map (\(i,m) -> (i-l,m)) $ multPM_ShortUp l (unPMS a) h0'
+
 
 
 modMonomP :: (Eq a, Num a) => Int -> Polynom a -> Polynom a
@@ -397,7 +439,7 @@ divPHensel a b
         (lc,b') = moniLcP b
         f  = reciprocP2 m b'
         g  = invHensel f l
-        q  = multShortP l g $ reciprocP2 n a
+        q  = multPShortDown l g $ reciprocP2 n a
         q' = multKonstP lc $ reciprocP2 (l-1) q
         r  = a - b*q'
 
