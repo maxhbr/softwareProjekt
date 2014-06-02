@@ -12,7 +12,9 @@ benchFindIrreds =
     , bench "9" $ whnf findIrreds (getAllMonicPs es1 [9]) ]
   , bgroup "findIrreds e2e2f2" 
     [ bench "3" $ whnf findIrreds (getAllMonicPs es2 [3])
-    , bench "5" $ whnf findIrreds (getAllMonicPs es2 [5]) ] ]
+    , bench "5" $ whnf findIrreds (getAllMonicPs es2 [5])    
+    , bench "7" $ whnf findIrreds (getAllMonicPs es2 [7])    
+    , bench "9" $ whnf findIrreds (getAllMonicPs es2 [9]) ] ]
   where es1 = elems e2f2
         es2 = elems e2e2f2
 
