@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, BangPatterns#-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.Polynomials
@@ -15,9 +15,9 @@ module Projekt.Core.Polynomials
   -- Operationen auf Polynomen
   , degP, uDegP
   -- unär
-  , moniP, deriveP
+  , moniP, moniLcP, deriveP, reciprocP, reciprocP2
   -- binär
-  , divP, (@/), modByP, ggTP, eekP
+  , divP, (@/), modByP, ggTP, eekP, invHensel, divPHensel
   -- weiteres
   , evalP, hasNs
   , getAllP, getAllPs
@@ -204,6 +204,40 @@ multPM' i m ((j,n):ns) | c == 0     = multPM' i m ns
                        | otherwise = (i+j,c) : multPM' i m ns
   where c = n*m
 
+{-# INLINE multMonomP #-}
+-- |Multipliziert f mit x^i
+multMonomP :: (Eq a, Num a) => Int -> Polynom a -> Polynom a
+multMonomP i f@(PMS _ False) = multMonomP i $ cleanP f
+multMonomP i (PMS ms True)   = PMS (map (A.first (+i)) ms) True
+
+{-# INLINE multKonstP #-}
+multKonstP :: (Eq a, Num a) => a -> Polynom a -> Polynom a
+multKonstP a f  = PMS (map (A.second (*a)) ms) True
+  where ms = unPMS $ cleanP f
+
+
+{-# INLINE multShortP #-}
+-- |Multipliziert 2 Polynome miteinander, bei
+--  gleichzeitiger Reduktion mod x^l, d.h.
+--  schneidet alle Terme >= x^l ab
+multShortP :: (Eq a, Num a) => Int -> Polynom a -> Polynom a -> Polynom a
+multShortP l f g  = PMS c True
+  where c = multPM_Short l (unPMS $ cleanP f) (unPMS $ cleanP g)
+
+{-# INLINE multPM_Short #-}
+-- | Multiplikation von absteigend sortierten [(Int,a)] Listen
+multPM_Short :: (Eq a, Num a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+multPM_Short l ms  []     = []
+multPM_Short l []  ns     = []
+multPM_Short l ((i,m):ms) ns  
+                    = addPM (multPM'_Short l i m ns) (multPM_Short l ms ns)
+
+{-# INLINE multPM'_Short #-}
+multPM'_Short l i m []                          = []
+multPM'_Short l i m ((j,n):ns) | c == 0 || k >= l = multPM'_Short l i m ns
+                               | otherwise      = (k,c) : multPM'_Short l i m ns
+  where c = n*m
+        k = i+j
 
 {-# INLINE getLcP #-}
 getLcP :: (Num a, Eq a) => Polynom a -> a
@@ -249,6 +283,14 @@ moniP f@(PMS ms True) = PMS ns True
         l  = snd $ head ms
 moniP f               = moniP $ cleanP f
 
+-- |Normiert f und gibt gleichzeitig das Inverse des Leitkoeefizieten zurück
+moniLcP :: (Num a, Eq a, Fractional a) => Polynom a -> (a,Polynom a)
+moniLcP f@(PMS [] _)    = (0,f)
+moniLcP f@(PMS ms True) = (l,PMS ns True)
+  where ns = map (\(i,m) -> (i,m*l)) ms
+        l  = recip $ snd $ head ms
+moniLcP f               = moniLcP $ cleanP f
+
 
 -- |Nimmt ein Polynom und leitet dieses ab.
 deriveP :: (Num a, Eq a) => Polynom a -> Polynom a
@@ -262,13 +304,22 @@ deriveP (PMS ms b) = PMS (deriveP' ms) b
                 c=m*fromInteger (fromIntegral i)
 
 
+{-# INLINE reciprocP #-}
+reciprocP :: (Eq a, Fractional a) => Polynom a -> Polynom a
+reciprocP f = reciprocP2 d f
+  where d  = uDegP f
 
+
+reciprocP2 :: (Eq a, Fractional a) => Int -> Polynom a -> Polynom a
+reciprocP2 k f = cleanP $ PMS ms False
+  where d  = uDegP f
+        ms = map (\(i,m) -> (k-i,m)) $ unPMS f
 
 -- |divP mit Horner Schema
 --  siehe http://en.wikipedia.org/wiki/Synthetic_division
 divP :: (Show a, Eq a, Fractional a) =>
                               Polynom a -> Polynom a -> (Polynom a,Polynom a)
-divP a b           = divPHorner a b
+divP a b           = divPHensel a b
 
 divPHorner a (PMS [] _)    = error "Division by zero"
 divPHorner a@(PMS as True) b@(PMS bs True)
@@ -291,10 +342,11 @@ divPHornerM' _  [] _ _ = []
 divPHornerM' divs ff@((i,f):fs) lc n
   | n > fst (head ff)  = ff
   | otherwise            = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++
-      --" ff="++show ff++"\n-> i="++show i++" n="++show n++" => (i,fbar)="++show (i,fbar)++" hs="++show hs) $
+     -- " ff="++show ff++"\n-> i="++show i++" n="++show n++" => (i,fbar)="++show (i,fbar)++" hs="++show hs) $
         (i,fbar) : divPHornerM' divs hs lc n
   where fbar = f/lc
-        hs   = addPM fs $ map ( (+) (i-n) A.*** (*) fbar) divs
+        hs   = addPM fs $! js 
+        js   = map ( (+) (i-n) A.*** (*) fbar) divs
 
 {-# INLINE divP' #-}
 divP' :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
@@ -308,9 +360,47 @@ divP' a b = fst $ divP a b
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
 -- Also Division mit rest und Rüchgabewert ist der Rest.
 --
--- mehr Performance durch andere Rechnung?
 modByP :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 modByP f p = snd $ divP f p
+
+-- |Hensel inverse lift
+--  Input: Polynom h mit h(0) = 1
+--         Int l
+--  Output: h^(-1) mod x^k
+invHensel :: (Show a, Num a, Eq a, Fractional a) => Polynom a -> Int -> Polynom a
+invHensel h k  | isNullP h  = nullP
+               | otherwise  = invHensel' (pKonst 1) 1
+  where invHensel' !a !l  
+          | l >= k     = trace ("invHensel' done l="++show l++" a="++show (length $ unPMS a))$ modMonomP k a
+          | otherwise = trace ("invHensel' l="++show l++" a="++show (length (unPMS a)))$ invHensel' a' l'
+          where a' = (multKonstP 2 a) - (multShortP l' h $ multShortP l' a a)
+                l' = 2*l
+
+
+modMonomP :: (Eq a, Num a) => Int -> Polynom a -> Polynom a
+modMonomP _ (PMS [] _)    = nullP
+modMonomP l (PMS ms True) = PMS (dropWhile (\(i,_) -> i>=l) ms) True
+modMonomP l f             = modMonomP l $ cleanP f
+
+
+divPHensel :: (Show a, Eq a, Fractional a) =>
+              Polynom a -> Polynom a -> (Polynom a, Polynom a)
+divPHensel a b
+    | isNullP a = (nullP, nullP)
+    | a == b     = (pKonst 1,nullP)
+    | l <= 0     = (nullP,a)
+    | otherwise = --trace ("a="++show a++" b="++show b++"\n=>f="++show f++" g="++show g++" test g*f mod x^l ="++show (modMonomP l (g*f))++" q="++show q) $
+                  (q',r)
+  where n  = uDegP a
+        m  = uDegP b
+        l  = n-m+1
+        (lc,b') = moniLcP b
+        f  = reciprocP2 m b'
+        g  = invHensel f l
+        q  = multShortP l g $ reciprocP2 n a
+        q' = multKonstP lc $ reciprocP2 (l-1) q
+        r  = a - b*q'
+
 
 
 {-# INLINE eekP #-}

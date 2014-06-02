@@ -12,8 +12,8 @@ import qualified AlgSandbox
 --------------------------------------------------------------------------------
 main :: IO ()
 main = do
-  PFSandbox.main
+  {-PFSandbox.main-}
   PolySandbox.main
-  FFSandbox.main
-  MatrixSandbox.main
-  AlgSandbox.main
+  {-FFSandbox.main-}
+  {-MatrixSandbox.main-}
+  {-AlgSandbox.main-}

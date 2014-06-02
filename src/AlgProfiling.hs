@@ -34,8 +34,11 @@ e4f2 = FFElem (pList [0,1::F2]) e4f2Mipo
  -        = (x+1)(x²+1)³(x+2)⁴
  -}
 {-f=pList [1::F3,0,2,2,0,1,1,0,2,2,0,1]-}
-f = pTupUnsave [(11,1::F3),(9,2)]
+f = pTupUnsave [(11,1),(8,2::F3),(6,1),(5,1),(3,2),(2,2),(0,1)]
 {-f' = poly LE [1::F3,0,2,2,0,1,1,0,2,2,0,1] -}
+
+a = pTupUnsave [(6,3::F5),(5,2),(4,1),(3,1),(1,2),(0,3)]
+b = pTupUnsave [(6,2::F5),(5,1),(4,3),(2,4)]
 
 testPoly1 = pList $ listFFElem e4f2Mipo [ pList [0::F2,0,1,1]
                                     , 1
@@ -97,5 +100,5 @@ main :: IO ()
 {-main = mapM_ print $ map appBerlekamp $ map appSff $ findTrivialsNs $ getAllMonicPs (elems (1::F3)) [2]-}
 {-main = print $ length $ filter (\x -> x) $ map (rabin . toPMS) $ getAllMonicPs (elems (1::F3)) [8]-}
 {-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [7]-}
-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [7]
-{-main = print $ f^10-}
+{-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [7]-}
+main = print $ snd $ (divP (pTupUnsave [(3^11,1),(1,-1)]) f)
