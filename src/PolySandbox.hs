@@ -32,7 +32,7 @@ exmpPolyMod3' = pTup [(0,2::F3), (3,1::F3)]
 exmpPolyMod5  = pList [4::F5, 1, 0, 0, 4, 1]
 
 --------------------------------------------------------------------------------
-testSize = 30
+testSize = 3
 
 unDivP (q,r) a b = a == q * b + r
 unEekP (d,s,t) a b = d == s*a + t*b
@@ -48,11 +48,11 @@ subroutine list = do
   it "test divPHorner <-> divPHensel" $
     pMapM_ (\ (x,y) -> (divPHensel x y) `shouldBe` (divP x y)) $
           zip (take testSize list) (drop testSize list)
-  {-it "x/0 throws exception" $-}
-    {-pMapM_ (\x -> evaluate (divP x (nullP)) `shouldThrow` anyException) list-}
-  {-it "test eekP" $-}
-    {-pMapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $-}
-          {-zip (take testSize list) (drop testSize list)-}
+  it "x/0 throws exception" $
+    pMapM_ (\x -> evaluate (divP x (nullP)) `shouldThrow` anyException) list
+  it "test eekP" $
+    pMapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
+          zip (take testSize list) (drop testSize list)
 
 main :: IO ()
 main = do
@@ -60,8 +60,11 @@ main = do
   list  <- rndSelect (getAllP (units undefined ::[F5]) 4) (2*testSize)
   wList <- rndSelect (getAllP (units e4f2) 4)            (2*testSize)
   hspec $ do
+    describe "Projekt.Core.Polynomials Basic" $ 
+      it "P[1] == P[1,0]" $
+        pList [1] `shouldBe` pList[1,0]
     describe "Projekt.Core.Polynomials @F5 (subset)" $ subroutine list
-    {-describe "Projekt.Core.Polynomials @e2f2 (full)" $-}
-      {-subroutine (getAllP (units e2f2) 4)-}
+    describe "Projekt.Core.Polynomials @e2f2 (full)" $
+      subroutine (getAllP (units e2f2) 4)
     --describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList
-    {-describe "Projekt.Core.Polynomials @e4f2 (subset)" $ subroutine wList-}
+    describe "Projekt.Core.Polynomials @e4f2 (subset)" $ subroutine wList
