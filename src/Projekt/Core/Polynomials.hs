@@ -39,7 +39,7 @@ import Projekt.Core.ShowTex
 -- |Polynome sind Listen von Monomen, welche durch Paare (Integer,a)
 -- dargestellt werden. In der ersten Stelle steht der Grad, in der zweiten der
 -- Koeffizient.
-data Polynom a = PMS { unPMS :: ![(Int,a)], clean :: !Bool} deriving ()
+data Polynom a = PMS { unPMS :: [(Int,a)], clean :: Bool} deriving ()
 
 -- |Das Nullpoylnom
 nullP = PMS [] True
@@ -93,6 +93,7 @@ instance (Eq a, Num a) => Eq (Polynom a) where
   {-f == g = unP (aggP f) == unP (aggP g)-}
   f == g = eqP f g
 
+{-# INLINE eqP #-}
 eqP :: (Eq a, Num a) => Polynom a -> Polynom a -> Bool
 eqP (PMS ms True) (PMS ns True)  = eqP' ms ns 
   where eqP' [] ns = isNullP' ns
@@ -100,6 +101,7 @@ eqP (PMS ms True) (PMS ns True)  = eqP' ms ns
         eqP' ((i,m):ms) ((j,n):ns) =  i==j && m==n && eqP' ms ns
 eqP f g  = eqP (cleanP f) (cleanP g)
 
+{-# INLINE isNullP #-}
 isNullP (PMS ms _) = isNullP' ms
 isNullP' []     = True
 isNullP' ((i,m):ms) | m /= 0     = False
@@ -175,11 +177,11 @@ addPM :: (Eq a,Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 addPM [] gs          = gs
 addPM fs []          = fs
 addPM ff@((i,f):fs) gg@((j,g):gs)
-  | i==j && c/=0  = (i,f+g) : addPM fs gs
+  | i==j && c/=0  = (i,c) : addPM fs gs
   | i==j && c==0  = addPM fs gs
   | i<j         = (j,g) : addPM ff gs
   | i>j         = (i,f) : addPM fs gg
-   where c = f+g
+   where !c = f+g
 
 
 {-# INLINE zipSum #-}
@@ -196,13 +198,17 @@ zipSum (x:xs) (y:ys) = (x+y) : zipSum xs ys
 multPM :: (Eq a, Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 multPM  ms  []     = []
 multPM  []  ns     = []
-multPM  ((i,m):ms) ns  = addPM (multPM' i m ns) (multPM ms ns)
+multPM  ((i,m):ms) ns  = addPM a b
+  where !a = multPM' i m ns
+        !b = multPM ms ns
+
 
 {-# INLINE multPM' #-}
 multPM' i m []                     = []
 multPM' i m ((j,n):ns) | c == 0     = multPM' i m ns
-                       | otherwise = (i+j,c) : multPM' i m ns
-  where c = n*m
+                       | otherwise = (k,c) : multPM' i m ns
+  where !c = n*m
+        !k = i+j
 
 {-# INLINE multMonomP #-}
 -- |Multipliziert f mit x^i
