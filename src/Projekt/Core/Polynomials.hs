@@ -514,5 +514,6 @@ getAllMonicPs es is = map (\x -> PMS x True) $ concat [allMonics i | i <- is]
         ess i       | i == 0     = [[(0,y)] | y <- swpes]
                     | otherwise = [[(i,y)] | y <- swpes] ++ (ess (i-1)) ++ 
                               [(i,y):ys | y <- swpes, ys <- ess (i-1)]
-        swpes       = filter (/=0) es
+        swpes       = tail es ++ [head es]
+        {-one         = head [e | e <- es, e == 1]-}
         {-one         = (\ x -> x / x) $ head [e | e <- es, e /= 0]-}
