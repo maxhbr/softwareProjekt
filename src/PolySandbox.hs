@@ -32,17 +32,15 @@ exmpPolyMod3' = pTup [(0,2::F3), (3,1::F3)]
 exmpPolyMod5  = pList [4::F5, 1, 0, 0, 4, 1]
 
 --------------------------------------------------------------------------------
-testSize = 3
-
-unDivP (q,r) a b = a == q * b + r
-unEekP (d,s,t) a b = d == s*a + t*b
-
+--------------------------------------------------------------------------------
 subroutineAdd list = do
   it "test * (x+0=x)" $
     pMapM_ (\ x -> x + pKonst 0 `shouldBe` x) list
   it "test * (x-x=0)" $
     pMapM_ (\ x -> x - x `shouldBe` pKonst 0) list
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 subroutineMult list = do
   it "test * (x*1=x)" $
     pMapM_ (\ x -> x * pKonst 1 `shouldBe` x) list
@@ -50,6 +48,8 @@ subroutineMult list = do
     pMapM_ (\ (x,y) -> x * y == y * x `shouldBe` True) $
           zip (take testSize list) (drop testSize list)
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 subroutineDiv list = do
   it "test divP (x/x=1)" $
     pMapM_ (\ x -> divPHensel x x `shouldBe` (pKonst 1, nullP)) list
@@ -64,7 +64,19 @@ subroutineDiv list = do
   it "test eekP" $
     pMapM_ (\ (x, y) -> unEekP (eekP x y) x y `shouldBe` True) $
           zip (take testSize list) (drop testSize list)
+  where unDivP (q,r) a b = a == q * b + r
+        unEekP (d,s,t) a b = d == s*a + t*b
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+subroutine list = do
+  subroutineAdd list
+  subroutineMult list
+  subroutineDiv list
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+testSize = 3
 main :: IO ()
 main = do
   list  <- rndSelect (getAllP (units undefined ::[F5]) 6) (2*testSize)
@@ -73,16 +85,10 @@ main = do
     describe "Projekt.Core.Polynomials Basic" $ 
       it "P[1] == P[1,0]" $
         pList [1] `shouldBe` pList[1,0]
-    describe "Projekt.Core.Polynomials @F5 (subset)" $ do
-      subroutineAdd list
-      subroutineMult list
-      subroutineDiv list
-    describe "Projekt.Core.Polynomials @e2f2 (full)" $ do
-      subroutineAdd (getAllP (units e2f2) 4)
-      subroutineMult (getAllP (units e2f2) 4)
-      subroutineDiv (getAllP (units e2f2) 4)
+    describe "Projekt.Core.Polynomials @F5 (subset)" $
+      subroutine list
+    describe "Projekt.Core.Polynomials @e2f2 (full)" $
+      subroutine (getAllP (units e2f2) 4)
     --describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList
-    describe "Projekt.Core.Polynomials @e4f2 (subset)" $ do
-      subroutineAdd wList
-      subroutineMult wList
-      subroutineDiv wList
+    describe "Projekt.Core.Polynomials @e4f2 (subset)" $
+      subroutine wList
