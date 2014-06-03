@@ -79,8 +79,9 @@ subroutine list = do
 testSize = 3
 main :: IO ()
 main = do
-  list  <- rndSelect (getAllP (units undefined ::[F5]) 6) (2*testSize)
-  wList <- rndSelect (getAllP (units e4f2) 4)            (2*testSize)
+  list  <- rndSelect (getAllP (elems undefined ::[F5]) 6) (2*testSize)
+  vList <- rndSelect (getAllP (elems e2f2) 4)            (2*testSize)
+  wList <- rndSelect (getAllP (elems e4f2) 4)            (2*testSize)
   hspec $ do
     describe "Projekt.Core.Polynomials Basic" $ 
       it "P[1] == P[1,0]" $
@@ -88,7 +89,9 @@ main = do
     describe "Projekt.Core.Polynomials @F5 (subset)" $
       subroutine list
     describe "Projekt.Core.Polynomials @e2f2 (full)" $
-      subroutine (getAllP (units e2f2) 4)
+      subroutine (getAllP (elems e2f2) 4)
     --describe "Projekt.Core.Polynomials @e2e2f2"    $ subroutine vList
-    describe "Projekt.Core.Polynomials @e4f2 (subset)" $
-      subroutine wList
+    describe "Projekt.Core.Polynomials @e2f2 (subset)" $
+      subroutine vList
+    {-describe "Projekt.Core.Polynomials @e4f2 (subset)" $-}
+      {-subroutine wList-}
