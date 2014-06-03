@@ -196,7 +196,7 @@ zipSum (x:xs) (y:ys) = (x+y) : zipSum xs ys
 {-# INLINE multPM #-}
 -- | Multiplikation von absteigend sortierten [(Int,a)] Listen
 multPM :: (Eq a, Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
-#if 0
+#if 1
 multPM  ((i,m):ms) ns  = addPM a b
   where !a = multPM' i m ns
         !b = multPM ms ns
