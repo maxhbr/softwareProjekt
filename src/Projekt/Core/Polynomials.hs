@@ -76,9 +76,8 @@ cleanP   (PMS ms False) = PMS (clean' ms) True
 
 -- |Erzeugt aus einer Liste von Monomen eine Liste von Koeffizienten.
 tuple2List :: (Num a) => [(Int,a)]-> [a]
-tuple2List ms = tuple2List' ms
-  where tuple2List' [] = []
-        tuple2List' ((i,m):ms) = zipSum ([0 | j <- [1..i]] ++ [m]) $ tuple2List' ms
+tuple2List [] = []
+tuple2List ((i,m):ms) = zipSum ([0 | j <- [1..i]] ++ [m]) $ tuple2List ms
 
 -- |Wandelt eine Liste von Koeffizienten in eine Liste von Monomen.
 --  Diese ist bereits dem Grade nach absteigend sortiert.
@@ -86,7 +85,7 @@ list2TupleSave :: (Eq a, Num a) => [a] -> [(Int,a)]
 list2TupleSave ms = list2Tuple' ms 0
   where list2Tuple' [] n                 = []
         list2Tuple' (m:ms) n | m == 0     = list2Tuple' ms (n+1)
-                             | otherwise = (list2Tuple' ms (n+1)) ++ [(n,m)]
+                             | otherwise = list2Tuple' ms (n+1) ++ [(n,m)]
 
 
 instance (Eq a, Num a) => Eq (Polynom a) where
@@ -304,9 +303,9 @@ uDegP = fromJust . degP
 
 
 instance (Num a, Binary a) => Binary (Polynom a) where
-   put (PMS x _) = put $ x
+   put (PMS x _) = put x
    get       = do x <- get
-                  return $ (PMS x False)
+                  return $ PMS x False
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen
@@ -351,13 +350,13 @@ reciprocP f = reciprocP2 d f
 reciprocP2 :: (Eq a, Fractional a) => Int -> Polynom a -> Polynom a
 reciprocP2 k f = cleanP $ PMS ms False
   where d  = uDegP f
-        ms = map (\(i,m) -> (k-i,m)) $ unPMS f
+        ms = map (A.first (k -)) $ unPMS f
 
 -- |divP mit Horner Schema
 --  siehe http://en.wikipedia.org/wiki/Synthetic_division
 divP :: (Show a, Eq a, Fractional a) =>
                               Polynom a -> Polynom a -> (Polynom a,Polynom a)
-divP a b           = divPHorner a b
+divP = divPHorner
 
 divPHorner a (PMS [] _)    = error "Division by zero"
 divPHorner a@(PMS as True) b@(PMS bs True)
@@ -418,7 +417,7 @@ invHensel h k  | isNullP h  = nullP
                         {-++ ", c="++show c ++", b="++show b++"\n")$-}
                         invHensel' (a+a') l' l h0' h1'
           where b = negate $ multPShortDown l a $!
-                            (multPShortDown l a (PMS h1' True)) + (PMS c True)
+                            multPShortDown l a (PMS h1' True) + PMS c True
                 a' = multMonomP l b
                 l' = 2*l
                 h1' = map (\(i,m) -> (i-lold,m)) $ takeWhile (\(i,_) -> i>=lold) h1
@@ -481,7 +480,7 @@ evalP :: (Eq a, Num a) => a -> Polynom a -> a
 evalP x f = evalP' x (unPMS $ cleanP f)
 evalP' :: (Num a) => a -> [(Int,a)] -> a
 evalP' x []   = 0
-evalP' x fs   = foldl' (\a -> \(_,m) -> a*x+m) 0 fs
+evalP' x fs   = foldl' (\a (_,m) -> a*x+m) 0 fs
 
 hasNs :: (Eq a, Fractional a) => Polynom a -> [a] -> Bool
 hasNs f es = not (null [f | e <- es, evalP e f == 0])
@@ -508,12 +507,10 @@ getAllMonicP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
 getAllMonicP es d = getAllMonicPs es [0..d]
 
 getAllMonicPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
-getAllMonicPs es is = map (\x -> PMS x True) $ concat [allMonics i | i <- is]
+getAllMonicPs es is = map (`PMS` True) $ concat [allMonics i | i <- is]
   where allMonics 0 = [[(0,1)]]
         allMonics i = [[(i,1)]] ++ [(i,1):rs | rs <- ess (i-1)]
         ess i       | i == 0     = [[(0,y)] | y <- swpes]
                     | otherwise = [[(i,y)] | y <- swpes] ++ (ess (i-1)) ++ 
                               [(i,y):ys | y <- swpes, ys <- ess (i-1)]
         swpes       = tail es ++ [head es]
-        {-one         = head [e | e <- es, e == 1]-}
-        {-one         = (\ x -> x / x) $ head [e | e <- es, e /= 0]-}
