@@ -33,6 +33,7 @@ import Debug.Trace
 
 import Projekt.Core.ShowTex
 
+
 --------------------------------------------------------------------------------
 --  Data Definition
 

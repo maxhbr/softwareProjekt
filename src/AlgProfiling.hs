@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 import Debug.Trace
 
 import Projekt.Core
@@ -7,6 +8,7 @@ import Data.List
 --import Math.Polynomial (poly, Poly, multPoly, Endianness (LE))
 --import Data.Matrix hiding ( (<->), (<|>))
 --import qualified Data.Matrix as M
+import Projekt.Core.Polynomials.FFT
 
 {----------------------------------------------------------------------------------}
 {---  Beispiele-}
@@ -40,6 +42,8 @@ f = pTupUnsave [(11::Int,1),(8,2),(6,1),(5,1),(3,2),(2,2),(0,1)]
 
 a = pTupUnsave [(6,3::F5),(5,2),(4,1),(3,1),(1,2),(0,3)]
 b = pTupUnsave [(6,2::F5),(5,1),(4,3),(2,4)]
+
+c = pTupUnsave [(4,1::F5)]
 
 testPoly1 = pList $ listFFElem e4f2Mipo [ pList [0::F2,0,1,1]
                                     , 1
@@ -86,8 +90,8 @@ l = take 100 $ getAllMonicPs (elems (1::F3)) [100]
 
 {-heavyBench :: (Num a, Eq a) => [(Int,a)] -> Int -> [(Int,a)]-}
 heavyBench f 0 = f
-heavyBench f n = (*) f $! heavyBench f (n-1)
-
+heavyBench f n = ssP g g
+  where !g  = heavyBench f (n-1)
 
 
 main :: IO ()
@@ -109,4 +113,4 @@ main :: IO ()
 {-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [7]-}
 {-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [7]-}
 {-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
-main = print $ last $ p2Tup $! heavyBench f 500
+main = print $ last $ p2Tup $! heavyBench a 7
