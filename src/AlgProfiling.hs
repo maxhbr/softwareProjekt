@@ -1,6 +1,8 @@
 {-# LANGUAGE BangPatterns #-}
 import Debug.Trace
 
+import Control.Arrow as A
+
 import Projekt.Core
 import Projekt.Algorithmen
 {-import System.Random-}
@@ -57,6 +59,12 @@ testPoly3 = pList $ listFFElem e4f2Mipo [ pList [0::F2,0,1,1]
 testPoly = testPoly1^2 * testPoly2 * testPoly3
 
 
+testPolyF5 = pList $ listFFElem (pList [2::F5,4,1]) 
+                                  [ pList [0::F5,0,1,1]
+                                    , 1
+                                    , pList [1::F5,1,1]
+                                    , pList [0::F5,1]
+                                    , pList [1::F5,1,0,1] ]
 multMyPoly f 1 = f
 multMyPoly f n = f * multMyPoly f (n-1)
 
@@ -85,11 +93,10 @@ prob1d e deg = map (\x -> map (\(i,f) -> berlekamp f) x) $ findTrivialsSff $ get
 
 l = take 100 $ getAllMonicPs (elems (1::F3)) [100]
 
-{-heavyBench :: (Num a, Eq a) => [(Int,a)] -> Int -> [(Int,a)]-}
-heavyBench f 0 = f
-heavyBench f n = g*g --pTupUnsave $ multPMKaratsuba (p2Tup g) (p2Tup g)
-  where !g  = heavyBench f (n-1)
 
+heavyBench mul f 0 = f
+heavyBench mul f n = mul f g
+  where g = heavyBench mul f (n-1) 
 
 main :: IO ()
 {-main = print $ map fst $ sffAndBerlekamp testPoly-}
@@ -107,7 +114,12 @@ main :: IO ()
 {-main = print $ map (\f -> hasNs f (elems (1::F3))) $ getAllMonicPs (elems (1::F3)) [2]-}
 {-main = mapM_ print $ map appBerlekamp $ map appSff $ findTrivialsNs $ getAllMonicPs (elems (1::F3)) [2]-}
 {-main = print $ length $ filter (\x -> x) $ map (rabin . toPMS) $ getAllMonicPs (elems (1::F3)) [8]-}
-{-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [7]-}
-{-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [7]-}
+main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [9]
+{-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [9]-}
 {-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
-main = print $ last $ p2Tup $! heavyBench a 9
+{-main = print $ foldr1 (+) $ map (snd) $ p2Tup $ heavyBench testPoly1 200-}
+{-main = print $ foldr1 (+) $ map (snd) $ heavyBench' (p2Tup testPoly1) 200-}
+{-main = print $ multMyPolys (e2f2Mipo^1000) (e2f2Mipo^1000)-}
+{-main = print $ multPMKaratsuba (p2Tup (testPolyF5^1000)) (p2Tup (testPolyF5^1000))-}
+{-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
+

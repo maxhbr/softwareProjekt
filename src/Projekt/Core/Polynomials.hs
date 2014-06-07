@@ -15,7 +15,7 @@ module Projekt.Core.Polynomials
   -- Operationen auf Polynomen
   , degP, uDegP
   -- unär
-  , moniP, moniLcP, deriveP, reciprocP, reciprocP2
+  , moniP, moniLcP, deriveP, reciprocP, reciprocP2, multMonomP
   -- binär
   , divP, (@/), modByP, ggTP, eekP, invHensel, divPHensel
   -- weiteres
@@ -23,7 +23,7 @@ module Projekt.Core.Polynomials
   , addPM, multPM
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
-  , multPMKaratsuba
+  , multPK, multPMKaratsuba
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -164,6 +164,9 @@ instance (Num a, Eq a) => Num (Polynom a) where
   {-# INLINE (+) #-}
   f@(PMS _ _) + g@(PMS _ _) = PMS hs True
     where hs = addPM (unPMS $ cleanP f) (unPMS $ cleanP g)
+  {-# INLINE (-) #-}
+  f@(PMS _ _) - g@(PMS _ _) = PMS hs True
+    where hs = subtrPM (unPMS $ cleanP f) (unPMS $ cleanP g)
   {-# INLINE (*) #-}
   f@(PMS _ _) * g@(PMS _ _) = PMS hs True
     where hs = multPM (unPMS $ cleanP f) (unPMS $ cleanP g)
@@ -184,6 +187,23 @@ addPM ff@((i,f):fs) gg@((j,g):gs)
   | i<j         = (j,g) : addPM ff gs
   | i>j         = (i,f) : addPM fs gg
    where !c = f+g
+
+{-# RULES 
+"addPM/negate" forall f g. addPM f (negate g) = subtrPM f g
+"addPM/negate2" forall f g. addPM (negate f) g = subtrPM g f
+  #-}
+{-# INLINE subtrPM #-}
+-- | subtrahiere Polynome in Monomdarstellung, d.h
+--   [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist
+subtrPM :: (Eq a,Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+subtrPM [] gs          = map (A.second (negate)) gs
+subtrPM fs []          = fs
+subtrPM ff@((i,f):fs) gg@((j,g):gs)
+  | i==j && c/=0  = (i,c) : subtrPM fs gs
+  | i==j && c==0  = subtrPM fs gs
+  | i<j         = (j,negate g) : subtrPM ff gs
+  | i>j         = (i,f) : subtrPM fs gg
+   where !c = f-g
 
 
 {-# INLINE zipSum #-}
@@ -220,6 +240,12 @@ multPM' i m ((j,n):ns) | c == 0     = multPM' i m ns
 -------------------------------------------------------------------------------
 -- Karatsuba Multiplikation
 
+{-# INLINE multPK #-}
+multPK :: (Show a, Num a, Eq a) => Polynom a -> Polynom a -> Polynom a
+multPK f g = PMS h True
+  where h = multPMKaratsuba ((unPMS.cleanP) f) ((unPMS.cleanP) g)
+
+{-# INLINE multPMKaratsuba #-}
 multPMKaratsuba :: (Show a, Num a, Eq a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 multPMKaratsuba f g  = multPMK' n f g
   where n  = (next2Pot (max df dg)) `quot` 2
@@ -232,11 +258,11 @@ multPMK' _ _ [] = []
 multPMK' _ [] _ = []
 multPMK' _ [(i,x)] g = map (\(j,y) -> (i+j,x*y)) g
 multPMK' _ f [(i,x)] = map (\(j,y) -> (i+j,x*y)) f
-multPMK' _ [(i1,x1),(i2,x2)] [(j1,y1),(j2,y2)]
+multPMK' 1 [(i1,x1),(i2,x2)] [(j1,y1),(j2,y2)]
       = [(2,p1), (1,p3-p1-p2), (0,p2)]
-  where p1 = x1*y1
-        p2 = x2*y2
-        p3 = (x1+x2)*(y1+y2)
+  where !p1 = x1*y1
+        !p2 = x2*y2
+        !p3 = (x1+x2)*(y1+y2)
 multPMK' n f g = --trace ("karat n="++show n
         {-++"\n\tf="++show f++"\n\tg="++show g-}
         {-++"\n\t=>fH="++show fH++" fL="++show fL-}
@@ -249,22 +275,34 @@ multPMK' n f g = --trace ("karat n="++show n
         {-++"\n\t  e3="++show e3)$-}
                   addPM e1 $ addPM e2 e3
   where  -- High und Low Parts
+        {-# INLINE fH' #-}
         fH' = takeWhile (\(i,_) -> i>=n) f
+        {-# INLINE fH #-}
         fH = map (A.first (\i -> i-n)) fH'
+        {-# INLINE fL #-}
         fL = f \\ fH'
+        {-# INLINE gH' #-}
         gH' = takeWhile (\(i,_) -> i>=n) g
+        {-# INLINE gH #-}
         gH = map (A.first (\i -> i-n)) gH'
+        {-# INLINE gL #-}
         gL = g \\ gH'
         -- Rekursiver Karatsuba
+        {-# INLINE p1 #-}
         p1 = multPMK' (n `quot` 2) fH gH
+        {-# INLINE p2 #-}
         p2 = multPMK' (n `quot` 2) fL gL
+        {-# INLINE p3 #-}
         p3 = multPMK' (n `quot` 2) (addPM fH fL) (addPM gH gL)
+        {-# INLINE e1 #-}
         e1 = map (A.first (+(2*n))) p1
-        e2 = map (A.first (+n)) $ addPM p3 $
-                                  (map (A.second (negate)) $ addPM p1 p2)
+        {-# INLINE e2 #-}
+        e2 = map (A.first (+n)) $ subtrPM p3 $ (addPM p1 p2)
+        {-# INLINE e3 #-}
         e3 = p2
 
 
+{-# INLINE next2Pot #-}
 next2Pot :: Int -> Int
 next2Pot l = next2Pot' 1
   where next2Pot' n | n >= l     = n
@@ -432,6 +470,7 @@ divPHorner a@(PMS as True) b@(PMS bs True)
         toP (a,b)  = (PMS a True, PMS b True)
 divPHorner a b = divPHorner (cleanP a) (cleanP b)
 
+{-# INLINE divPHornerM' #-}
 -- |Horner für absteigend sortierte [(Int,a)] Paare
 divPHornerM' _  [] _ _ = []
 divPHornerM' divs ff@((i,f):fs) lc n
@@ -440,7 +479,9 @@ divPHornerM' divs ff@((i,f):fs) lc n
      -- " ff="++show ff++"\n-> i="++show i++" n="++show n++" => (i,fbar)="++show (i,fbar)++" hs="++show hs) $
         (i,fbar) : divPHornerM' divs hs lc n
   where fbar = f/lc
+        {-# INLINE hs #-}
         hs   = addPM fs $! js 
+        {-# INLINE js #-}
         js   = map ( (+) (i-n) A.*** (*) fbar) divs
 
 {-# INLINE divP' #-}
