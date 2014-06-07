@@ -9,7 +9,7 @@
 --------------------------------------------------------------------------------
 module Projekt.Core.Polynomials
   ( Polynom, pList, pTup, pTupUnsave, pKonst, p2Tup, p2List
-  , nullP, isNullP
+  , nullP, isNullP, isNullP'
   -- getter
   , getDegrees, getLcP
   -- Operationen auf Polynomen
@@ -20,8 +20,10 @@ module Projekt.Core.Polynomials
   , divP, (@/), modByP, ggTP, eekP, invHensel, divPHensel
   -- weiteres
   , evalP, hasNs
+  , addPM, multPM
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
+  , multPMKaratsuba
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -105,7 +107,7 @@ eqP f g  = eqP (cleanP f) (cleanP g)
 isNullP (PMS ms _) = isNullP' ms
 isNullP' []     = True
 isNullP' ((i,m):ms) | m /= 0     = False
-                  | otherwise = isNullP' ms
+                    | otherwise = isNullP' ms
 
 
 if' :: Bool -> a -> a -> a
@@ -203,8 +205,8 @@ multPM  ((i,m):ms) ns  = addPM a b
   where !a = multPM' i m ns
         !b = multPM ms ns
 #else
-multPM ms ns = foldr addPM [(0,0)] summanten
-  where  summanten = [multPM' i m ns | (i,m) <- ms]
+multPM ms ns = foldr addPM [(0,0)] summanden
+  where  summanden = [multPM' i m ns | (i,m) <- ms]
 #endif
 
 
@@ -214,6 +216,61 @@ multPM' i m ((j,n):ns) | c == 0     = multPM' i m ns
                        | otherwise = (k,c) : multPM' i m ns
   where !c = n*m
         !k = i+j
+
+-------------------------------------------------------------------------------
+-- Karatsuba Multiplikation
+
+multPMKaratsuba :: (Show a, Num a, Eq a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+multPMKaratsuba f g  = multPMK' n f g
+  where n  = (next2Pot (max df dg)) `quot` 2
+        df = if null f then 0 else (fst $ head f)+1
+        dg = if null g then 0 else (fst $ head g)+1
+
+-- Der eigentliche Karatsuba
+multPMK' :: (Show a, Num a, Eq a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+multPMK' _ _ [] = []
+multPMK' _ [] _ = []
+multPMK' _ [(i,x)] g = map (\(j,y) -> (i+j,x*y)) g
+multPMK' _ f [(i,x)] = map (\(j,y) -> (i+j,x*y)) f
+multPMK' _ [(i1,x1),(i2,x2)] [(j1,y1),(j2,y2)]
+      = [(2,p1), (1,p3-p1-p2), (0,p2)]
+  where p1 = x1*y1
+        p2 = x2*y2
+        p3 = (x1+x2)*(y1+y2)
+multPMK' n f g = --trace ("karat n="++show n
+        {-++"\n\tf="++show f++"\n\tg="++show g-}
+        {-++"\n\t=>fH="++show fH++" fL="++show fL-}
+        {-++"\n\t  gH="++show gH++" gL="++show gL-}
+        {-++"\n\t=>p1="++show p1-}
+        {-++"\n\t  p2="++show p2-}
+        {-++"\n\t  p3="++show p3-}
+        {-++"\n\t=>e1="++show e1-}
+        {-++"\n\t  e2="++show e2-}
+        {-++"\n\t  e3="++show e3)$-}
+                  addPM e1 $ addPM e2 e3
+  where  -- High und Low Parts
+        fH' = takeWhile (\(i,_) -> i>=n) f
+        fH = map (A.first (\i -> i-n)) fH'
+        fL = f \\ fH'
+        gH' = takeWhile (\(i,_) -> i>=n) g
+        gH = map (A.first (\i -> i-n)) gH'
+        gL = g \\ gH'
+        -- Rekursiver Karatsuba
+        p1 = multPMK' (n `quot` 2) fH gH
+        p2 = multPMK' (n `quot` 2) fL gL
+        p3 = multPMK' (n `quot` 2) (addPM fH fL) (addPM gH gL)
+        e1 = map (A.first (+(2*n))) p1
+        e2 = map (A.first (+n)) $ addPM p3 $
+                                  (map (A.second (negate)) $ addPM p1 p2)
+        e3 = p2
+
+
+next2Pot :: Int -> Int
+next2Pot l = next2Pot' 1
+  where next2Pot' n | n >= l     = n
+                    | otherwise = next2Pot' $! 2*n
+
+
 
 {-# INLINE multMonomP #-}
 -- |Multipliziert f mit x^i

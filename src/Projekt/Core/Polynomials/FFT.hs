@@ -71,14 +71,15 @@ ss 1 f g = multLists f g
 ss 2 f g = multLists f g
 ss l f g 
   | (all (==0) f) || (all (==0) g) = [] 
-  | otherwise = --trace ("ss with l="++show l++" l'="++show l'++" m="++show m++" m'="++show m'
-      {-++"\nf="++show f++"\ng="++show g-}
-      {-++"\n\t fs="++show fs++" gs="++show gs-}
-      {-++"\n\t fs'="++show fs'++" gs'="++show gs'-}
-      {-++"\n\t fftFs="++show (map (pList) fftFs)++"\n\tffTGs="++show (map pList fftGs)-}
-      {-++"\n\t -> ffTHs"++show (map pList fftHs)-}
-      {-++"\n\t xi*(2*m'-2)="++show (xi*(2*m'-2))++" hs''="++show (map pList hs'')-}
-      {-++"\n\t hs'="++show hs'++" \n\ths="++show hs) $-}
+  | otherwise = trace ("ss with l="++show l++" l'="++show l'++" m="++show m++" m'="++show m'
+      ++"\nf="++show f++"\ng="++show g
+      ++"\n\t fs="++show fs++" gs="++show gs
+      ++"\n\t fs'="++show fs'++" gs'="++show gs'
+      ++"\n\t fftFs="++show (map (pList) fftFs)++"\n\tffTGs="++show (map pList fftGs)
+      ++"\n\t -> ffTHs"++show (map pList fftHs)
+      ++"\n\t xi*(2*m'-2)="++show (xi*(2*m'-2))++" hs''="++show (map pList hs'')
+      ++"\n\t hs'="++show hs'++" \n\txi*(2*m'-1)="++show (xi*(2*m'-1)) 
+      ++" hs'''="++show (map (p2Tup . pList) (zipWith (multx (xi*(2*m'-1))) [0..] hs' ))++" hs="++show (map pList hs)) $
       foldr1 (zipWith' (+) 0) $  reduceModxn (2^l) $ zipWith (multx (m)) [0..] hs
   where -- << n = 2^l = m * m' >>
         !l' = l `quot` 2

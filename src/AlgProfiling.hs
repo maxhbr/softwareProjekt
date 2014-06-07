@@ -5,10 +5,7 @@ import Projekt.Core
 import Projekt.Algorithmen
 {-import System.Random-}
 import Data.List
---import Math.Polynomial (poly, Poly, multPoly, Endianness (LE))
---import Data.Matrix hiding ( (<->), (<|>))
---import qualified Data.Matrix as M
-import Projekt.Core.Polynomials.FFT
+import Projekt.Core.Polynomials.FFTTuple
 
 {----------------------------------------------------------------------------------}
 {---  Beispiele-}
@@ -90,7 +87,7 @@ l = take 100 $ getAllMonicPs (elems (1::F3)) [100]
 
 {-heavyBench :: (Num a, Eq a) => [(Int,a)] -> Int -> [(Int,a)]-}
 heavyBench f 0 = f
-heavyBench f n = ssP g g
+heavyBench f n = g*g --pTupUnsave $ multPMKaratsuba (p2Tup g) (p2Tup g)
   where !g  = heavyBench f (n-1)
 
 
@@ -113,4 +110,4 @@ main :: IO ()
 {-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [7]-}
 {-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [7]-}
 {-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
-main = print $ last $ p2Tup $! heavyBench a 7
+main = print $ last $ p2Tup $! heavyBench a 9
