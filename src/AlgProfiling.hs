@@ -115,7 +115,7 @@ main :: IO ()
 {-main = mapM_ print $ map appBerlekamp $ map appSff $ findTrivialsNs $ getAllMonicPs (elems (1::F3)) [2]-}
 {-main = print $ length $ filter (\x -> x) $ map (rabin . toPMS) $ getAllMonicPs (elems (1::F3)) [8]-}
 {-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [9]-}
-main = mapM_ print $ map sffAndBerlekamp $ getAllMonicPs (elems (1::F3)) [3]
+{-main = mapM_ print $ map sffAndBerlekamp $ getAllMonicPs (elems (1::F3)) [3]-}
 {-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [9]-}
 {-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
 {-main = print $ foldr1 (+) $ map (snd) $ p2Tup $ heavyBench testPoly1 200-}
@@ -123,4 +123,5 @@ main = mapM_ print $ map sffAndBerlekamp $ getAllMonicPs (elems (1::F3)) [3]
 {-main = print $ multMyPolys (e2f2Mipo^1000) (e2f2Mipo^1000)-}
 {-main = print $ multPMKaratsuba (p2Tup (testPolyF5^1000)) (p2Tup (testPolyF5^1000))-}
 {-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
+main = print $ modMonom (5^21) a
 

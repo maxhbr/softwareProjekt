@@ -85,9 +85,13 @@ factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ from
 --   x^n mod f
 modMonom :: (Show a, Num a, Eq a, Fractional a) => 
                                                 Int -> Polynom a -> Polynom a
-modMonom n f | n < df    = pTupUnsave [(n,1)]
-             | even n    = g `modByP` f
-             | otherwise = (multMonomP 1 g) `modByP` f
+modMonom n f | n < df    = --trace ("modMonom n="++show n++" n<df") $
+                            pTupUnsave [(n,1)]
+             | even n    = --trace ("modMonom n="++show n++" n ger") $
+                            g `modByP` f
+             | otherwise = --trace ("modMonom n="++show n++" n unger") $
+                            (multMonomP 1 g) `modByP` f
   where df = uDegP f
         m  = n `quot` 2
-        g  = (modMonom m f) * (modMonom m f)
+        g  = h*h
+        h  = modMonom m f

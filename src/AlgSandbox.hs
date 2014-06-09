@@ -115,10 +115,10 @@ irredTestsF2 func = [it ("findIrreds von Grad "++show n++" über F_2") $
     `shouldBe` (countMonicIrreds 2 n) | n <- [1..10]]
 irredTestsF3 func = [it ("findIrreds von Grad "++show n++" über F_3") $
     (length $ func $ getAllMonicPs (elems (1::F3)) [n])
-    `shouldBe` (countMonicIrreds 3 n) | n <- [1..6]]
+    `shouldBe` (countMonicIrreds 3 n) | n <- [1..10]]
 irredTestsF5 func = [it ("findIrreds von Grad "++show n++" über F_5") $
     (length $ func $ getAllMonicPs (elems (1::F5)) [n])
-    `shouldBe` (countMonicIrreds 5 n) | n <- [1..5]]
+    `shouldBe` (countMonicIrreds 5 n) | n <- [1..6]]
 
 main :: IO ()
 main = do
@@ -151,10 +151,10 @@ main = do
       {-it "sffAndBerlekamp and unFact should be inverse (random subset of e4f2)" $-}
         {-mapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) $-}
         {-take (quot testSize 50 + 1) list2-}
-    describe "Teste Irreduzibilität" $ do
-      sequence_ (irredTestsF2 findIrreds)
-      sequence_ (irredTestsF3 findIrreds)
-      sequence_ (irredTestsF5 findIrreds)
+    {-describe "Teste Irreduzibilität" $ do-}
+      {-sequence_ (irredTestsF2 findIrreds)-}
+      {-sequence_ (irredTestsF3 findIrreds)-}
+      {-sequence_ (irredTestsF5 findIrreds)-}
     describe "Teste Irreduzibilität (Rabin)" $ do
       sequence_ (irredTestsF2 findIrredsRabin)
       sequence_ (irredTestsF3 findIrredsRabin)

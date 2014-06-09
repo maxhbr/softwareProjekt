@@ -13,7 +13,7 @@ ghc \
     ${DIR}AlgProfiling.hs
 
 if [ $? -eq 0 ]; then
-  ${DIR}out/Profiling/AlgProfiling +RTS -p
+  ${DIR}out/Profiling/AlgProfiling +RTS -p -sstderr
 fi
 
 # -fforce-recomp, -O2 and -fllvm are from:
