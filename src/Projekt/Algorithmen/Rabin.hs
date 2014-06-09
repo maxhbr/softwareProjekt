@@ -50,24 +50,22 @@ findIrredsRabin ff@(f:fs) = findIrreds' ff
 --  aus http://en.wikipedia.org/wiki/Factorization_of_polynomials_over_
 --      finite_fields#Irreducible_polynomials
 rabin :: (Show a, FiniteField a, Num a, Fractional a, Eq a) => Polynom a -> Bool
-rabin f = --trace ("rabin with f="++show f++" d="++show d++" q="++show q++" ns="++show ns) $
-    rabin' f ns
+rabin f = rabin' f ns
   where ns = map (\p -> d `quot` p) $ nub $ factor d
         d  = uDegP f
         q  = elemCount $ getReprP f
         pX = pTupUnsave [(1,1)]
         -- eigentlicher Rabin für den letzen Test mit x^(q^n) - x
-        rabin' f [] = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $ 
-                      isNullP g
+        rabin' f [] = isNullP g
           where g  = (h'-pX) `modByP` f
                 h' = modMonom (q^d) f
         -- eigentlicher Rabin für x^(q^n_j) - x mit n_j = n / p_j
-        rabin' f (n:ns) | g /= pKonst 1  = --trace ("rabin' n="++show n++" g="++show g) 
-                                      False
-                        | otherwise = --trace ("rabin' d="++show d++" h="++show h++" h mod f="++show (modByP h f)++" => ggT="++show g) $
-                                      rabin' f ns
-          where g  = (ggTP f $ h'-pX)
-                h' = modMonom (q^n) f
+        rabin' f (n:ns) | g /= pKonst 1  = False
+                        | otherwise = rabin' f ns
+          where g  = --trace ("rabin: ggTP for f="++show f++" h'-pX="++show (p2Tup (h'-pX))) $ 
+                      (ggTP f (h'-pX))
+                h' = --trace ("h'="++show (p2Tup (modMonom (q^n) f ))) $ 
+                      modMonom (q^n) f
 
 -------------------------------------------------------------------------------
 -- Helper

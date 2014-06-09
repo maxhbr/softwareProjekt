@@ -114,7 +114,8 @@ main :: IO ()
 {-main = print $ map (\f -> hasNs f (elems (1::F3))) $ getAllMonicPs (elems (1::F3)) [2]-}
 {-main = mapM_ print $ map appBerlekamp $ map appSff $ findTrivialsNs $ getAllMonicPs (elems (1::F3)) [2]-}
 {-main = print $ length $ filter (\x -> x) $ map (rabin . toPMS) $ getAllMonicPs (elems (1::F3)) [8]-}
-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [9]
+{-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [9]-}
+main = mapM_ print $ map sffAndBerlekamp $ getAllMonicPs (elems (1::F3)) [3]
 {-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [9]-}
 {-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
 {-main = print $ foldr1 (+) $ map (snd) $ p2Tup $ heavyBench testPoly1 200-}

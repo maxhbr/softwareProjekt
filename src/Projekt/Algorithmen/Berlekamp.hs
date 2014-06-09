@@ -48,10 +48,11 @@ findIrred = head . findIrreds
 findIrreds :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [Polynom a]
 findIrreds (f:fs) = findIrreds' (f:fs)
   where findIrreds' []     = []
-        findIrreds' (f:fs) | (not (hasNs f es)|| uDegP f < 2) &&
-                             isTrivialFact fSff &&
-                             isTrivialFact fB = f : findIrreds' fs
-                           | otherwise = findIrreds' fs
+        findIrreds' (f:fs) 
+          | (not (hasNs f es) || uDegP f < 2) 
+              && isTrivialFact fSff 
+              && isTrivialFact fB              = f : findIrreds' fs
+          | otherwise                          = findIrreds' fs
           where fSff = appSff $ toFact f
                 fB   = appBerlekamp fSff
         es = elems $ getReprP f
@@ -87,10 +88,11 @@ berlekampBasis f = transposeM $ kernelM $ transposeM $
 berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
                                               => Polynom a -> [(Int,Polynom a)]
 berlekampFactor f 
-    | length triv == 1 = triv
-    | length triv == 2 = (head triv) : (doBerlekamp $ snd $ last triv)
+    | length triv == 1 = berleFac
+    | length triv == 2 = (head triv) : berleFac
     | otherwise       = error "obviousFactor malefunction"
-  where triv = obviousFactor f
+  where triv     = obviousFactor f
+        berleFac = doBerlekamp $ snd $ last triv
  
 doBerlekamp :: (Show a, Fractional a, Num a, FiniteField a)
                                               => Polynom a -> [(Int,Polynom a)]
@@ -98,11 +100,13 @@ doBerlekamp f = berlekampFactor' f m
   where m = berlekampBasis f
         berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)
                                       => Polynom a -> Matrix a -> [(Int,Polynom a)]
-        berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
-                             | getNumRowsM m == 1 = [(1,f)]
+        berlekampFactor' f m | uDegP f <= 1       = --trace ("berlekamp f="++show f++" deg f <= 1") $
+                                                    [(1,f)]
+                             | getNumRowsM m == 1 = --trace ("berlekamp f="++show f++" triv m="++show m) $
+                                                    [(1,f)]
                              | otherwise         = --trace ("berlekamp f="++show f++" m=\n"++show m)
                               berlekampFactor' g n ++ berlekampFactor' g' n'
-          where g  = --trace ("list="++show [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
+          where g  = --trace ("list="++show [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
                      --        , x /= 1])$
                      head [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
                              , x /= 1]

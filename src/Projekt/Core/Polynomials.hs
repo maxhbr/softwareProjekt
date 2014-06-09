@@ -8,7 +8,7 @@
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.Polynomials
-  ( Polynom, pList, pTup, pTupUnsave, pKonst, p2Tup, p2List
+  ( Polynom, pList, pTup, pTupUnsave, pKonst, p2Tup, p2List, cleanP
   , nullP, isNullP, isNullP'
   -- getter
   , getDegrees, getLcP
@@ -62,8 +62,9 @@ pTupUnsave :: [(Int,a)] -> Polynom a
 pTupUnsave ms = PMS ms True
 
 -- |Erzeugt ein konstantes Polynom, d.h. ein Polynom von Grad 0
-pKonst :: a -> Polynom a
-pKonst x = PMS [(0,x)] True
+pKonst :: (Eq a, Num a) => a -> Polynom a
+pKonst x | x == 0     = nullP
+         | otherwise = PMS [(0,x)] True
 
 p2Tup :: (Num a, Eq a) => Polynom a -> [(Int,a)]
 p2Tup = unPMS . cleanP
@@ -225,10 +226,9 @@ multPM  ((i,m):ms) ns  = addPM a b
   where !a = multPM' i m ns
         !b = multPM ms ns
 #else
-multPM ms ns = foldr addPM [(0,0)] summanden
+multPM ms ns = foldr1 addPM summanden
   where  summanden = [multPM' i m ns | (i,m) <- ms]
 #endif
-
 
 {-# INLINE multPM' #-}
 multPM' i m []                     = []
@@ -374,7 +374,7 @@ multPM'_ShortUp l i m ((j,n):ns)
 
 {-# INLINE getLcP #-}
 getLcP :: (Num a, Eq a) => Polynom a -> a
-getLcP (PMS [] _)    = 0
+getLcP (PMS [] _)    =  0
 getLcP (PMS fs True) = snd $ head fs
 getLcP f             = getLcP $ cleanP f
 
@@ -579,7 +579,7 @@ evalP :: (Eq a, Num a) => a -> Polynom a -> a
 evalP x f = evalP' x (unPMS $ cleanP f)
 evalP' :: (Num a) => a -> [(Int,a)] -> a
 evalP' x []   = 0
-evalP' x fs   = foldl' (\a (_,m) -> a*x+m) 0 fs
+evalP' x fs   = snd $ foldl' (\(i,z) (j,y) -> (j,z*x^(i-j)+y)) (head fs) (tail fs)
 
 hasNs :: (Eq a, Fractional a) => Polynom a -> [a] -> Bool
 hasNs f es = not (null [f | e <- es, evalP e f == 0])
