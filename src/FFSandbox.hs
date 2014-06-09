@@ -18,6 +18,7 @@ module FFSandbox
   , main
   )where
 import Projekt.Core
+import Projekt.Algorithmen.Rabin
 import Debug.Trace
 
 import SpecCommon

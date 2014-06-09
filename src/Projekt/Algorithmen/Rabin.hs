@@ -8,7 +8,8 @@
 
 module Projekt.Algorithmen.Rabin (
   rabin
-  , findIrredsRabin
+  , getMonicIrredRabin
+  , findIrredRabin, findIrredsRabin
   , modMonom, factor
 )	where
 
@@ -16,6 +17,15 @@ import Projekt.Core
 import Debug.Trace
 import Data.List
 
+-- |Gibt ein irreduzibles monisches Polynom von Grad n über dem Körper von x
+getMonicIrredRabin :: (Show a, Num a, Fractional a, FiniteField a) => 
+                                                        a -> Int -> Polynom a
+getMonicIrredRabin x n = findIrredRabin $ getAllMonicPs (elems x) [n]
+
+
+-- |Wählt aus einer Liste von Polynomen das erste Irreduzibele Polynom heraus
+findIrredRabin :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> Polynom a
+findIrredRabin = head . findIrredsRabin
 
 -- |Filtert mittels Rabin aus einer Liste irreduziblen Polynome heraus
 findIrredsRabin :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [Polynom a]
