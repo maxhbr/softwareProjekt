@@ -21,10 +21,12 @@ module Projekt.Core.Factorization
 import Data.List
 import Control.Parallel
 import Control.Parallel.Strategies
+import Control.Arrow as A
 
 import Projekt.Core.FiniteFields
 import Projekt.Core.Polynomials
 
+import Debug.Trace
 --------------------------------------------------------------------------------
 -- |Erzeugt eine triviale Faktoriesierung zu einem Polynom
 toFact :: Polynom a -> [(Int,Polynom a)]
@@ -44,14 +46,18 @@ potFact n ((i,f):ts) = (i*n,f) : potFact n ts
 
 -- |Nimmt eine Faktoriesierung und wendet auf diese einen gegebenen
 -- Faktoriesierungsalgorithmus an
-appFact :: (Num a) =>
+appFact :: (Eq a, Num a) =>
   (Polynom a -> [(Int,Polynom a)]) -> [(Int,Polynom a)] -> [(Int,Polynom a)]
 appFact alg = withStrategy (parList rpar) . concatMap
-  (\(i,f) -> potFact i (alg f))
+  (\(i,f) -> appFact' i f)
+  where appFact' i f  | isNullP f   = [(i,nullP)]
+                      | uDegP f <= 1 = [(i,f)]
+                      | otherwise   = potFact i (alg f)
 
 -- |Fasst in einer Faktoriesierung gleiche Funktionen Zusammen
 aggFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
-aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], f /= P[1]]
+aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], 
+                                                                f /= pKonst 1]
 
 -- |Sagt, ob die gegebene Faktoriesierung trivial ist, also aus nur einem
 -- Echten Faktor vom Grad 1 besteht
@@ -62,10 +68,10 @@ isTrivialFact ms = sum (map fst ms) == 1
 
 -- |Gibt alle Faktorisierungen zurück, welche nach der offensichtlichen
 -- Faktoriesierung noch trivial sind
-findTrivialsOb :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
+findTrivialsOb :: (Show a, Fractional a, Num a, FiniteField a) => 
+                                          [Polynom a] -> [[(Int,Polynom a)]]
 findTrivialsOb ps = [fs | fs <- parMap rpar appObFact
-                        [(toFact . aggP) f | f <- ps , f /= P[]]
-                      , isTrivialFact fs]
+                     [toFact f | f <- ps , not (isNullP f)], isTrivialFact fs]
 
 -- |Gibt alle Polynome zurück, die keine Nullstellen haben.
 findTrivialsNs :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a]
@@ -77,14 +83,22 @@ findTrivialsNs ps = [toFact f | f <- ps, not (hasNs f es) || uDegP f < 2]
 --------------------------------------------------------------------------------
 --  Einfache / offensichtliche Faktorisierungen
 
--- |Versucht an der Darstellung des Polynoms eine Faktoriesierung zu erahnen
-obviousFactor :: (Num a, Eq a) => Polynom a -> [(Int,Polynom a)]
-obviousFactor (P[])      = [(1,P[])]
-obviousFactor (P[m])     = [(1,P[m])]
-obviousFactor (P[m0,m1]) = [(1,P[m0,m1])]
-obviousFactor (P (0:ms)) = aggFact $ (1,P[0,1]) : obviousFactor (P ms)
-obviousFactor f          = toFact f
+obviousFactor :: (Show a, Num a, Eq a) => Polynom a -> [(Int,Polynom a)]
+obviousFactor f | isNullP f     = [(1,nullP)]
+                | uDegP f <= 1   = [(1,f)]
+                | hasNoKonst fs = factorX
+                | otherwise     = toFact f
+  where fs = p2Tup f
+        -- Teste, ob ein konstanter Term vorhanden ist
+        hasNoKonst ms | (fst $ last ms) == 0  = False
+                      | otherwise          = True
+        -- Hier kann man d mal X ausklammern
+        factorX | g == 1     = [(d,pTupUnsave [(1,1)])]
+                | otherwise = [(d,pTupUnsave [(1,1)]), (1,g)]
+          where d = fst $ last fs
+                g = --trace ("ob f="++show f++" -> d="++show d++" fs="++show fs
+                    -- ++" mapped="++show(map (A.first (\x -> x- d)) fs ))$
+                    pTupUnsave $ map (A.first (\x -> x-d)) fs
 
--- |Wendet die offensichtliche Faktoriesierung an
-appObFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appObFact :: (Show a, Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 appObFact = appFact obviousFactor

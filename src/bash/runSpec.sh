@@ -9,6 +9,7 @@ ghc --make \
   -threaded \
   -O2 \
   -fllvm \
+  -rtsopts \
     $DIR/../Spec.hs
   #-fforce-recomp \
 
@@ -21,7 +22,7 @@ if [ $? -eq 0 ]; then
     fi
   fi
 
-  time $DIR/../out/Spec $@ +RTS -N${N}
+  time $DIR/../out/Spec $@ +RTS -N${N} -sstderr
 fi
 
 # -fforce-recomp, -O2 and -fllvm are from:

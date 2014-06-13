@@ -67,20 +67,21 @@ findTrivialsSff ps = [fs | fs <- parMap rpar appSff
        Seite 345(355)
  -}
 
-sffFactor :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
-sffFactor (P[]) = [(1,P[])]
-sffFactor (P[m]) = [(1,P[m])]
-sffFactor (P[m0,m1]) = [(1,P[m0,m1])]
-sffFactor f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sffFactor $ charRootP c)
-      | df /= 0 && c == 1 = r
-      | otherwise       = map (\(n,x) -> (n*p,x)) $ sffFactor $ charRootP f
+sffFactor :: (Show a, FiniteField a, Num a, Fractional a) => 
+                                                Polynom a -> [(Int,Polynom a)]
+sffFactor f 
+  | isNullP f       = [(1,nullP)]
+  | uDegP f <= 1     = [(1,f)]
+  | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sffFactor $ charRootP c)
+  | df /= 0 && c == 1 = r
+  | otherwise       = map (\(n,x) -> (n*p,x)) $ sffFactor $ charRootP f
   where df         = deriveP f
         c'         = ggTP f df
         p          = charOfP f
         (r,c)      = sffFactor' 1 (f @/ c') c'
         sffFactor' i w c | w == 1      = ([], c)
-                   | z /= P[one] = ((i,z) : r, c')
-                   | otherwise  = (r,c')
+                         | z /= 1      = ((i,z) : r, c')
+                         | otherwise  = (r,c')
           where y      = ggTP w c
                 z      = w @/ y
                 (r,c') = sffFactor' (i+1) y (c @/ y)
@@ -93,9 +94,9 @@ sffFactor f | df /= 0 && c /= 1 = r ++ map (\(n,x) -> (n*p,x)) (sffFactor $ char
  -      f = X¹¹+2x⁹+2x⁸+x⁶+x⁵+2x³+2x²+1
  -        = (x+1)(x²+1)³(x+2)⁴
  -}
-f=P[1::F3,0,2,2,0,1,1,0,2,2,0,1]
+f=pList [1::F3,0,2,2,0,1,1,0,2,2,0,1]
 sqf :: [(Int,Polynom F3)]
-sqf=[(1,P[1::F3,1])
-    ,(2,P[1])
-    ,(3,P[1::F3,0,1])
-    ,(4,P[2::F3,1])]
+sqf=[(1,pList [1::F3,1])
+    ,(2,pList [1])
+    ,(3,pList [1::F3,0,1])
+    ,(4,pList [2::F3,1])]

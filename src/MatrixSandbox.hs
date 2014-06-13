@@ -52,10 +52,10 @@ m''  = fromListsM [ [0::F5, 0, 1 ]
 --------------------------------------------------------------------------------
 --  Matrizen von Polynomen
 
-mp = fromListsM [ [ P[0,1::F5], P[0,0,1::F5] ]
-                , [ P[1::F5], P[0,1::F5] ] ]
-mp2 = fromListsM [ [ P[0,1::F5], P[0,0,1::F5] ]
-                 , [ P[0,1::F5], P[0,1::F5] ] ]
+mp = fromListsM [ [ pList [0,1::F5], pList [0,0,1::F5] ]
+                , [ pList [1::F5], pList [0,1::F5] ] ]
+mp2 = fromListsM [ [ pList [0,1::F5], pList [0,0,1::F5] ]
+                 , [ pList [0,1::F5], pList [0,1::F5] ] ]
 
 --------------------------------------------------------------------------------
 -- TODO: Test Matrix Multiplikation
