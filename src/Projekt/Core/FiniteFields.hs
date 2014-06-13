@@ -13,9 +13,11 @@ module Projekt.Core.FiniteFields
   , module X
   ) where
 import Data.Maybe
+import Data.List
 import Control.Exception
 import Data.Binary
 import Control.Monad
+import Data.Ord (Ordering (..))
 
 import Projekt.Core.FiniteField as X
 import Projekt.Core.PrimeFields as X
@@ -162,3 +164,22 @@ charRootP f | isNullP f     = --trace ("charRootP f="++show f++" => "++show null
 
 hasNSInFF :: (Eq a, Num a, FiniteField a) => Polynom a -> Bool
 hasNSInFF f = not (null [f | e <- elems (getReprP f), evalP e f == 0])
+
+
+-- |Erzeugt das Conwayway-Polynom C_p,n
+{-generateConwayP :: (Show a, FiniteField a, Num a) => a -> Int -> Polynom a-}
+generateConwayP :: (Numeral n) => Mod n -> Int -> [Polynom (Mod n)]
+generateConwayP e n = sortBy conwayOrdering $ getAllMonicPs (elems e) [n]
+  where p = charakteristik e
+
+
+conwayOrdering :: (Numeral n) => Polynom (Mod n) -> Polynom (Mod n) -> Ordering
+conwayOrdering f g = conwayOrdering' (p2Tup f) (p2Tup g)
+  where n = uDegP f
+        conwayOrdering' [] [] = EQ
+        conwayOrdering' ((i,x):fss) ((j,y):gss) 
+          | i==j && x==y  = conwayOrdering' fss gss
+          | i==j && x/=y  && (-1)^(n-i)*x < (-1)^(n-i)*y  = LT
+          | otherwise = GT
+          
+
