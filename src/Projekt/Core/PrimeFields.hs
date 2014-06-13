@@ -106,11 +106,6 @@ instance (Numeral n) => Num (Mod n) where
 
 {-# INLINE add #-}
 add x y = MkMod $ unMod x + unMod y `rem` modulus x
-{-
-add x y | z <= 10000 = MkMod z
-        | otherwise = MkMod $ z `rem` modulus x
-  where z = unMod x + unMod y
- -}
 
 {-# INLINE mult #-}
 mult x y = MkMod $ (unMod x * unMod y) `rem` modulus x 
@@ -119,18 +114,17 @@ instance (Numeral n) => FiniteField (Mod n) where
   zero                = MkMod 0
   one                 = MkMod 1
   elems               = const $ elems' one
+    where elems' :: (Numeral n) => Mod n -> [Mod n]
+          elems' x = map MkMod [0.. (modulus x - 1)]
   charakteristik      = modulus
   elemCount           = modulus
-  getReprP f          = 0 * (snd $ head $ p2Tup f)
+  getReprP f          = 0 * snd (head (p2Tup f))
 
 {-# INLINE modulus #-}
 modulus :: Numeral a => Mod a -> Int
 modulus x = numValue $ modulus' x
   where modulus' :: Numeral a => Mod a -> a
         modulus' = const undefined
-
-elems' :: (Numeral n) => Mod n -> [Mod n]
-elems' x = map MkMod [0.. (modulus x - 1)]
 
 instance (Numeral n) => Fractional (Mod n) where
   recip          = invMod
@@ -149,9 +143,7 @@ invMod x = invMod' (unMod x `mod` p,p,one,zero)
           | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
             where q = v `div` u
 
-instance (Numeral n) => Ord (Mod n) where
-  (<=) x y  = getRepr x <= getRepr y
-
+-- Zur serialisierung wird eine Instanz vom Typ Binary benötigt
 instance (Numeral a) => Binary (Mod a) where
    put (MkMod x) = put x
    get           = do x <- get

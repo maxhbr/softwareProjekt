@@ -34,7 +34,7 @@ toFact f = [(1,f)]
 
 -- |Multipliziert eine Faktoriesierung aus
 unFact :: (FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> Polynom a
-unFact []      = P[1]
+unFact []      = pKonst 1
 unFact [(1,f)] = f
 unFact [(i,f)] = f^i
 unFact fs      = product $ map (\(i,f) -> f^i) fs
@@ -49,7 +49,7 @@ potFact n ((i,f):ts) = (i*n,f) : potFact n ts
 appFact :: (Eq a, Num a) =>
   (Polynom a -> [(Int,Polynom a)]) -> [(Int,Polynom a)] -> [(Int,Polynom a)]
 appFact alg = withStrategy (parList rpar) . concatMap
-  (\(i,f) -> appFact' i f)
+  (uncurry appFact')
   where appFact' i f  | isNullP f   = [(i,nullP)]
                       | uDegP f <= 1 = [(i,f)]
                       | otherwise   = potFact i (alg f)
@@ -90,7 +90,7 @@ obviousFactor f | isNullP f     = [(1,nullP)]
                 | otherwise     = toFact f
   where fs = p2Tup f
         -- Teste, ob ein konstanter Term vorhanden ist
-        hasNoKonst ms | (fst $ last ms) == 0  = False
+        hasNoKonst ms | fst (last ms) == 0  = False
                       | otherwise          = True
         -- Hier kann man d mal X ausklammern
         factorX | g == 1     = [(d,pTupUnsave [(1,1)])]
