@@ -26,8 +26,9 @@ import Projekt.Core.ShowTex
 
 --------------------------------------------------------------------------------
 --  Data Definition
-
--- Zeile x Spalte
+--
+-- Eine Matrix ist im inneren als ein zwei dimensionales Array dargestellt,
+-- wobei die erste Stelle die Zeile und dei zweite die Spalte darstellt
 data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a
 
 --------------------------------------------------------------------------------
@@ -35,7 +36,8 @@ data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a
 
 fillList ls n m = ls ++ [(idx,0) | idx <- getAllIdxsExcept n m idxs]
   where idxs                      = map fst ls
-        getAllIdxsExcept n m idxs = [idx | idx <- [(i,j) | i <- [1..n], j <- [1..m]]
+        getAllIdxsExcept n m idxs = [idx | idx <- [(i,j) | i <- [1..n]
+                                                        , j <- [1..m]]
                                          , idx `notElem` idxs]
 
 isQuadraticM :: Matrix a -> Bool
@@ -47,14 +49,18 @@ isQuadraticM (M m) = uncurry (==) b
 genDiagM :: Num a => a -> Int -> Matrix a
 genDiagM x n = M $ array ((1,1),(n,n)) $ fillList [((i,i),x) | i <- [1..n]] n n
 
+-- |Erzeugt eine Matrix aus einer Liste von Listen von Einträgen
 fromListsM :: [[a]] -> Matrix a
 fromListsM []  = error "empty lists given to fromListsM"
 fromListsM [[]]  = error "empty lists given to fromListsM"
-fromListsM ess = M $ array ((1,1),(k,l)) [((i,j),ess!!(i-1)!!(j-1)) | i <- [1..k]
-                                                                    , j <- [1..l]]
+fromListsM ess = M $ array ((1,1),(k,l)) 
+                           [((i,j),ess!!(i-1)!!(j-1)) | i <- [1..k]
+                                                      , j <- [1..l]]
   where k = length ess
         l = length $ head ess
 
+-- |Erzeugt aus einer Matrix eine Liste von Listen der Einträge. Ist invers zu
+-- fromListsM
 toListsM :: Matrix a -> [[a]]
 toListsM (M m) = [[m!(i,j) | j <- [1..l]] | i <- [1..k]]
   where (k,l) = snd $ bounds m
@@ -113,10 +119,16 @@ instance (Num a, Eq a) => Num (Matrix a) where
   x + y         = addM x y
   x * y         = multM x y
   fromInteger i = Mdiag (fromInteger i)
-  abs _         = error "Prelude.Num.abs: inappropriate abstraction"
+  abs           = absM
+    where absM :: (Num a) => Matrix a -> Matrix a
+          absM (Mdiag x) = Mdiag $ abs x
+          absM (M m)     = M $ amap abs m
   signum _      = error "Prelude.Num.signum: inappropriate abstraction"
   negate        = negateM
-
+    where {-# INLINE negateM #-}
+          negateM :: (Num a) => Matrix a -> Matrix a
+          negateM (Mdiag x) = Mdiag $ negate x
+          negateM (M m)     = M $ amap negate m
 
 {-# INLINE addM #-}
 addM :: (Num a) => Matrix a -> Matrix a -> Matrix a
@@ -127,10 +139,6 @@ addM (M x)     (M y)     | test      = M $ array (bounds x)
     [(idx,x!idx + y!idx) | idx <- indices x]
                          | otherwise = error "not the same Dimensions"
   where test      = bounds x == bounds y
-
-negateM :: (Num a) => Matrix a -> Matrix a
-negateM (Mdiag x) = Mdiag $ negate x
-negateM (M m)     = M $ amap negate m
 
 {-# INLINE multM #-}
 multM :: (Num a) => Matrix a -> Matrix a -> Matrix a
