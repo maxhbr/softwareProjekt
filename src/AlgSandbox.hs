@@ -151,13 +151,13 @@ main = do
       it "sffAndBerlekamp and unFact should be inverse (random subset of e4f2)" $
         mapM_ (\f -> unFact (sffAndBerlekamp f) `shouldBe` f) $
         take (quot testSize 50 + 1) list2
-    describe "Teste Irreduzibilität" $ do
-      sequence_ (irredTestsF2 findIrreds)
-      sequence_ (irredTestsF3 findIrreds)
-      sequence_ (irredTestsF5 findIrreds)
-    describe "Teste Irreduzibilität (Rabin)" $ do
-      sequence_ (irredTestsF2 findIrredsRabin)
-      sequence_ (irredTestsF3 findIrredsRabin)
-      sequence_ (irredTestsF5 findIrredsRabin)
+    {-describe "Teste Irreduzibilität" $ do-}
+      {-sequence_ (irredTestsF2 findIrreds)-}
+      {-sequence_ (irredTestsF3 findIrreds)-}
+      {-sequence_ (irredTestsF5 findIrreds)-}
+    {-describe "Teste Irreduzibilität (Rabin)" $ do-}
+      {-sequence_ (irredTestsF2 findIrredsRabin)-}
+      {-sequence_ (irredTestsF3 findIrredsRabin)-}
+      {-sequence_ (irredTestsF5 findIrredsRabin)-}
 
 
