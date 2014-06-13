@@ -35,7 +35,7 @@ $(genPrimeField 7 "F7")
 module Projekt.Core.PrimeFields
   ( Numeral (..)
   -- Endliche Körper
-  , Mod (..)
+  , Mod (..), unMod
   , modulus
   -- Beispiele
   , F2 , F3 , F5 , F7, F101
