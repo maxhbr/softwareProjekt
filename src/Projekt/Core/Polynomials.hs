@@ -106,7 +106,7 @@ eqP f g  = eqP (cleanP f) (cleanP g)
 
 {-# INLINE isNullP #-}
 isNullP (PMS ms _) = isNullP' ms
-isNullP' []     = True
+isNullP' []         = True
 isNullP' ((i,m):ms) | m /= 0     = False
                     | otherwise = isNullP' ms
 
@@ -197,7 +197,7 @@ addPM ff@((i,f):fs) gg@((j,g):gs)
 -- | subtrahiere Polynome in Monomdarstellung, d.h
 --   [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist
 subtrPM :: (Eq a,Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
-subtrPM [] gs          = map (A.second (negate)) gs
+subtrPM [] gs          = map (A.second negate) gs
 subtrPM fs []          = fs
 subtrPM ff@((i,f):fs) gg@((j,g):gs)
   | i==j && c/=0  = (i,c) : subtrPM fs gs
@@ -608,7 +608,7 @@ getAllMonicP es d = getAllMonicPs es [0..d]
 getAllMonicPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
 getAllMonicPs es is = map (`PMS` True) $ concat [allMonics i | i <- is]
   where allMonics 0 = [[(0,1)]]
-        allMonics i = [[(i,1)]] ++ [(i,1):rs | rs <- ess (i-1)]
+        allMonics i = [(i,1)] : [(i,1):rs | rs <- ess (i-1)]
         ess i       | i == 0     = [[(0,y)] | y <- swpes]
                     | otherwise = [[(i,y)] | y <- swpes] ++ (ess (i-1)) ++ 
                               [(i,y):ys | y <- swpes, ys <- ess (i-1)]
