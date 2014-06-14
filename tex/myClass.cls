@@ -149,8 +149,11 @@
 %%%%  Ploting  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{tikz}
 \usepackage{tikz-cd}
-\usetikzlibrary{matrix,arrows, calc, decorations.pathmorphing,%
+\usetikzlibrary{matrix, positioning, arrows, calc, decorations.pathmorphing,%
   decorations.pathreplacing }
+\makeatletter
+\global\let\tikz@ensure@dollar@catcode=\relax
+\makeatother
 
 %%%%  figures  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{float}
@@ -205,6 +208,31 @@
   }%
 }
 
+
+%%%% Tikz Pfeil setup (Für Listings) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\trightarrow}{\tikz[baseline]{
+  \draw[round cap->,line width=0.6pt] (0,0.3em) -- (1.5ex,0.3em);}}
+\newcommand{\tleftarrow}{\tikz[baseline]{
+  \draw[<-round cap,line width=0.6pt] (0,0.3em) -- (1.5ex,0.3em);}}
+\newcommand{\tRightarrow}{\tikz[baseline]{
+  \draw[-implies,double,line width=0.7pt] (0,0.3em) -- (2ex,0.3em);}}
+\newcommand{\tequiv}{\tikz[baseline]{
+  \draw[round cap-round cap, line width=0.6pt] (0,0.45em) -- (1ex,0.45em);
+  \draw[round cap-round cap, line width=0.6pt] (0,0.3em) -- (1ex,0.3em);
+  \draw[round cap-round cap, line width=0.6pt] (0,0.15em) -- (1ex,0.15em);
+  }}
+\newcommand{\tneq}{\tikz[baseline]{
+  \draw[round cap-round cap, line width=0.6pt] (0,0.4em) -- (1ex,0.4em);
+  \draw[round cap-round cap, line width=0.6pt] (0,0.25em) -- (1ex,0.25em);
+  \draw[round cap-round cap, line width=0.6pt] (0.2ex,0.1em) -- (0.8ex,0.55em);
+  }}
+\newcommand{\tdplus}{\tikz[baseline]{
+  \draw[round cap-round cap, line width=0.6pt] (0,0.3em) -- (1ex,0.3em);
+  \draw[round cap-round cap, line width=0.6pt] (0.3ex,0.1em) -- (0.3ex,0.5em);
+  \draw[round cap-round cap, line width=0.6pt] (0.7ex,0.1em) -- (0.7ex,0.5em);
+  }}
+
+
 %%%%  Listings  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{listings}
 \lstset{literate=
@@ -219,6 +247,10 @@
   {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
   {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
   {€}{{\EUR}}1 {£}{{\pounds}}1
+  %% Haskell Concealing
+  {::}{{:\!\!:\ }}1 {\\}{{$\lambda$}}1 {->}{{\trightarrow}}1 
+  {<-}{{\tleftarrow}}1 {=>}{{\tRightarrow}}1 {==}{{\tequiv}}1
+  {/=}{{\tneq}}1 {++}{{\tdplus}}1
 }
 
 %%%% Bibliography %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

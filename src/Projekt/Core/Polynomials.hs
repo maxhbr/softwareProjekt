@@ -79,7 +79,7 @@ cleanP   (PMS ms False) = PMS (clean' ms) True
   where clean' ms = filter (\(_,m) -> m/=0) $ sortBy (flip (comparing fst)) ms
 
 -- |Erzeugt aus einer Liste von Monomen eine Liste von Koeffizienten.
-tuple2List :: (Num a) => [(Int,a)]-> [a]
+tuple2List :: (Num a) => [(Int,a)] -> [a]
 tuple2List [] = []
 tuple2List ((i,m):ms) = zipSum ([0 | j <- [1..i]] ++ [m]) $ tuple2List ms
 
