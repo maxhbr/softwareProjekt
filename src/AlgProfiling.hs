@@ -8,11 +8,17 @@ import Projekt.Algorithmen
 {-import System.Random-}
 import Data.List
 import Projekt.Core.Polynomials.FFTTuple
+import Projekt.Core.Polynomials.Conway
 
 {----------------------------------------------------------------------------------}
 {---  Beispiele-}
 e2f2Mipo = pList [1::F2,1,1] -- x²+x+1
 e2f2 = FFElem (pList [0,1::F2]) e2f2Mipo
+
+
+e40f2Mipo = getConway (1::F2) 40
+e40f2 = FFElem (pList [0,1::F2]) e40f2Mipo
+
 
 {- F16=E2(E2)
  - als Grad 2 Erweiterung von E2 durch MPol x²+x+e2f2
@@ -44,7 +50,7 @@ b = pTupUnsave [(6,2::F5),(5,1),(4,3),(2,4)]
 
 c = pTupUnsave [(4,1::F5)]
 
-testPoly1 = pList $ listFFElem e4f2Mipo [ pList [0::F2,0,1,1]
+testPoly1 = pList $ listFFElem e40f2Mipo [ pList [0::F2,0,1,1]
                                     , 1
                                     , pList [1::F2,1,1]
                                     , pList [0::F2,1]
@@ -65,8 +71,8 @@ testPolyF5 = pList $ listFFElem (pList [2::F5,4,1])
                                     , pList [1::F5,1,1]
                                     , pList [0::F5,1]
                                     , pList [1::F5,1,0,1] ]
-multMyPoly f 1 = f
-multMyPoly f n = f * multMyPoly f (n-1)
+
+multMyPoly mulFunk f g = mulFunk f g
 
 {-multMyPoly' f 1 = f-}
 {-multMyPoly' f n = multPoly f $ multMyPoly' f (n-1)-}
@@ -119,10 +125,11 @@ main :: IO ()
 {-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [9]-}
 {-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
 {-main = print $ foldr1 (+) $ map (snd) $ p2Tup $ heavyBench testPoly1 200-}
-{-main = print $ foldr1 (+) $ map (snd) $ heavyBench' (p2Tup testPoly1) 200-}
-{-main = print $ multMyPolys (e2f2Mipo^1000) (e2f2Mipo^1000)-}
+{-main = print $ foldr1 (+) $ map (snd) $ heavyBench (p2Tup testPoly1) 200-}
+main = do
+  let testPolyBench = testPoly1^1000
+  print $ multMyPoly (ssP) (testPolyBench) (testPolyBench)
 {-main = print $ multPMKaratsuba (p2Tup (testPolyF5^1000)) (p2Tup (testPolyF5^1000))-}
 {-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
-main = print $ modMonom (5^21) a
+{-main = print $ modMonom (5^21) a-}
 
->>>>>>> polyTupleImpl

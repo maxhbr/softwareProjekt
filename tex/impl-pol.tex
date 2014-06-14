@@ -1,5 +1,92 @@
-\section{Polynome}
-Polynome sind als Liste implementiert, so entspricht die liste \texttt{[1,0,3]}
-dem Polynom $3x^2+1$.
+\section{Implementierung von Polynomen}
+
+\subsection{Der Datentyp}
+
+Grundsätzlich gibt es zwei verschiedene Möglichkeiten Polynome zu
+implementieren: \emph{sparse} und \emph{dense}, d.h. 
+\begin{itemize}
+  \item entweder entscheidet man
+    sich ein Polynom $f(X) = a_nX^n + \ldots + a_0$ als Liste\footnote{Was genau 
+    eine ``Liste'' in der jeweilig benutzten Sprache bedeuten soll, bleibt der
+    Interpretation überlassen.} der Länge $n$ zu hinterlegen,
+  \item oder man speichert lediglich eine Liste von Tupel $(i,a_i)$, so dass
+    $i \in \{0,\ldots,n\}$ den Index/Exponenten des Koeffizienten $a_i$ angibt
+    und alle Koeffizienten, die Null sind, ausgelassen werden.
+\end{itemize}
+In der hier vorliegenden finalen implementierung haben wir uns für letztere
+Variante entschieden, da diese insbesondere bei spärlich besetzten Polynomen
+mit hohem Grad deutliche Performancegewinne zeigt.
+
+Konkret ist ein Polynom also definiert durch:
+\codeinput{Core/Polynomials}{45}{45}
+
+Um diese Darstellung \emph{dense} nennen und mit ihr effizient arbeiten zu 
+können, treffen wir folgende Beschränkungen an die Implementierung:
+\begin{invariante}
+  \label{inv:poly}
+  Für ħPMS $L$ Trueħ gilt stets, dass die Monome in $L$ alle nicht Null 
+  sind und ihrem Grade nach in
+  absteigender Reihenfolge sortiert sind, d.h.
+  \begin{enumerate}
+    \item für alle $(i,x) \in L$ ist $x \neq 0$.
+    \item für alle $(i,x), (j,y) \in L$ gilt: Steht $(i,x)$ vor $(j,y)$, so ist
+      $i > j$.
+  \end{enumerate}
+\end{invariante}
+
+\begin{beispiel}
+  Für das Polynom $f(X) = X^5 + 3X^2 + 1$ wäre 
+  \begin{hcode}
+    PMS [(5,1), (2,3), (0,1)] True
+  \end{hcode}
+  die korrekte Darstellung.
+\end{beispiel}
+
+Damit diese Invariante stets sichergestellt ist, existiert die Funktion
+ħcleanPħ, mit der eine ħ[(Int,a)]ħ Liste in die korrekte Form gebracht werden
+kann:
+\codeinput{Core/Polynomials}{75}{79}
+
+
+\subsubsection{Polynome erstellen}
+\paragraph{Allgemein}
+Diese Einschränkung erfordert auch, dass der Konstruktor des Polynomdatentyps
+nicht öffentlich gemacht wird und wir benötigen separate Funktionen, um
+Polynome zu erstellen. Diese sind selbsterklärend:
+\codeinput{Core/Polynomials}{51}{52}
+\codeinput{Core/Polynomials}{55}{56}
+Ferner existiert noch eine Variante der ``unsicheren'' Erstellung von
+Polynomen, die eine korrekte Darstellung nach \thref{inv:poly} voraussetzt,
+diese jedoch nicht prüft. 
+\codeinput{Core/Polynomials}{58}{62}
+
+
+\paragraph{Polynome dekonstruieren}
+Den Weg rückwärts zu gehen ist natürlich auch möglich, was ħp2Tupħ und ħp2Listħ
+bewerkstelligen:
+
+\codeinput{Core/Polynomials}{69}{70}
+\codeinput{Core/Polynomials}{72}{73}
+
+
+\paragraph{Spezielle Polynome}
+Eines der am häufigsten verwendenten Polynome ist das Nullpolynom. Daher gibt
+es sowohl eine Prüfung, ob ein Polynom null ist, als auch das Nullpolynom
+selbst als Objekt:
+\codeinput{Core/Polynomials}{47}{48}
+\codeinput{Core/Polynomials}{107}{111}
+
+Des Weiteren haben wir eine kleine Schreibhilfe zur Erstellung von konstanten
+Polynomen generiert:
+\codeinput{Core/Polynomials}{64}{67}
+
+
+\subsection{Rechnen mit Polynomen}
+Um für Polynome ħfħ und ħgħ wie gewohnt ħf+għ und ħf*għ schreiben zu
+können, benötigen wir eine ħNumħ-Instanz für den Datentyp ħPolynomħ:
+
+
+
+
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:

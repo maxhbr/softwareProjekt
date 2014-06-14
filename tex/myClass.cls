@@ -14,7 +14,8 @@
 \setdefaultlanguage{german}
 \setotherlanguages{english}
 
-\usepackage{amsmath,amsthm,amssymb}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb}
 \usepackage{latexsym}
 \usepackage{enumerate}
 \usepackage{graphicx}
@@ -81,46 +82,50 @@
   \usepackage[scaled=.92]{helvet}
   \usepackage{courier}
 \fi
-
+\makeatletter
 %\linespread{1.5}
 
 %%%%  Theoreme Styles  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\makeatletter
+\usepackage[thref, hyperref, amsmath, thmmarks]{ntheorem}
+
 
 \theoremstyle{plain}% default
 \newtheorem{thm}{Satz}[chapter]
-%\newtheorem{thm}[satz]{Satz}
+%%\newtheorem{thm}[satz]{Satz}
 \newtheorem{lemma}[thm]{Lemma}
-\newtheorem{lem}[thm]{Lemma}
-\newtheorem{lemdef}[thm]{Lemma/Definition}
-\newtheorem{lemcor}[thm]{Lemma/Korollar}
-\newtheorem{defcor}[thm]{Definition/Korollar}
-\newtheorem{cor}[thm]{Korollar}
-\newtheorem{kor}[thm]{Korollar}
-\newtheorem{prop}[thm]{Proposition}
+%\newtheorem{lem}[thm]{Lemma}
+%\newtheorem{lemdef}[thm]{Lemma/Definition}
+%\newtheorem{lemcor}[thm]{Lemma/Korollar}
+%\newtheorem{defcor}[thm]{Definition/Korollar}
+%\newtheorem{cor}[thm]{Korollar}
+%\newtheorem{kor}[thm]{Korollar}
+%\newtheorem{prop}[thm]{Proposition}
 
-\newtheorem{ex}{Aufgabe}[chapter]
-\newtheorem*{beh}{Behauptung}
-\newtheorem*{dazu}{Dazu}
+%\newtheorem{ex}{Aufgabe}[chapter]
+%\newtheorem*{beh}{Behauptung}
+%\newtheorem*{dazu}{Dazu}
 
 \theoremstyle{definition}
-\newtheorem{defn}[thm]{Definition}
-\newtheorem{conj}[thm]{Conjecture}
-\newtheorem{exmp}[thm]{Beispiel}
-\newtheorem{bsp}[thm]{Beispiel}
+%\newtheorem{defn}[thm]{Definition}
+%\newtheorem{conj}[thm]{Conjecture}
+%\newtheorem{exmp}[thm]{Beispiel}
+%\newtheorem{bsp}[thm]{Beispiel}
+\newtheorem{invariante}[thm]{Invariante}
+
 
 \theoremstyle{remark}
-\newtheorem{rem}[thm]{Bemerkung}
-\newtheorem{bem}[thm]{Bemerkung}
-\newtheorem{beo}[thm]{Beobachtung}
-\newtheorem{note}[thm]{Notiz}
+%\newtheorem{rem}[thm]{Bemerkung}
+%\newtheorem{bem}[thm]{Bemerkung}
+%\newtheorem{beo}[thm]{Beobachtung}
+%\newtheorem{note}[thm]{Notiz}
+\newtheorem{beispiel}[thm]{Beispiel}
 
-%\usepackage{thmbox}
-\newtheorem{try}{Versuch}
-\newtheorem{case}{Fall}
+%%\usepackage{thmbox}
+%\newtheorem{try}{Versuch}
+%\newtheorem{case}{Fall}
 
-\numberwithin{equation}{chapter}
-\numberwithin{figure}{chapter}
+%\numberwithin{equation}{chapter}
+%\numberwithin{figure}{chapter}
 %\numberwithin{figure}{thm}
 
 \usepackage[framemethod=TikZ]{mdframed}

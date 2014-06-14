@@ -27,7 +27,7 @@
 
 \ifnum\myDevelopVariable=0
   \frontmatter
-  \input{titel.tex}
+  \input{titel}
   \newpage \thispagestyle{empty} \mbox{}
 \else
   \mainmatter
@@ -45,17 +45,16 @@
 \fi
 
 \chapter{Beispiele}
-\input{exmp.tex}
+\input{exmp}
 
 \chapter{Implementierung}
 
-\lstinputlisting{../src/Projekt/Core/Polynomials.hs}
 
-\input{impl-pol.tex}
-\input{impl-gal.tex}
+\input{impl-pol}
+\input{impl-gal}
 
 \chapter{Algorithmen}
-\input{alg.tex}
+\input{alg}
 
 \chapter{Performance}
 
