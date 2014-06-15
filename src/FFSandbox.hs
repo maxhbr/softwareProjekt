@@ -19,7 +19,7 @@ module FFSandbox
   )where
 import Projekt.Core
 import Projekt.Algorithmen.Rabin
-import Projekt.Core.Polynomials.Conway
+{-import Projekt.Core.Polynomials.Conway-}
 import Debug.Trace
 
 import SpecCommon

@@ -8,13 +8,14 @@
 --      * dvipng    um aus dem erstelltem DVI ein PNG zu erstellen
 --      * sxiv      für das schnelle öffnen durch viewRendered
 --
--- Dies sollte so hauptsächlich unter Linux laffähig sein
+-- Dies sollte so hauptsächlich unter Linux lauffähig sein
 --
 --------------------------------------------------------------------------------
 module Projekt.Core.ShowTex
   ( ShowTex(..)
   , renderTex, renderRawTex
   , viewRendered
+  , outputPNG
   ) where
 import System.Process
 
@@ -27,6 +28,11 @@ instance ShowTex Integer where
 --------------------------------------------------------------------------------
 --  Nutze latex und dvipng um Latex schnipsel in ein PNG zu rendern
 
+-- Variablen
+outputDIR = "/tmp"
+outputDVI = outputDIR ++ "/article.dvi"
+outputPNG = outputDIR ++ "/snipet.png"
+
 -- |wie renderRawTex, nur dass zunächst ShowTex aufgerufen wird.
 renderTex :: (ShowTex a) => a -> IO ()
 renderTex = renderRawTex . showTex
@@ -37,24 +43,16 @@ renderTex = renderRawTex . showTex
 renderRawTex :: String -> IO ()
 renderRawTex x = do createProcess (shell cmd)
                     return ()
-  where cmd = "latex -halt-on-error -output-directory /tmp "
+  where cmd = "latex -halt-on-error -output-directory " ++ outputDIR ++ " "
               ++ "'\\documentclass[12pt]{article}"
-              ++ "\\pagestyle{empty}"
-              ++ "\\usepackage{amsmath}"
+              ++ "\\pagestyle{empty}" ++ "\\usepackage{amsmath}"
               ++ "\\begin{document}"
-              ++ "\\begin{multline*}"
-              ++ x
-              ++ "\\end{multline*}"
-              ++ "\\end{document}'"
-              ++ " > /dev/null"
-              ++ " ; "
-              ++ "dvipng "
-              ++ "-gamma 2 -z 9 -T tight "
-              ++ "-bg White " -- ++ "-bg Transparent "
-              ++ "-o /tmp/snipet.png /tmp/article.dvi"
-              ++ " > /dev/null"
+              ++ "\\begin{multline*}" ++ x ++ "\\end{multline*}"
+              ++ "\\end{document}' > /dev/null ; "
+              ++ "dvipng -gamma 2 -z 9 -T tight -bg White " -- -bg Transparent
+              ++ "-o " ++ outputPNG ++ " " ++ outputDVI ++ " > /dev/null"
 
 --------------------------------------------------------------------------------
 -- |Nutze sxiv um das erzeugte Bild anzuzeigen
-viewRendered = do createProcess (shell "sxiv /tmp/snipet.png")
+viewRendered = do createProcess (shell ("sxiv " ++ outputPNG))
                   return ()
