@@ -80,13 +80,17 @@
 {\hrule\smallskip}
 % }}}
 
+\RequirePackage{calc}
 
 \newlength{\parskipsave}
+\newcounter{mycount}
 \newcommand{\codeinput}[3]{
   \setlength{\parskipsave}{\bigskipamount}
   \addtolength{\parskipsave}{\parskip}
   \marginpar{\vspace*{\parskipsave}\scriptsize\path{Projekt/#1.hs}}
-  \lstinputlisting[firstline=#2,lastline=#3,firstnumber=#2]%
+  \setcounter{mycount}{#2}
+  \addtocounter{mycount}{#3}
+  \lstinputlisting[firstline=#2,lastline={\value{mycount}},firstnumber=#2]%
     {../src/Projekt/#1.hs}
 }
 
