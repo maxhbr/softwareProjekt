@@ -10,7 +10,7 @@ ghc --make \
   -O2 \
   -fllvm \
   -rtsopts \
-    $DIR/../Spec.hs
+    $DIR/../Projekt/Tests/Spec.hs
   #-fforce-recomp \
 
 if [ $? -eq 0 ]; then

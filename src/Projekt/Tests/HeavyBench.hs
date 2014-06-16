@@ -1,5 +1,16 @@
+--------------------------------------------------------------------------------
+-- |
+-- Module      : Projekt.Tests.HeavyBench
+-- Note        :
+--
+--
+--
+--------------------------------------------------------------------------------
+
 {-# GHC_OPTIONS -funbox-strict-fields #-}
 {-# LANGUAGE BangPatterns #-}
+module Projekt.Tests.HeavyBench
+  where
 import qualified Control.Arrow as A
 
 
@@ -14,7 +25,7 @@ multPM  ((i,m):ms) ns  = addPM  a b
 multPM' i m []         = []
 multPM' i m ((j,n):ns) = (k,c) : multPM' i m ns
   where !c = n*m
-        !k = i+j  
+        !k = i+j
 
 
 addPM [] gs          = gs

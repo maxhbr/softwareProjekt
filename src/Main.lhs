@@ -1,10 +1,9 @@
+\begin{code}
 {-# LANGUAGE QuasiQuotes, TemplateHaskell #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Main
--- Note        :
---
---
+-- Note        : Dies hier soll ein kleines Beispielprogramm sein
 --
 --------------------------------------------------------------------------------
 module Main
@@ -24,16 +23,18 @@ import Control.Parallel.Strategies
 import Debug.Trace
 
 import Projekt.Projekt
+\end{code}
 
---------------------------------------------------------------------------------
---  Beliebiger Primkörper mit Charakteristik `c`
-c = 3
+Nun erzeugen wir uns einen Primkörper mit der hier gewählen Charakteristik
+$c=3$.
 
-data PfNumeral
-instance Numeral PfNumeral where {numValue x = c}
-instance Show PfNumeral where {show = show}
-type PF = Mod PfNumeral
+\begin{code}
+$(genPrimeField 3 "PF")
+\end{code}
 
+Über diesem Körper können wir nun Erweiterungskörper generieren
+
+\begin{code}
 --------------------------------------------------------------------------------
 --  Erweiterungen über PF
 
@@ -56,7 +57,9 @@ e5e4pf = FFElem (P[0,e4pf]) e5e4pfMiPo
 
 e99fpMipo = findIrred (getAllMonicPs (elems pf) [99])
 e99pf = FFElem (P[0,pf]) e99fpMipo
+\end{code}
 
+\begin{code}
 --------------------------------------------------------------------------------
 --  Problem1:
 --      Finde alle irreduziblen Polynome über Endlichem Körper, welcher `e`
@@ -146,7 +149,9 @@ problem1eRead = do
   r <- readFile file
   print (decode r:: Polynom (FFElem PF))
     where file = "/tmp/irreds" ++ show c
+\end{code}
 
+\begin{code}
 --------------------------------------------------------------------------------
 --  Problem2:
 --      Finde ein irreduziblen Polynom über Endlichem Körper, welcher `e`
@@ -180,7 +185,9 @@ problem2b e deg = do
 problem2c e deg = do
   print "Irred:"
   print $ findIrred $ getAllMonicPs (elems e) deg
+\end{code}
 
+\begin{code}
 --------------------------------------------------------------------------------
 --  Problem3:
 --      Finde den Körper e5e2pf bzw. e5e4pf
@@ -188,7 +195,9 @@ problem2c e deg = do
 problem3 = print $ length $ elems e5e2pf
 problem3b = print $ length $ elems e5e4pf
 problem3c = print $ length $ elems e99pf
+\end{code}
 
+\begin{code}
 --------------------------------------------------------------------------------
 --  Main
 
@@ -206,3 +215,4 @@ main = do
   (grp:(arg:_)) <- getArgs
   let (Just action) = lookup grp dispatch
   action arg
+\end{code}

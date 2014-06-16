@@ -5,9 +5,11 @@
 --
 --  Diese Sandbox ist zum testen von FiniteFields gedacht.
 --
+--  Die main Funktion enthält Hspec unit tests.
+--
 --------------------------------------------------------------------------------
 
-module FFSandbox
+module Projekt.Sandbox.FFSandbox
   ( f2
   , e2f2Mipo, e2f2
   , e2e2f2Mipo, e2e2f2
@@ -19,10 +21,10 @@ module FFSandbox
   )where
 import Projekt.Core
 import Projekt.Algorithmen.Rabin
-import Projekt.Core.Polynomials.Conway
+{-import Projekt.Core.Polynomials.Conway-}
 import Debug.Trace
 
-import SpecCommon
+import Projekt.Sandbox.SandboxCommon
 
 pp :: (Show a) => [a] -> IO()
 pp =  mapM_ print
@@ -127,10 +129,10 @@ e3e3e3f3 = FFElem (pList [0,one]) e3e3e3f3Mipo
 --------------------------------------------------------------------------------
 testForExceptions a aMipo = do
   it "x/0 throws exception" $ do
-    evaluate (one / FFElem (nullP) aMipo) `shouldThrow` anyException
-    evaluate (a / FFElem (nullP) aMipo) `shouldThrow` anyException
+    evaluate (one / FFElem nullP aMipo) `shouldThrow` anyException
+    evaluate (a / FFElem nullP aMipo) `shouldThrow` anyException
   it "0/0 throws exception" $
-    evaluate (FFElem (nullP) aMipo / FFElem (nullP) aMipo) `shouldThrow` anyException
+    evaluate (FFElem nullP aMipo / FFElem nullP aMipo) `shouldThrow` anyException
 
 furtherTests e = furtherTests' (elems e) (units e) e
 furtherTests' es us e = do

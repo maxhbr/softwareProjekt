@@ -9,6 +9,6 @@ import Projekt.Algorithmen as X
 -- `d`.
 -- Das übergebene Element muss "genug" Information enthalten.
 extendFFBy :: (Show a, Num a, Fractional a, FiniteField a) => Int -> a -> FFElem a
-extendFFBy d e = FFElem (P[0,onefy]) $ findIrred $ getAllMonicPs (elems e) [d]
+extendFFBy d e = FFElem (pList[0,onefy]) $ findIrred $ getAllMonicPs (elems e) [d]
   where onefy | e == 1     = e
               | otherwise = e / e

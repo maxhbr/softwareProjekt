@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE TemplateHaskell #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : Projekt.Core.PrimeFields
@@ -32,6 +30,8 @@ $(genPrimeField 7 "F7")
  -}
 -- Den Primkörper mit Charakteristik 7 und Namen F7 erzeugen lassen
 --------------------------------------------------------------------------------
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE TemplateHaskell #-}
 module Projekt.Core.PrimeFields
   ( Numeral (..)
   -- Endliche Körper
@@ -69,6 +69,7 @@ instance (Numeral n, Show n) => Show (Mod n) where
     where showModulus :: (Numeral n) => Mod n -> String
           showModulus = showModulus' . show . modulus
           showModulus' :: String -> String
+#if 1
           showModulus' "" = ""
           showModulus' (c:cs) = newC : showModulus' cs
             where newC | c == '0' = '₀'
@@ -81,6 +82,9 @@ instance (Numeral n, Show n) => Show (Mod n) where
                        | c == '7' = '₇'
                        | c == '8' = '₈'
                        | c == '9' = '₀'
+#else
+          showModulus' s = "^{" ++ s ++ "}"
+#endif
 
 instance (Numeral n, Show n) => ShowTex (Mod n) where
   showTex x = show (unMod x) ++ "_{" ++ show (modulus x) ++ "}"
@@ -94,31 +98,25 @@ instance (Numeral n) => Eq (Mod n) where
   x == y = (unMod x - unMod y) `rem` modulus x == 0
 
 instance (Numeral n) => Num (Mod n) where
-  {-# INLINE (+) #-} 
-  x + y       = add x y 
-  {-# INLINE (*) #-} 
-  x * y       = mult x y 
+  {-# INLINE (+) #-}
+  x + y       = MkMod $ unMod x + unMod y `rem` modulus x
+  {-# INLINE (*) #-}
+  x * y       = MkMod $ unMod x * unMod y `rem` modulus x
   fromInteger = MkMod . fromIntegral
-  abs x       = x --error "Prelude.Num.abs: inappropriate abstraction"
+  abs x       = error "Prelude.Num.abs: inappropriate abstraction"
   signum _    = error "Prelude.Num.signum: inappropriate abstraction"
   {-# INLINE negate #-}
   negate      = MkMod . negate . unMod
 
-{-# INLINE add #-}
-add x y = MkMod $ unMod x + unMod y `rem` modulus x
-
-{-# INLINE mult #-}
-mult x y = MkMod $ (unMod x * unMod y) `rem` modulus x 
-
 instance (Numeral n) => FiniteField (Mod n) where
-  zero                = MkMod 0
-  one                 = MkMod 1
-  elems               = const $ elems' one
+  zero           = MkMod 0
+  one            = MkMod 1
+  elems          = const $ elems' one
     where elems' :: (Numeral n) => Mod n -> [Mod n]
           elems' x = map MkMod [0.. (modulus x - 1)]
-  charakteristik      = modulus
-  elemCount           = modulus
-  getReprP f          = 0 * snd (head (p2Tup f))
+  charakteristik = modulus
+  elemCount      = modulus
+  getReprP e     = 0 * snd (head (p2Tup e))
 
 {-# INLINE modulus #-}
 modulus :: Numeral a => Mod a -> Int
@@ -128,26 +126,25 @@ modulus x = numValue $ modulus' x
 
 instance (Numeral n) => Fractional (Mod n) where
   recip          = invMod
-  fromRational _ = error "inappropriate abstraction"
+  fromRational _ = error "Prelude.Fractional.fromRational: inappropriate abstraction"
 
 -- Inversion mit erweitertem Euklidischem Algorithmus
 -- Algorithm 2.20 aus Guide to Elliptic Curve Cryptography
 invMod :: Numeral a => Mod a -> Mod a
-invMod 0 = error "Division by zero"
+invMod 0 = error "Projekt.Core.PrimeField.invMod: Division by zero"
 invMod x = invMod' (unMod x `mod` p,p,one,zero)
   where p = modulus x
         invMod' :: Numeral a => (Int, Int, Mod a, Mod a) -> Mod a
-        divMod' (0,_,_,_) = error "Division by zero"
-        invMod' (u,v,x1,x2)
-          | u == 1     = x1
-          | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
-            where q = v `div` u
+        divMod' (0,_,_,_)   = error "Projekt.Core.PrimeField.invMod: Division by zero"
+        invMod' (u,v,x1,x2) | u == 1     = x1
+                            | otherwise = invMod' (v-q*u,u,x2-MkMod q*x1,x1)
+          where q = v `div` u
 
--- Zur serialisierung wird eine Instanz vom Typ Binary benötigt
+-- Zur Serialisierung wird eine Instanz vom Typ Binary benötigt
 instance (Numeral a) => Binary (Mod a) where
-   put (MkMod x) = put x
-   get           = do x <- get
-                      return $ MkMod x
+  put (MkMod x) = put x
+  get           = do x <- get
+                     return $ MkMod x
 
 --------------------------------------------------------------------------------
 --  Erzeugen von Primkörpern
@@ -159,17 +156,17 @@ genPrimeField p pfName = do
   i1 <- instanceD (cxt [])
     (appT (conT ''Numeral) (conT (mkName mName)))
     [funD (mkName "numValue")
-      [clause [varP $ mkName "x"] 
+      [clause [varP $ mkName "x"]
         (normalB $ litE $ IntegerL p) [] ] ]
   i2 <- instanceD (cxt [])
     (appT (conT ''Show) (conT (mkName mName)))
-    [funD (mkName "show") 
+    [funD (mkName "show")
       [clause [] ( normalB $ appsE [varE (mkName "show")] ) [] ] ]
   t <- tySynD (mkName pfName) []
     (appT (conT ''Mod) (conT $ mkName mName))
   return [d,i1,i2,t]
     where mName ='M' : show p
-ppQ x = putStrLn =<< runQ ((show . ppr) `fmap` x)
+-- ppQ x = putStrLn =<< runQ ((show . ppr) `fmap` x)
 
 -- Erzeugen von Primkörpern mittels CPP Compiler Befehlen
 #define PFInstance(MName,MValue,PFName) \

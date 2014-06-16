@@ -1,8 +1,10 @@
+module Prjekt.Tests.Bench
+  where
 import Criterion.Main
 
 import Projekt.Core
 import Projekt.Algorithmen
-import FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
+import Projekt.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
 
 benchFindIrreds =
   [ bgroup "findIrreds e2f2" 

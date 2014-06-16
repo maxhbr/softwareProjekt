@@ -5,13 +5,16 @@
 --
 --  Diese Sandbox ist zum testen von Polynomials gedacht.
 --
+--  Die main Funktion enthält Hspec unit tests.
+--
 --------------------------------------------------------------------------------
 
-module PolySandbox where
+module Projekt.Sandbox.PolySandbox
+  where
 import Projekt.Core
 
-import FFSandbox (e2f2,e2e2f2,e4f2)
-import SpecCommon
+import Projekt.Sandbox.FFSandbox (e2f2,e2e2f2,e4f2)
+import Projekt.Sandbox.SandboxCommon
 
 --------------------------------------------------------------------------------
 --  Über den ganzen Zahlen
