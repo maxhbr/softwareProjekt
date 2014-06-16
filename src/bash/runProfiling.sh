@@ -10,7 +10,7 @@ ghc \
   -prof \
   -fprof-auto -rtsopts \
   -O2 \
-    ${DIR}AlgProfiling.hs
+    ${DIR}Projekt/Tests/AlgProfiling.hs
 
 if [ $? -eq 0 ]; then
   ${DIR}out/Profiling/AlgProfiling +RTS -p -sstderr

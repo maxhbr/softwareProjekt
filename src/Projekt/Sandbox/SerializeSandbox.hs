@@ -1,3 +1,14 @@
+--------------------------------------------------------------------------------
+-- |
+-- Module      : AlgSandbox
+-- Note        : Beispiele und Platz zum Spielen und Probieren
+--
+--  Diese Sandbox ist zum testen der serialisierung gedacht.
+--
+--------------------------------------------------------------------------------
+
+module Projekt.Sandbox.SerializeSandbox
+  where
 import Prelude hiding (writeFile, readFile)
 
 import Debug.Trace

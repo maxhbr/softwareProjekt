@@ -7,7 +7,7 @@
 --
 --------------------------------------------------------------------------------
 
-module AlgSandbox
+module Projekt.Sandbox.AlgSandbox
   where
 
 import Debug.Trace
@@ -16,10 +16,10 @@ import Data.List
 
 import Projekt.Core
 import Projekt.Algorithmen
-import FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
 
-import SpecCommon
-import PolySandbox hiding (testSize, main)
+import Projekt.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
+import Projekt.Sandbox.SandboxCommon
+import Projekt.Sandbox.PolySandbox hiding (testSize, main)
 
 --------------------------------------------------------------------------------
 --  Beispiele

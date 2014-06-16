@@ -1,4 +1,4 @@
-module SpecCommon
+module Projekt.Sandbox.SandboxCommon
   ( module X
   , pMapM_
   , rndSelect

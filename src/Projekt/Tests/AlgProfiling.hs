@@ -1,12 +1,13 @@
 {-# LANGUAGE BangPatterns #-}
-import Debug.Trace
-
+module Projekt.Tests.AlgProfiling
+  where
 import Control.Arrow as A
-
 import Projekt.Core
 import Projekt.Algorithmen
 {-import System.Random-}
 import Data.List
+import Debug.Trace
+
 import Projekt.Core.Polynomials.FFTTuple
 import Projekt.Core.Polynomials.Conway
 

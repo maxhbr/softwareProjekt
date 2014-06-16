@@ -7,15 +7,16 @@
 --
 --------------------------------------------------------------------------------
 
-module MatrixSandbox where
+module Projekt.Sandbox.MatrixSandbox
+  where
 import Projekt.Core hiding (examplePoly, examplePoly')
 import Projekt.Core.Matrix
 
 import Test.Hspec
 import Control.Exception (evaluate)
 
-import SpecCommon
-import FFSandbox hiding (main)
+import Projekt.Sandbox.SandboxCommon
+import Projekt.Sandbox.FFSandbox hiding (main)
 
 --------------------------------------------------------------------------------
 --  Matrizen

@@ -1,4 +1,3 @@
-{-# LANGUAGE TemplateHaskell #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : PFSandbox
@@ -8,13 +7,15 @@
 --
 --------------------------------------------------------------------------------
 
-module PFSandbox where
+{-# LANGUAGE TemplateHaskell #-}
+module Projekt.Sandbox.PFSandbox
+  where
 import Projekt.Core
 
 import Test.Hspec
 import Control.Exception (evaluate)
 
-import SpecCommon
+import Projekt.Sandbox.SandboxCommon
 
 --------------------------------------------------------------------------------
 main :: IO ()
