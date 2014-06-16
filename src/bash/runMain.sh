@@ -9,7 +9,7 @@ ghc --make \
   -threaded \
   -O2 \
   -fllvm \
-    $DIR/../Main.hs
+    $DIR/../Main.lhs
   #-fforce-recomp \
 
 if [ $? -eq 0 ]; then
