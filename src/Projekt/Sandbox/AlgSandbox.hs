@@ -5,6 +5,8 @@
 --
 --  Diese Sandbox ist zum testen von FiniteFields gedacht.
 --
+--  Die main Funktion enthält Hspec unit tests.
+--
 --------------------------------------------------------------------------------
 
 module Projekt.Sandbox.AlgSandbox

@@ -5,6 +5,8 @@
 --
 --  Diese Sandbox ist zum testen von PrimeFields gedacht.
 --
+--  Die main Funktion enthält Hspec unit tests.
+--
 --------------------------------------------------------------------------------
 
 {-# LANGUAGE TemplateHaskell #-}

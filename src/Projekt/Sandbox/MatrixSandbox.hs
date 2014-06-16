@@ -3,7 +3,9 @@
 -- Module      : MatrixSandbox
 -- Note        : Beispiele und Platz zum Spielen und Probieren
 --
+--  Diese Sandbox ist zum testen der Matrix Implementierung gedacht.
 --
+--  Die main Funktion enthält Hspec unit tests.
 --
 --------------------------------------------------------------------------------
 
