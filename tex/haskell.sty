@@ -75,10 +75,6 @@
 	emphstyle={[5]\color{preto_ulisses}\textbf}
 }
 
-\lstnewenvironment{code}
-{\textbf{Haskell Code} \hspace{1cm} \hrulefill \lstset{language=HaskellUlisses}}
-{\hrule\smallskip}
-% }}}
 
 \RequirePackage{calc}
 
@@ -99,3 +95,33 @@
   \lstset{language=Haskellulisses,numbers=none,belowskip=\smallskipamount}}{}
 
 \lstMakeShortInline[mathescape=true]ħ
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Source to Latex Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newlength{\parskipsave}
+%\newcounter{mycount}
+\newcommand{\haskellinput}[2]{
+  \immediate\write18{/usr/bin/awk 'BEGIN {RS="\string\n\string\n";} /.*?^#2 /'
+    ../src/Projekt/#1.hs | sed '/./,$!d' >/tmp/temp.tex}
+  \immediate\write18{/usr/bin/grep -n -Ff /tmp/temp.tex 
+    ../src/Projekt/#1.hs | /usr/bin/gawk 'NR==1 
+      {print "\string\\begin\string\{lstlisting\string\}[firstnumber="$1"]"};' 
+      FS=":" >/tmp/temp2.tex}
+  \immediate\write18{/usr/bin/cat /tmp/temp.tex >>/tmp/temp2.tex}
+  \immediate\write18{echo '\string\end\string{lstlisting\string}' >>/tmp/temp2.tex}
+  %Input File
+  \setlength{\parskipsave}{\bigskipamount}
+  \addtolength{\parskipsave}{\parskip}
+  \marginpar{\vspace*{\parskipsave}\scriptsize\path{Projekt/#1.hs}}
+  \input{/tmp/temp2.tex}
+  %Clean up
+  \immediate\write18{/usr/bin/rm /tmp/temp.txt}
+  \immediate\write18{/usr/bin/rm /tmp/temp2.txt}
+}
+
+
+
+
+

@@ -18,7 +18,7 @@ Variante entschieden, da diese insbesondere bei spärlich besetzten Polynomen
 mit hohem Grad deutliche Performancegewinne zeigt.
 
 Konkret ist ein Polynom also definiert durch:
-\codeinput{Core/Polynomials}{45}{1}
+\haskellinput{Core/Polynomials}{data Polynom}
 
 Um diese Darstellung \emph{dense} nennen und mit ihr effizient arbeiten zu 
 können, treffen wir folgende Beschränkungen an die Implementierung:
@@ -47,7 +47,7 @@ können, treffen wir folgende Beschränkungen an die Implementierung:
 Damit diese Invariante stets sichergestellt ist, existiert die Funktion
 ħcleanPħ, mit der eine ħ[(Int,a)]ħ Liste in die korrekte Form gebracht werden
 kann:
-\codeinput{Core/Polynomials}{75}{4}
+\haskellinput{Core/Polynomials}{cleanP}
 
 
 \subsubsection{Polynome erstellen}
@@ -55,44 +55,46 @@ kann:
 Diese Einschränkung erfordert auch, dass der Konstruktor des Polynomdatentyps
 nicht öffentlich gemacht wird und wir benötigen separate Funktionen, um
 Polynome zu erstellen. Diese sind selbsterklärend:
-\codeinput{Core/Polynomials}{51}{1}
-\codeinput{Core/Polynomials}{55}{1}
+\haskellinput{Core/Polynomials}{pList}
+\haskellinput{Core/Polynomials}{pTup}
 Ferner existiert noch eine Variante der ``unsicheren'' Erstellung von
 Polynomen, die eine korrekte Darstellung nach \thref{inv:poly} voraussetzt,
 diese jedoch nicht prüft. 
-\codeinput{Core/Polynomials}{58}{4}
+\haskellinput{Core/Polynomials}{pTupUnsave}
 
 
 \paragraph{Polynome dekonstruieren}
 Den Weg rückwärts zu gehen ist natürlich auch möglich, was ħp2Tupħ und ħp2Listħ
 bewerkstelligen:
 
-\codeinput{Core/Polynomials}{69}{2}
-\codeinput{Core/Polynomials}{72}{1}
+\haskellinput{Core/Polynomials}{p2Tup}
+\haskellinput{Core/Polynomials}{p2List}
 
 
 \paragraph{Spezielle Polynome}
 Eines der am häufigsten verwendenten Polynome ist das Nullpolynom. Daher gibt
 es sowohl eine Prüfung, ob ein Polynom null ist, als auch das Nullpolynom
 selbst als Objekt:
-\codeinput{Core/Polynomials}{47}{1}
-\codeinput{Core/Polynomials}{107}{4}
+\haskellinput{Core/Polynomials}{nullP}
+\haskellinput{Core/Polynomials}{isNullP}
+
 
 Des Weiteren haben wir eine kleine Schreibhilfe zur Erstellung von konstanten
 Polynomen generiert:
-\codeinput{Core/Polynomials}{64}{3}
+\haskellinput{Core/Polynomials}{pKonst}
+
 
 
 \subsection{Zweiwertige Operationen auf Polynomen}
 \paragraph{Gleichheit} Bekanntlich sind zwei Polynome 
-  genau dann gleich, wenn ihre Koeffizienten übereinstimmen:
-  \codeinput{Core/Polynomials}{100}{5}
+genau dann gleich, wenn ihre Koeffizienten übereinstimmen:
+\haskellinput{Core/Polynomials}{eqP}
 
 \paragraph{Addition} Hier kommt zum ersten mal ein kleiner Nachteil der
 \emph{dense} Darstellung zu Tage, da das Addieren zweier Polynome nicht einfach
 das elementweise summieren zweier Listen ist, sondern stets geprüft werden
 muss, bei welchem Grad man gerade ist:
-\codeinput{Core/Polynomials}{182}{8}
+\haskellinput{Core/Polynomials}{addPM}
 ħaddPMħ darf offensichtlich nur ausgeführt werden, wenn die beiden Polynome
 \thref{inv:poly} erfüllen. Darüber hinaus stellt obige Funktion auch sicher,
 dass besagte Invariante erhalten bleibt.
@@ -103,7 +105,7 @@ Standarddefinition der Subtraktion, nämlich Addition des ersten mit dem
 negierten zweiten Argument, das zweite Polynom doppelt durchlaufen (einmal beim
 Negieren und einmal beim Addieren) werden. Um dies zu verhindern, haben wir die
 Subtraktion separat geschrieben.
-\codeinput{Core/Polynomials}{199}{8}
+\haskellinput{Core/Polynomials}{subtrPM}
 Wiederum darf obige Subtraktion nur auf wohlgeformte Polynome angewandt werden.
 
 
