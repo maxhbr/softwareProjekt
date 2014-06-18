@@ -221,14 +221,8 @@ zipSum (x:xs) (y:ys) = (x+y) : zipSum xs ys
 multPM :: (Eq a, Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 multPM f [] = []
 multPM [] f = []
-#if 0
-multPM  ((i,m):ms) ns  = addPM a b
-  where !a = multPM' i m ns
-        !b = multPM ms ns
-#else
 multPM ms ns = foldr1 addPM summanden
   where  summanden = [multPM' i m ns | (i,m) <- ms]
-#endif
 
 {-# INLINE multPM' #-}
 multPM' i m []                     = []
@@ -263,17 +257,7 @@ multPMK' 1 [(i1,x1),(i2,x2)] [(j1,y1),(j2,y2)]
   where !p1 = x1*y1
         !p2 = x2*y2
         !p3 = (x1+x2)*(y1+y2)
-multPMK' n f g = --trace ("karat n="++show n
-        {-++"\n\tf="++show f++"\n\tg="++show g-}
-        {-++"\n\t=>fH="++show fH++" fL="++show fL-}
-        {-++"\n\t  gH="++show gH++" gL="++show gL-}
-        {-++"\n\t=>p1="++show p1-}
-        {-++"\n\t  p2="++show p2-}
-        {-++"\n\t  p3="++show p3-}
-        {-++"\n\t=>e1="++show e1-}
-        {-++"\n\t  e2="++show e2-}
-        {-++"\n\t  e3="++show e3)$-}
-                  addPM e1 $ addPM e2 e3
+multPMK' n f g = addPM e1 $ addPM e2 e3
   where  -- High und Low Parts
         {-# INLINE fH' #-}
         fH' = takeWhile (\(i,_) -> i>=n) f
