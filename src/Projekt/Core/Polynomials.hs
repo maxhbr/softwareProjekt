@@ -42,7 +42,7 @@ import Projekt.Core.ShowTex
 -- |Polynome sind Listen von Monomen, welche durch Paare (Integer,a)
 -- dargestellt werden. In der ersten Stelle steht der Grad, in der zweiten der
 -- Koeffizient.
-data Polynom a = PMS { unPMS :: [(Int,a)], clean :: Bool} deriving ()
+data Polynom a = PMS { unPMS :: [(Int,a)], clean :: Bool } deriving ()
 
 -- |Das Nullpoylnom
 nullP = PMS [] True
