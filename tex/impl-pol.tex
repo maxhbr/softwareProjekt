@@ -134,7 +134,106 @@ wobei
 \[ A = a_1 b_1, \qquad B = a_2b_2, \qquad C = (a_1+b_1)(a_2+b_2) \,.\]
 Damit können die ursprünglich 4 auftretenden Multiplikation des
 Standardalgorithmus durch 3 Multiplikation und 4 Additionen ersetzt werden.
+Dies lässt sich natürlich rekursiv anwenden. Da die Polynome jedoch nicht immer
+von gleichem Grad sind und dieser selten eine Zweierpotenz ist (letzteres ist
+notwendig, damit der Algorithmus rekursiv bis zu obigem Grundfall laufen kann),
+wählt man die nächstkleinere Zweierpotenz des Maximums der beiden Gräder als
+Teilungspunkt für den rekursiven Aufruf.
+Die Implementierung erfolgt dabei in drei Schritten: 
+\haskellinput{Core/Polynomials}{multPK}
+Hierzu gibt es nichts zu sagen. Im nächsten Schritt wird dann die passende
+Zweierpotenz ermittelt und damit der eigentliche Karatsuba aufgerufen:
+\haskellinput{Core/Polynomials}{multPMKaratsuba}
+Letztlich bleibt nur der Algorithmus übrig. Aufgrund der Tupeldarstellung der
+Polynome, ist die Trennung selbiger nicht so einfach und elegant, wie es die
+Listendarstellung erlaubt hätte. Nichtsdestotrotz ist diese Implementierung
+auch in diesem Fall effizienter.
+\haskellinput{Core/Polynomials}{multPMK'\string\''}
 
+\paragraph{Ein kleiner Vergleich}
+Wie bereits erwähnt, bringt der Karatsuba auf Polynomen über den ħPrimeFieldsħ
+keinerlei Vorteile gegenüber der Standardmultiplikation. Betrachten wir jedoch
+ein Beispiel über einem Erweiterungskörper, so kann der Karatsuba seien Vorteil
+ausspielen, da dort ja die Koeffizienten selbst Polynome sind, und daher
+Addition weitaus "`billiger"' ist als Multiplikation.
+\begin{beispiel}
+  Nehmen wir einmal das Polynom 
+  \[ f(X) = \in \F_{2^40}\]
+  dargestellt durch
+\end{beispiel}
+
+\subsubsection{FFT-Multiplikation: Der Schönhagen-Strassen-Algorithmus}
+Eine, was die Idee angeht, weitaus komplexere Möglichkeit Polynome zu
+multiplizieren, ist die FFT-Multiplikation. Sie ist die bislang schnellste
+bekannte Methode. Allerdings gilt dies nur für die asymptotische Laufzeit!
+Daher konnten wir leider nur feststellen, dass die FFT-Multiplikation stets
+weitaus langsamer ist, als der Standardalgorithmus oder Karatsuba.
+
+Die Idee der FFT-Multiplikation basiert auf der Tatsache, dass sich das Produkt
+zweier Polynome in Diskreter Fourier-Transformation (DFT) als komponentenweises
+Produkt der Fourier-Transformierten der beiden Polynome berechnen lässt. 
+Dies wollen wir uns näher betrachten:
+
+Im Folgenden sei stets $R$ ein kommutativer Ring mit Eins und 
+$\omega\in R$ eine primitive $n$-te Einheitswurzel.
+
+\begin{definition}
+   Ist $f\in R[X]$ ein Polynom, so ist seine
+  \emph{Diskrete Fourier-Transformation (DFT)} definiert als
+  \[ f^\wedge(\omega) = (f(\omega^j):\ j=1,\ldots,n-1) \in R^n\,.\]
+\end{definition}
+
+Eine wesentliche Eigenschaft liefert folgende Proposition. 
+
+\begin{prop}
+  Sei $f \in R[X]$ und $F := f^\wedge(\omega)$ seine DFT. Ist 
+  $n \in R$ eine Einheit, so gilt
+  \[ f(X) = (\tfrac 1 n F^\wedge(\omega^{-1}))(X) \,.\]
+\end{prop}
+\begin{proof}
+  
+\end{proof}
+
+Die auftauchende Frage zur Notation eines $n$-Tupels als Polynom beantwortet
+nachstehende Definition:
+
+\begin{definition}
+  Sei $r = (r_0,\ldots,r_{n-1})\in R^n$, so definieren wir 
+  \[ r(X) := \sum_{i=0}^{n-1} r_i X^i \ \in R[X] \,.\]
+  Ferner notieren wir für 
+  $f(X) = \sum_{i=0}^{n-1} f_i X^i \in R[X]$
+  \[ f = (f_0,\ldots,f_{n-1}) \in R^n \,.\]
+\end{definition}
+
+Die DFT eines Polynoms lässt sich sehr schnell durchführen, wenn man
+$n = 2^l$ eine Zweierpotenz setzt:
+\begin{pseudocode}{FFT}{alg:fft}
+Input: $n = 2^l$, $\omega \in R$ eine primitive $n$-te Einheitswurzel, $f \in R^n$
+Output: $f^\wedge(\omega)$
+Algorithmus: FFT($n$,$\omega$,$f$)
+  1. Setze
+    $r := \big(f_j + f_{j+\frac n 2}:\ j=0,\ldots,\tfrac n 2\big)$
+    $r_\omega := \big( \omega^j (f_j - f_{j+\frac n 2}):\
+         j=0,\ldots,\tfrac n 2\big)$
+  2. Berechne rekursiv $a := $ FFT($\tfrac n 2$, $\omega^2$, $r$) und $b := $ FFT($\tfrac n 2$, $\omega^2$, $r_\omega$)
+  3. Mische die Ergebnisse: $f^\wedge(\omega) := (a_0,b_0,a_1,\ldots,
+      a_{\frac n 2 -1},b_{\frac n 2 -1})$
+\end{pseudocode}
+
+Wie man damit Polynome multiplizieren kann, erklärt nachstehender Algorithmus:
+\begin{pseudocode}{FFT-Multiplikation}{alg:dftmul}
+Input: $f(X),g(X) \in R[X]$
+Output: $h(X) = f(X)g(X) \in R[X]$
+Algorithmus:
+  1. Berechne $a := f^\wedge(\omega)$, $b := g^\wedge(\omega)$.
+  2. Berechne komponentenweise $c := a\odot b$.
+  3. Setze $h(X) := (\tfrac 1 n c^\wedge(\omega\inv))(X)$
+\end{pseudocode}
+
+
+Es bleiben ein paar Probleme offen: Um mit obigem Algorithmus Polynome zu
+multplizieren, muss es in $R$ für jede Zweierpotenz $n$ eine $n$-te
+Einheitswurzel und $2$ muss eine Einheit sein.
 
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:
