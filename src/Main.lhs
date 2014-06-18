@@ -22,7 +22,7 @@ import Control.Parallel.Strategies
 
 import Debug.Trace
 
-import Projekt.Projekt
+import GalFld.GalFld
 \end{code}
 
 Nun erzeugen wir uns einen Primkörper mit der hier gewählen Charakteristik
