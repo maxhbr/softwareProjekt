@@ -48,7 +48,7 @@ cabal-version:       >=1.10
 
 library
   -- Modules exported by the library.
-  exposed-modules:     Main, GalFld.GalFld, GalFld.Algorithmen, GalFld.Core, GalFld.Core.Factorization, GalFld.Core.PrimeFields, GalFld.Core.ShowTex, GalFld.Core.Polynomials, GalFld.Core.Matrix, GalFld.Core.FiniteField, GalFld.Core.FiniteFields, GalFld.Core.Polynomials.Conway, GalFld.Core.Polynomials.FFTTuple, GalFld.Core.Polynomials.FFT, GalFld.Sandbox.AlgSandbox, GalFld.Sandbox.MatrixSandbox, GalFld.Sandbox.SandboxCommon, GalFld.Sandbox.PolySandbox, GalFld.Sandbox.FFSandbox, GalFld.Sandbox.PFSandbox, GalFld.Sandbox.SerializeSandbox, GalFld.Tests.Bench, GalFld.Tests.Spec, GalFld.Tests.HeavyBench, GalFld.Tests.AlgProfiling, GalFld.Algorithmen.TypeZeroFactorization, GalFld.Algorithmen.Rabin, GalFld.Algorithmen.Berlekamp, GalFld.Algorithmen.Factorizations, GalFld.Algorithmen.SFreeFactorization
+  exposed-modules:     Main, GalFld.GalFld, GalFld.Algorithmen, GalFld.Core, GalFld.Core.Factorization, GalFld.Core.PrimeFields, GalFld.Core.ShowTex, GalFld.Core.Polynomials, GalFld.Core.Matrix, GalFld.Core.FiniteField, GalFld.Core.FiniteFields, GalFld.Core.Polynomials.Conway, GalFld.Core.Polynomials.FFTTuple, GalFld.Core.Polynomials.FFT, GalFld.Sandbox.AlgSandbox, GalFld.Sandbox.MatrixSandbox, GalFld.Sandbox.SandboxCommon, GalFld.Sandbox.PolySandbox, GalFld.Sandbox.FFSandbox, GalFld.Sandbox.PFSandbox, GalFld.Sandbox.SerializeSandbox, GalFld.Algorithmen.Rabin, GalFld.Algorithmen.Berlekamp, GalFld.Algorithmen.Factorizations, GalFld.Algorithmen.SFreeFactorization
   
   -- Modules included in this library but not exported.
   -- other-modules:       
