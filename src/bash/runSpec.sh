@@ -5,13 +5,12 @@ mkdir -p $DIR/../out
 
 ghc --make \
   -outputdir out \
-  -o out/Spec \
+  -o out/HSpecTests \
   -threaded \
   -O2 \
   -fllvm \
   -rtsopts \
-    $DIR/../Projekt/Tests/Spec.hs
-  #-fforce-recomp \
+    $DIR/../HSpecTests.hs
 
 if [ $? -eq 0 ]; then
   if [[ $# != 0 ]]; then
@@ -22,8 +21,5 @@ if [ $? -eq 0 ]; then
     fi
   fi
 
-  time $DIR/../out/Spec $@ +RTS -N${N} -sstderr
+  time $DIR/../out/HSpecTests $@ +RTS -N${N} -sstderr
 fi
-
-# -fforce-recomp, -O2 and -fllvm are from:
-# stackoverflow.com/questions/7017116/haskell-simple-way-to-cache-a-function-call
