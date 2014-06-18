@@ -16,7 +16,7 @@ import Data.List
 
 import Data.Binary
 import Data.ByteString.Lazy (writeFile, readFile, appendFile)
-import qualified Control.Monad.Parallel as P
+--import qualified Control.Monad.Parallel as P
 import Control.Parallel
 import Control.Parallel.Strategies
 
@@ -41,22 +41,22 @@ $(genPrimeField 3 "PF")
 pf = 1::PF
 
 e2fpMipo = $([|findIrred (getAllMonicPs (elems pf) [2])|])
-e2pf = FFElem (P[0,pf]) e2fpMipo
+e2pf = FFElem (pList[0,pf]) e2fpMipo
 
 e2e2pfMipo = $([|findIrred (getAllMonicPs (elems e2pf) [2])|])
-e2e2pf = FFElem (P[0,e2pf]) e2e2pfMipo
+e2e2pf = FFElem (pList[0,e2pf]) e2e2pfMipo
 
 e4pfMipo = $([|findIrred (getAllMonicPs (elems pf) [4])|])
-e4pf = FFElem (P[0,pf]) e4pfMipo
+e4pf = FFElem (pList[0,pf]) e4pfMipo
 
 e5e2pfMiPo = findIrred $ getAllMonicPs (elems e2pf) [5]
-e5e2pf = FFElem (P[0,e2pf]) e5e2pfMiPo
+e5e2pf = FFElem (pList[0,e2pf]) e5e2pfMiPo
 
 e5e4pfMiPo = findIrred $ getAllMonicPs (elems e4pf) [5]
-e5e4pf = FFElem (P[0,e4pf]) e5e4pfMiPo
+e5e4pf = FFElem (pList[0,e4pf]) e5e4pfMiPo
 
 e99fpMipo = findIrred (getAllMonicPs (elems pf) [99])
-e99pf = FFElem (P[0,pf]) e99fpMipo
+e99pf = FFElem (pList[0,pf]) e99fpMipo
 \end{code}
 
 \begin{code}
@@ -70,7 +70,7 @@ problem1 e deg = do
   let es = elems e
   print $ ("Anzahl aller Elemente im Galoiskörper: " ++) $ show $ length es
 
-  let list = [(toFact . aggP) f | f <- getAllMonicP es deg, f /= P[]]
+  let list = [(toFact . aggP) f | f <- getAllMonicP es deg, f /= pList[]]
   print $ "Anzahl aller monischen Polynome /=0 bis zu Grad "
     ++ show deg ++ ": " ++ show (length list)
 
@@ -103,7 +103,7 @@ problem1b e deg = do
     where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
                      [fs | fs <- parMap rpar appSff
                            [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
-                                              , f /= P[]]
+                                              , f /= pList[]]
                          , isTrivialFact fs]
                    , isTrivialFact fs]
  -}
@@ -118,7 +118,7 @@ problem1c e deg = do
     where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
                      [fs | fs <- parMap rpar appSff
                            [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
-                                              , f /= P[]]
+                                              , f /= pList[]]
                          , isTrivialFact fs]
                    , isTrivialFact fs]
  -}
@@ -134,7 +134,7 @@ problem1e e deg = do
   print "start"
   writeFile file $ encode $ findIrreds $ getAllMonicPs (elems e) [deg]
   print "done"
-    where file = "/tmp/irreds" ++ show c
+    where file = "/tmp/irreds" ++ show e
 
 problem1eMap e deg = do
   P.writeFile file ""
@@ -143,12 +143,12 @@ problem1eMap e deg = do
     findIrreds $
     getAllMonicPs (elems e) [deg]
   print "done"
-    where file = "/tmp/irreds" ++ show c
+    where file = "/tmp/irreds" ++ show e
 
 problem1eRead = do
   r <- readFile file
   print (decode r:: Polynom (FFElem PF))
-    where file = "/tmp/irreds" ++ show c
+    where file = "/tmp/irreds"
 \end{code}
 
 \begin{code}
@@ -160,7 +160,7 @@ problem1eRead = do
 {-
 problem2 e deg = do
   let es = elems e
-  let list = [(toFact . aggP) f | f <- getAllMonicPs es [deg], f /= P[]]
+  let list = [(toFact . aggP) f | f <- getAllMonicPs es [deg], f /= pList[]]
   print $ "Anzahl aller monischen Polynome /=0 bis zu Grad "
     ++ show deg ++ ": " ++ show (length list)
   let sffList = [fs | fs <- parMap rpar appSff list, isTrivialFact fs]
@@ -177,7 +177,7 @@ problem2b e deg = do
     where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
                      [fs | fs <- parMap rpar appSff
                            [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
-                                              , f /= P[]]
+                                              , f /= pList[]]
                          , isTrivialFact fs]
                    , isTrivialFact fs]
  -}
