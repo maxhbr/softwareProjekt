@@ -108,6 +108,33 @@ Subtraktion separat geschrieben.
 \haskellinput{Core/Polynomials}{subtrPM}
 Wiederum darf obige Subtraktion nur auf wohlgeformte Polynome angewandt werden.
 
+\paragraph{Multiplikation}
+Da auf dem Datentyp ħIntħ sowohl Multiplikation als auch Addition in gleicher
+Zeit erfolgen, hat sich herausgestellt, dass in den meisten Fällen die 
+"`Standardmultiplikation"' die effizienteste ist. Diese ist wie folgt
+implementiert:
+\haskellinput{Core/Polynomials}{multPM}
+\haskellinput{Core/Polynomials}{multPM'\string\''}
+Wir haben jedoch auch die Multiplikation nach Karatsuba und eine Multiplikation
+auf FFT-Grundlage implementiert, wie in \autoref{subsec:multAlg} nachzulesen ist.
+
+\subsection{Verschiedene Multiplikationsalgorithmen}
+\label{subsec:multAlgs}
+
+\subsubsection{Karatsuba}
+Einer der häufigsten Multiplikationsalgorithmen für Polynome ist sicher der
+Karatsuba. Er basiert auf der Idee Multiplikationen durch Additionen zu
+ersetzen, die im Allgemeinen "`billiger"' sind. 
+
+Der Basisfall für die Multiplikation zweier Polynome von Grad 1, lässt die Idee
+des Algorithmus deutlich werden:
+\[ (a_1 X + b_1) \cdot (a_2 X + b_2) = 
+  A X^2 + (C - A - B) X + B\]
+wobei 
+\[ A = a_1 b_1, \qquad B = a_2b_2, \qquad C = (a_1+b_1)(a_2+b_2) \,.\]
+Damit können die ursprünglich 4 auftretenden Multiplikation des
+Standardalgorithmus durch 3 Multiplikation und 4 Additionen ersetzt werden.
+
 
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:
