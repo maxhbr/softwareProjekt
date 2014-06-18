@@ -99,13 +99,14 @@
 %\newtheorem{defcor}[thm]{Definition/Korollar}
 %\newtheorem{cor}[thm]{Korollar}
 %\newtheorem{kor}[thm]{Korollar}
-%\newtheorem{prop}[thm]{Proposition}
+\newtheorem{prop}[thm]{Proposition}
 
 %\newtheorem{ex}{Aufgabe}[chapter]
 %\newtheorem*{beh}{Behauptung}
 %\newtheorem*{dazu}{Dazu}
 
 \theoremstyle{definition}
+\newtheorem{definition}[thm]{Definition}
 %\newtheorem{defn}[thm]{Definition}
 %\newtheorem{conj}[thm]{Conjecture}
 %\newtheorem{exmp}[thm]{Beispiel}
@@ -127,6 +128,15 @@
 %\numberwithin{equation}{chapter}
 %\numberwithin{figure}{chapter}
 %\numberwithin{figure}{thm}
+
+\theoremstyle{nonumberplain}
+\theoremindent0pt
+\theoremheaderfont{\sffamily\itshape}
+\theorembodyfont{\normalfont}
+\theoremseparator{.}
+\theoremsymbol{\ensuremath{_\square}}
+\newtheorem{proof}{Beweis}
+\qedsymbol{\ensuremath{_\square}}
 
 \usepackage[framemethod=TikZ]{mdframed}
 \surroundwithmdframed[
@@ -257,6 +267,28 @@
   {<-}{{\tleftarrow}}1 {=>}{{\tRightarrow}}1 {==}{{\tequiv}}1
   {/=}{{\tneq}}1 {++}{{\tdplus}}1
 }
+
+
+\lstnewenvironment{pseudocode}[2]{
+\renewcommand{\lstlistingname}{Algorithmus}
+\lstset{
+	mathescape = true,
+	basicstyle = \small\normalfont\sffamily,
+	frame = tb,
+	framexleftmargin = 15pt,
+  numbers=none,
+	breaklines = true,
+	xleftmargin = 0.1\linewidth,
+	xrightmargin = 0.1\linewidth,
+	escapechar=!,
+	tabsize=3,
+	morekeywords={if, and, or, is, then, else, endif, while, endwhile, for, from,
+	to, do, endfor, Input, Output, Algorithmus, return},
+	morecomment=[l]{//},
+	columns=flexible,
+  caption=#1,
+  label=#2
+}}{}
 
 %%%% Bibliography %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[style=authoryear,natbib=true,backend=biber]{biblatex}
