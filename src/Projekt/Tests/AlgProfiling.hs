@@ -9,7 +9,7 @@ import Data.List
 import Debug.Trace
 
 import Projekt.Core.Polynomials.FFTTuple
-import Projekt.Core.Polynomials.Conway
+{-import Projekt.Core.Polynomials.Conway-}
 
 {----------------------------------------------------------------------------------}
 {---  Beispiele-}
@@ -17,8 +17,11 @@ e2f2Mipo = pList [1::F2,1,1] -- x²+x+1
 e2f2 = FFElem (pList [0,1::F2]) e2f2Mipo
 
 
-e40f2Mipo = getConway (1::F2) 40
+e40f2Mipo = pList [1::F2,1,0,1,0,1,0,0,1,0,0,0,1,1,0,1,1,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
 e40f2 = FFElem (pList [0,1::F2]) e40f2Mipo
+
+e10f3Mipo = pList [2::F3,1,0,0,2,2,2,0,0,0,1]
+e10f3 = FFElem (pTupUnsave [(1,1::F3)]) e10f3Mipo
 
 
 {- F16=E2(E2)
@@ -72,6 +75,12 @@ testPolyF5 = pList $ listFFElem (pList [2::F5,4,1])
                                     , pList [1::F5,1,1]
                                     , pList [0::F5,1]
                                     , pList [1::F5,1,0,1] ]
+
+testPolyE10F3 = pList $ listFFElem e10f3Mipo [ pList [0::F3,0,1,1]
+                                    , 1
+                                    , pList [1::F3,1,1]
+                                    , pList [0::F3,1]
+                                    , pList [1::F3,1,0,1] ]
 
 multMyPoly mulFunk f g = mulFunk f g
 
@@ -127,9 +136,10 @@ main :: IO ()
 {-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
 {-main = print $ foldr1 (+) $ map (snd) $ p2Tup $ heavyBench testPoly1 200-}
 {-main = print $ foldr1 (+) $ map (snd) $ heavyBench (p2Tup testPoly1) 200-}
-main = do
-  let testPolyBench = testPoly1^1000
-  print $ multMyPoly (*) (testPolyBench) (testPolyBench)
+main = 
+  {-let testPolyBench = testPolyE10F3^10-}
+  {-print $ multMyPoly (*) (testPolyBench) (testPolyBench)-}
+  print "hallo"
 {-main = print $ multPMKaratsuba (p2Tup (testPolyF5^1000)) (p2Tup (testPolyF5^1000))-}
 {-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
 {-main = print $ modMonom (5^21) a-}

@@ -82,9 +82,9 @@ subroutine list = do
 testSize = 3
 main :: IO ()
 main = do
-  list  <- rndSelect (getAllP (elems undefined ::[F5]) 6) (2*testSize)
-  vList <- rndSelect (getAllP (elems e2f2) 4)            (2*testSize)
-  wList <- rndSelect (getAllP (elems e4f2) 4)            (2*testSize)
+  list  <- rndSelect (getAllP (elems undefined ::[F5]) 10) (2*testSize)
+  vList <- rndSelect (getAllP (elems e2f2) 10)            (2*testSize)
+  wList <- rndSelect (getAllP (elems e4f2) 10)            (2*testSize)
   hspec $ do
     describe "Projekt.Core.Polynomials Basic" $ 
       it "P[1] == P[1,0]" $
