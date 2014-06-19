@@ -1,4 +1,4 @@
-module GalFld.Tests.Bench
+module Main
   where
 import Criterion.Main
 

@@ -9,7 +9,7 @@
 
 {-# GHC_OPTIONS -funbox-strict-fields #-}
 {-# LANGUAGE BangPatterns #-}
-module GalFld.Tests.HeavyBench
+module Main
   where
 import qualified Control.Arrow as A
 

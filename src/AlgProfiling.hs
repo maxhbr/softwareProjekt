@@ -1,5 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
-module GalFld.Tests.AlgProfiling
+module Main
   where
 import Control.Arrow as A
 import GalFld.Core
