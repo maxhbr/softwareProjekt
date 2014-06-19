@@ -9,7 +9,7 @@ ghc --make \
   -threaded \
   -O2 \
   -fllvm \
-    $DIR/../Projekt/Tests/Bench.hs
+    $DIR/../Bench.hs
   #-fforce-recomp \
 
 if [ $? -eq 0 ]; then
