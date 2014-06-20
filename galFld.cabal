@@ -79,6 +79,17 @@ Executable exp
                      GalFld
   default-language:  Haskell2010
 
+-- Executable prof
+--   ghc-options:       -threaded -O2 -fllvm
+--   Main-is:           AlgProfiling.hs
+--   hs-source-dirs:    src
+--   Build-Depends:     base,
+--                      binary >=0.7 && <0.8,
+--                      bytestring >=0.10 && <0.11,
+--                      parallel >=3.2 && <3.3
+--   default-language:  Haskell2010
+--   GHC-Prof-Options: -auto-all   
+
 -- Run bench:
 -- cabal configure --enable-benchmarks && cabal build && cabal bench
 Benchmark bench
