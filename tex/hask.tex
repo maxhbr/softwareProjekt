@@ -1,0 +1,58 @@
+\section{Über die Programmiersprache}
+
+\subsection{Hello World}
+
+\subsection{Extensions}
+\subsection{Template Haskell}
+
+\section{Ausführen von Haskell Programmen}
+
+\subsection{Compiler basierte Optimierung}
+
+\subsection{Paralleles ausführen}
+
+\section{Testing: \texttt{hspec}}
+\begin{itemize}
+  \item \url{https://hackage.haskell.org/package/hspec}
+  \item \url{http://hspec.github.io/}
+\end{itemize}
+Hspec is roughly based on the Ruby library RSpec. However, Hspec is just a
+framework for running HUnit and QuickCheck tests. Compared to other options, it
+provides a much nicer syntax that makes tests very easy to read.
+
+\section{Benchmarking: \texttt{criterion}}
+\begin{itemize}
+  \item \url{https://hackage.haskell.org/package/criterion}
+\end{itemize}
+This library provides a powerful but simple way to measure software
+performance. It provides both a framework for executing and analysing
+benchmarks and a set of driver functions that makes it easy to build and run
+benchmarks, and to analyse their results.
+
+\section{Zusammenfügen: \texttt{cabal}}
+\begin{itemize}
+  \item \url{https://hackage.haskell.org/package/Cabal}
+  \item \url{http://www.haskell.org/haskellwiki/How_to_write_a_Haskell_program}
+\end{itemize}
+The Haskell Common Architecture for Building Applications and Libraries: a
+framework defining a common interface for authors to more easily build their
+Haskell applications in a portable way.
+
+The Haskell Cabal is part of a larger infrastructure for distributing,
+organizing, and cataloging Haskell libraries and tools.
+
+
+\lstinputlisting[ firstline=2
+                , lastline=18 ]{../galFld.cabal}
+
+\subsection{Die eigentliche Libary}
+\lstinputlisting[ firstline=20
+                , lastline=60 ]{../galFld.cabal}
+
+\subsection{Tests}
+\lstinputlisting[ firstline=62
+                , lastline=69 ]{../galFld.cabal}
+
+\subsection{Benchmarks}
+\lstinputlisting[ firstline=94
+                , lastline=105 ]{../galFld.cabal}
