@@ -104,9 +104,9 @@
 %\newcounter{mycount}
 \newcommand{\haskellinput}[2]{
   \immediate\write18{/usr/bin/awk 'BEGIN {RS="\string\n\string\n";} /.*?^#2 /'
-    ../src/Projekt/#1.hs | sed '/./,$!d' >/tmp/temp.tex}
+    ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex}
   \immediate\write18{/usr/bin/grep -n -Ff /tmp/temp.tex 
-    ../src/Projekt/#1.hs | /usr/bin/gawk 'NR==1 
+    ../src/GalFld/#1.hs | /usr/bin/gawk 'NR==1 
       {print "\string\\begin\string\{lstlisting\string\}[firstnumber="$1"]"};' 
       FS=":" >/tmp/temp2.tex}
   \immediate\write18{/usr/bin/cat /tmp/temp.tex >>/tmp/temp2.tex}
@@ -114,11 +114,11 @@
   %Input File
   \setlength{\parskipsave}{\bigskipamount}
   \addtolength{\parskipsave}{\parskip}
-  \marginpar{\vspace*{\parskipsave}\scriptsize\path{Projekt/#1.hs}}
+  \marginpar{\vspace*{\parskipsave}\scriptsize\path{GalFld/#1.hs}}
   \input{/tmp/temp2.tex}
   %Clean up
-  \immediate\write18{/usr/bin/rm /tmp/temp.txt}
-  \immediate\write18{/usr/bin/rm /tmp/temp2.txt}
+  \immediate\write18{/usr/bin/rm /tmp/temp.tex}
+  \immediate\write18{/usr/bin/rm /tmp/temp2.tex}
 }
 
 
