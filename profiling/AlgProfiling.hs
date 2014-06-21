@@ -137,9 +137,8 @@ main :: IO ()
 {-main = print $ foldr1 (+) $ map (snd) $ p2Tup $ heavyBench testPoly1 200-}
 {-main = print $ foldr1 (+) $ map (snd) $ heavyBench (p2Tup testPoly1) 200-}
 main = 
-  {-let testPolyBench = testPolyE10F3^10-}
-  {-print $ multMyPoly (*) (testPolyBench) (testPolyBench)-}
-  print "hallo"
+  let testPolyBench = testPolyE10F3^10
+  print $ multMyPoly (*) (testPolyBench) (testPolyBench)
 {-main = print $ multPMKaratsuba (p2Tup (testPolyF5^1000)) (p2Tup (testPolyF5^1000))-}
 {-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
 {-main = print $ modMonom (5^21) a-}

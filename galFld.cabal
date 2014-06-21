@@ -85,7 +85,7 @@ Executable prof
   Build-Depends:     base,
                      GalFld
   default-language:  Haskell2010
-  GHC-Prof-Options: -auto-all   
+  GHC-Prof-Options:  -auto-all
 
 -- Run bench:
 -- cabal configure --enable-benchmarks && cabal build && cabal bench

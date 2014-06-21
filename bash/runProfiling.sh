@@ -1,22 +1,19 @@
 #!/bin/sh
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../src/"
-mkdir -p ${DIR}out
-mkdir -p ${DIR}out/Profiling
-
-ghc \
-  -outputdir ${DIR}out/Profiling \
-  -o ${DIR}out/Profiling/AlgProfiling \
-  -prof \
-  -fprof-auto -rtsopts \
-  -O2 \
-    ${DIR}Projekt/Tests/AlgProfiling.hs
-
-if [ $? -eq 0 ]; then
-  ${DIR}out/Profiling/AlgProfiling +RTS -p -sstderr
+if [[ $# != 0 ]]; then
+  if [[ $1 == "-N" ]]; then
+    shift
+    N=$1
+    shift
+  fi
+else
+  N=1
 fi
 
-# -fforce-recomp, -O2 and -fllvm are from:
-  #-threaded \
-  #-O2 \
-  #-fllvm \
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+pushd $DIR
+cabal configure --enable-benchmarks --enable-tests \
+  --enable-library-profiling --enable-executable-profiling  \
+  && cabal build \
+  && time cabal +RTS -p -sstderr -RTS prof
+popd
