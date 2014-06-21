@@ -7,6 +7,7 @@ import GalFld.Core
 import GalFld.Algorithmen
 import GalFld.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
 
+#define BENCHFINDIRREDS
 #ifdef BENCHFINDIRREDS
 benchFindIrreds =
   [ bgroup "findIrreds e2f2"
