@@ -11,9 +11,17 @@ else
 fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
-pushd $DIR
-cabal configure --enable-benchmarks --enable-tests \
-  --enable-library-profiling --enable-executable-profiling  \
-  && cabal build \
-  && time cabal +RTS -p -sstderr -RTS prof
-popd
+mkdir -p ${DIR}/dist/Profiling
+
+ghc \
+  -outputdir ${DIR}/dist/Profiling \
+  -o ${DIR}/dist/Profiling/AlgProfiling \
+  -prof \
+  -fprof-auto -rtsopts \
+  -O2 \
+  -isrc \
+  ${DIR}/profiling/AlgProfiling.hs
+
+if [ $? -eq 0 ]; then
+  ${DIR}/dist/Profiling/AlgProfiling +RTS -p -sstderr
+fi
