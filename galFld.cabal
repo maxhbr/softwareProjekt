@@ -58,6 +58,7 @@ library
                      monad-parallel >=0.7 && <0.8,
                      integer-gmp >=0.5 && <0.6,
                      hspec >=1.9 && <1.10,
+                     criterion >=0.8 && <0.9,
                      random >=1.0 && <1.1
   hs-source-dirs:    src
   default-language:  Haskell2010
@@ -69,7 +70,7 @@ Test-suite spec
   hs-source-dirs:    test
   Main-is:           HSpecTests.hs
   Build-Depends:     base,
-                     GalFld
+                     galFld
   default-language:  Haskell2010
 
 Executable exmp
@@ -88,7 +89,8 @@ Executable exmp
 Executable prof
   Main-is:           AlgProfiling.hs
   hs-source-dirs:    profiling
-  Build-Depends:     base
+  Build-Depends:     base,
+                     galFld
   default-language:  Haskell2010
   GHC-Prof-Options:  -auto-all
 
@@ -98,5 +100,5 @@ Benchmark bench
   Main-is:           Bench.hs
   Build-Depends:     base,
                      criterion >=0.8 && <0.9,
-                     GalFld
+                     galFld
   default-language:  Haskell2010
