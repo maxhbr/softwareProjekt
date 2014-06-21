@@ -1,4 +1,3 @@
-{-# LANGUAGE CPP, BangPatterns#-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : GalFld.Core.Polynomials
@@ -7,6 +6,8 @@
 --
 --
 --------------------------------------------------------------------------------
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE BangPatterns #-}
 module GalFld.Core.Polynomials
   ( Polynom, pList, pTup, pTupUnsave, pKonst, p2Tup, p2List, cleanP
   , nullP, isNullP, isNullP'
