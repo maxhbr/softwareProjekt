@@ -16,8 +16,6 @@ import Control.Monad
 
 import Control.Parallel
 import Control.Parallel.Strategies
--- from monad-parallel
-import qualified Control.Monad.Parallel as P
 
 import GalFld.Core.Polynomials
 

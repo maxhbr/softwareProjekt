@@ -44,7 +44,6 @@ library
                      GalFld.Sandbox.MatrixSandbox,
                      GalFld.Sandbox.PFSandbox,
                      GalFld.Sandbox.PolySandbox,
-                     GalFld.Sandbox.SandboxCommon,
                      GalFld.Sandbox.SerializeSandbox
   -- other-modules:
   other-extensions:  QuasiQuotes, TemplateHaskell, CPP, BangPatterns
@@ -55,21 +54,71 @@ library
                      template-haskell >=2.9 && <2.10,
                      process >=1.2 && <1.3,
                      array >=0.5 && <0.6,
-                     monad-parallel >=0.7 && <0.8,
-                     integer-gmp >=0.5 && <0.6,
-                     hspec >=1.9 && <1.10,
-                     criterion >=0.8 && <0.9,
-                     random >=1.0 && <1.1
+                     integer-gmp >=0.5 && <0.6
   hs-source-dirs:    src
   default-language:  Haskell2010
   GHC-Prof-Options:  -auto-all
 
+--Test-suite spec
+--  type:              exitcode-stdio-1.0
+--  hs-source-dirs:    test
+--  Main-is:           HSpecTests.hs
+--  Build-Depends:     base,
+--                     galFld
+--  default-language:  Haskell2010
 
-Test-suite spec
+Test-suite PrimeFields
   type:              exitcode-stdio-1.0
   hs-source-dirs:    test
-  Main-is:           HSpecTests.hs
+  Main-is:           PFTests.hs
   Build-Depends:     base,
+                     hspec >=1.9 && <1.10,
+                     monad-parallel >=0.7 && <0.8,
+                     random >=1.0 && <1.1,
+                     galFld
+  default-language:  Haskell2010
+
+Test-suite FiniteFields
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    test
+  Main-is:           FFTests.hs
+  Build-Depends:     base,
+                     hspec >=1.9 && <1.10,
+                     monad-parallel >=0.7 && <0.8,
+                     random >=1.0 && <1.1,
+                     galFld
+  default-language:  Haskell2010
+
+Test-suite Polynomials
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    test
+  Main-is:           PolyTests.hs
+  Build-Depends:     base,
+                     hspec >=1.9 && <1.10,
+                     monad-parallel >=0.7 && <0.8,
+                     random >=1.0 && <1.1,
+                     galFld
+  default-language:  Haskell2010
+
+Test-suite Matrix
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    test
+  Main-is:           MatrixTests.hs
+  Build-Depends:     base,
+                     hspec >=1.9 && <1.10,
+                     monad-parallel >=0.7 && <0.8,
+                     random >=1.0 && <1.1,
+                     galFld
+  default-language:  Haskell2010
+
+Test-suite Algorithmen
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    test
+  Main-is:           AlgTests.hs
+  Build-Depends:     base,
+                     hspec >=1.9 && <1.10,
+                     monad-parallel >=0.7 && <0.8,
+                     random >=1.0 && <1.1,
                      galFld
   default-language:  Haskell2010
 

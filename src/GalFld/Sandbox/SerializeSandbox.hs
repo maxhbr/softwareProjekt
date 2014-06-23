@@ -15,7 +15,6 @@ import Debug.Trace
 
 import GalFld.Core
 import GalFld.Algorithmen
-import System.Random
 import Data.List
 
 import Data.Binary
