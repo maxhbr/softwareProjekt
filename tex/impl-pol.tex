@@ -222,9 +222,10 @@ Algorithmus: FFT($n$,$\omega$,$f$)
 
 Wie man damit Polynome multiplizieren kann, erklärt nachstehender Algorithmus:
 \begin{pseudocode}{FFT-Multiplikation}{alg:dftmul}
-Input: $f(X),g(X) \in R[X]$
+Input: $\omega \in R$ eine primitive $n$-te Einheitswurzel, $n = 2^l$,
+       $f(X),g(X) \in R[X]$ mit $\deg f + \deg g < n$
 Output: $h(X) = f(X)g(X) \in R[X]$
-Algorithmus:
+Algorithmus FFTM($f$,$g$,$n$,$\omega$):
   1. Berechne $a := f^\wedge(\omega)$, $b := g^\wedge(\omega)$.
   2. Berechne komponentenweise $c := a\odot b$.
   3. Setze $h(X) := (\tfrac 1 n c^\wedge(\omega\inv))(X)$
@@ -233,7 +234,48 @@ Algorithmus:
 
 Es bleiben ein paar Probleme offen: Um mit obigem Algorithmus Polynome zu
 multplizieren, muss es in $R$ für jede Zweierpotenz $n$ eine $n$-te
-Einheitswurzel und $2$ muss eine Einheit sein.
+Einheitswurzel und $2$ muss eine Einheit sein. Die Tatsache, dass 2 eine
+Einheit sei, spielt für den Fall der Anwendung -- nämlich Multiplikation von
+Polynomen über endlichen Körpern -- keine Rolle, da dies dort ja immer gegeben
+ist. Jedoch bleibt offen, wie man eine $n$-te Einheitswurzel finden soll.
+Die allgemeine Antwort lautet in diesem Fall: Wir suchen gar nicht, sondern
+modifizieren das Setting so, dass stets eine $n$-te Einheitswurzel gegeben
+ist:
 
+\begin{lemma}
+  Sei $R$ ein kommutativer Ring und $2 \in R$ eine Einheit. Sei fernen 
+  $n = 2^l$ mit $l\geq 1$. Dann ist 
+  \[ \omega := X\  \in\ R_n := R[X]\big/(X^n+1)\]
+  eine primitive $(2n)$-te Einheitswurzel.
+\end{lemma}
+\begin{proof}
+  
+\end{proof}
+
+Das bedeutet, wir "`erzwingen"' die Existenz einer passenden primitiven
+Einheitswurzel. Damit bleibt nur noch die Frage, wie wir ein Polynom 
+$f(X) \in R[X]$ als bivariates Polynom in $R[X,Y]\big/(Y^n+1)$ lesen können, um
+dort die FFT-Multiplikation anwenden zu können. Eine Antwort und das konkrete
+Vorgehen gibt der Schönhagen-Strassen-Algorithmus:
+
+\begin{pseudocode}{Schönhagen-Strassen-Multiplikation}{alg:ssm}
+Input: $f(X),g(X) \in R[X]$, so dass $2 \in R$ eine Einheit
+Output: $h(X) = f(X)g(X) \in R[X]$
+Algorithmus SS($f$,$g$):
+  1. Wähle $n = 2^l$ mit $\deg f + \deg g < n$.
+  2. Setze $m := 2^{\lfloor\tfrac l 2\rfloor}$ und $m' := \tfrac n m$.
+  3. Zerlege $f$ und $g$ in "`Blöcke"':
+     $f(X) = \sum_{j=0}^{m'-1} f_j(X) X^{mj}$
+     $g(X) = \sum_{j=0}^{m'-1} g_j(X) X^{mj}$
+  4. Setze $R_{2m} := R[X]\big/(X^{2m}+1)$ und 
+     $F(X,Y) := \sum_{j=0}^{m'-1} f_j(X) Y^j\ \in R_{2m}[Y]$
+     $G(X,Y) := \sum_{j=0}^{m'-1} g_j(X) Y^j\ \in R_{2m}[Y]$
+  5. Setze $\xi := \begin{cases} X, & l \text{ gerade}\\ X^2, &
+      \text{sonst}\end{cases}$ und $\omega := \xi^2$.
+  6. Setze $F^\ast(Y) := F(\xi Y)$, $G^\ast(Y) := G(\xi Y)$.
+  7. Berechne $H^\ast(Y) = $ FFTM($F^\ast$,$G^\ast$,$2m$,$\omega$)
+  8. Setze $H(Y) := H^\ast(\xi\inv Y)$.
+  9. Setze $h(X) := H(X,X^m) \bmod{X^n-1}$.
+\end{pseudocode}
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:
