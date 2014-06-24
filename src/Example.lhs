@@ -1,11 +1,9 @@
+Zunächst brauchen wir zwei Haskell Erweiterungen:
 \begin{code}
 {-# LANGUAGE QuasiQuotes, TemplateHaskell #-}
---------------------------------------------------------------------------------
--- |
--- Module      : Main
--- Note        : Dies hier soll ein kleines Beispielprogramm sein
---
---------------------------------------------------------------------------------
+\end{code}
+Nun können wir die nötigen Module einbinden
+\begin{code}
 module Main
   where
 
@@ -16,39 +14,58 @@ import Data.List
 
 import Data.Binary
 import Data.ByteString.Lazy (writeFile, readFile, appendFile)
---import qualified Control.Monad.Parallel as P
 import Control.Parallel
 import Control.Parallel.Strategies
 
-import Debug.Trace
-
+\end{code}
+Zuletzt laden wir noch unsere Bibliothek.
+\begin{code}
 import GalFld.GalFld
 \end{code}
 
-Nun erzeugen wir uns einen Primkörper mit der hier gewählen Charakteristik
-$c=3$.
+\iffalse
+\begin{code}
+import Debug.Trace
+\end{code}
+\fi
 
+\section{Erzeugen der Körper}
+
+Nun erzeugen wir uns einen Primkörper \texttt{FP} mit der hier gewählen
+Charakteristik $c=3$. Das hier vorgestellte Programm ist generisch in dieser
+Charakteristik.
 \begin{code}
 $(genPrimeField 3 "PF")
 \end{code}
 
-Über diesem Körper können wir nun Erweiterungskörper generieren
-
+Über diesem Körper können wir nun Erweiterungskörper generieren. Zunächst holen
+wir uns ein (beliebiges) Element aus unserem Primkörper.
 \begin{code}
---------------------------------------------------------------------------------
---  Erweiterungen über PF
-
 pf = 1::PF
+\end{code}
 
+Eine Grad $2$ Erweiterung über dem Primkörper erzeugen wir wie folgt:
+\begin{code}
 e2fpMipo = $([|findIrred (getAllMonicPs (elems pf) [2])|])
 e2pf = FFElem (pList[0,pf]) e2fpMipo
+\end{code}
+Wobei \texttt{e2fpMipo} $\in\texttt{FP}[x]$ ein Irreduzibles Polynom vom Grad
+$2$. \texttt{e2pf} ist damit ein erzeugendes Element im gesuchtem Körper, enthält
+also die ganze Information.
 
+Analog eine Grad $2$ Erweiterung über diese neue Erweiterung sowie eine Grad
+$4$ Erweiterung über unserem Grundkörper \texttt{FP}.
+\begin{code}
 e2e2pfMipo = $([|findIrred (getAllMonicPs (elems e2pf) [2])|])
 e2e2pf = FFElem (pList[0,e2pf]) e2e2pfMipo
 
 e4pfMipo = $([|findIrred (getAllMonicPs (elems pf) [4])|])
 e4pf = FFElem (pList[0,pf]) e4pfMipo
+\end{code}
 
+Hier noch ein paar größere Erweiterungen, für die die Minimalpolynome aber erst
+zur Laufzeit (wenn benötigt) erzeugt werden.
+\begin{code}
 e5e2pfMiPo = findIrred $ getAllMonicPs (elems e2pf) [5]
 e5e2pf = FFElem (pList[0,e2pf]) e5e2pfMiPo
 
@@ -59,6 +76,7 @@ e99fpMipo = findIrred (getAllMonicPs (elems pf) [99])
 e99pf = FFElem (pList[0,pf]) e99fpMipo
 \end{code}
 
+\section{Weiteres}
 \begin{code}
 --------------------------------------------------------------------------------
 --  Problem1:
