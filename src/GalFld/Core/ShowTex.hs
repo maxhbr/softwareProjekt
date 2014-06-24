@@ -11,6 +11,7 @@
 -- Dies sollte so hauptsächlich unter Linux lauffähig sein
 --
 --------------------------------------------------------------------------------
+{-# LANGUAGE CPP #-}
 module GalFld.Core.ShowTex
   ( ShowTex(..)
   , renderTex, renderRawTex
@@ -25,6 +26,7 @@ class ShowTex a where
 instance ShowTex Integer where
   showTex = show
 
+#ifdef linux_HOST_OS
 --------------------------------------------------------------------------------
 --  Nutze latex und dvipng um Latex schnipsel in ein PNG zu rendern
 
@@ -56,3 +58,9 @@ renderRawTex x = do createProcess (shell cmd)
 -- |Nutze sxiv um das erzeugte Bild anzuzeigen
 viewRendered = do createProcess (shell ("sxiv " ++ outputPNG))
                   return ()
+#else
+outputPNG = undefined
+renderTex = undefined
+renderRawTex = undefined
+viewRendered = undefined
+#endif
