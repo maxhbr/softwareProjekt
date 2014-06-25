@@ -15,7 +15,9 @@ maintainer:          mail@maximilian-huber.de
 category:            Math
 build-type:          Simple
 Bug-Reports:         https://github.com/maximilianhuber/softwareProjekt/issues
-extra-source-files:  README.md, src/Example.lhs
+extra-source-files:  README.md,
+                     --src/GalFld/Core/Polynomials/Conway.hs,
+                     src/Example.lhs
 cabal-version:       >=1.10
 
 source-repository head
