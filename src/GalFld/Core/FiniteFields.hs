@@ -137,6 +137,7 @@ instance (Num a, Binary a) => Binary (FFElem a) where
            case t of
                 0 -> liftM FFKonst get
                 1 -> liftM2 FFElem get get
+                _ -> trace (show t) undefined
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern

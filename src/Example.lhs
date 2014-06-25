@@ -1,6 +1,9 @@
 Zunächst brauchen wir zwei Haskell Erweiterungen:
 \begin{code}
-{-# LANGUAGE QuasiQuotes, TemplateHaskell #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE LambdaCase #-}
 \end{code}
 Nun können wir die nötigen Module einbinden
 \begin{code}
@@ -10,9 +13,11 @@ module Main
 import Prelude hiding (writeFile, readFile, appendFile)
 import qualified Prelude as P
 import System.Environment
+import System.Directory
 import Data.List
+import Control.Monad
 
-import Data.Binary
+import qualified Data.Binary as B
 import Data.ByteString.Lazy (writeFile, readFile, appendFile)
 import Control.Parallel
 import Control.Parallel.Strategies
@@ -76,161 +81,84 @@ e99fpMipo = findIrred (getAllMonicPs (elems pf) [99])
 e99pf = FFElem (pList[0,pf]) e99fpMipo
 \end{code}
 
+\section{Main Funktion}
+
+\begin{code}
+main = do
+  mapM_ (\d -> putStrLn $ show d ++ "  " ++ show (irred d)) [2..]
+    where es      = elems pf
+          irred d = findIrred $ getAllMonicPs es [d]
+
+\end{code}
+
 \section{Weiteres}
 \begin{code}
---------------------------------------------------------------------------------
---  Problem1:
---      Finde alle irreduziblen Polynome über Endlichem Körper, welcher `e`
---      enthält, bis zu einem vorgegebenem Grad `deg`.
-
 {-
-problem1 e deg = do
-  let es = elems e
-  print $ ("Anzahl aller Elemente im Galoiskörper: " ++) $ show $ length es
 
-  let list = [(toFact . aggP) f | f <- getAllMonicP es deg, f /= pList[]]
-  print $ "Anzahl aller monischen Polynome /=0 bis zu Grad "
-    ++ show deg ++ ": " ++ show (length list)
+degree = 4
 
-  print "Suche Irred!"
+#ifdef linux_HOST_OS
+outputPath = "/tmp/"
+#else
+outputPath = ""
+#endif
+outputFile = outputPath ++ "irreds" ++ show (modulus pf) ++ "_" ++ show degree
 
-  -- print "wende SFF an:"
-  {-let sffList = parMap rpar (\(f,i) -> trace ("sff " ++ show i) (appSff f)) (zip list [1..])-}
-  let sffList = [fs | fs <- parMap rpar appSff list, isTrivialFact fs]
+step1 = (doesFileExist outputFile) >>= \case
+  True -> print "Die irreduziblen Polynome wurden bereits generiert"
+  False -> do
+    print "Finde alle irreduziblen Polynome und speichere diese in eine Datei"
+    -- Leere die Datei
+    P.writeFile outputFile ""
+    -- Schreibe die gefundenen Polynome in die Datei
+    writeFile outputFile
+      $ B.encode
+      $ findIrreds
+      $ getAllMonicPs (elems e2pf) [degree]
 
-  -- print "wende Berlekamp an:"
-  {-let bList = parMap rpar (\(f,i) -> trace ("b " ++ show i) (appBerlekamp f)) (zip sffList [1..])-}
-  let bList = [fs | fs <- parMap rpar appBerlekamp sffList, isTrivialFact fs]
-
-  print $ ("Anzahl Irred: " ++) $ show $ length sffList
-
-  {-
-  if length bListIrred < 100
-    then do print "die irreduziblen Polynome"
-            mapM_ (print . snd . head) bListIrred
-   -}
- -}
-
-{-
--- Speicher gefundene als Liste in eine Datei
-problem1b e deg = do
-  print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
-    ++ show deg
-  writeFile "/tmp/irreds" (encode irreds)
-  print $ ("Anzahl Irred: " ++) $ show $ length irreds
-    where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
-                     [fs | fs <- parMap rpar appSff
-                           [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
-                                              , f /= pList[]]
-                         , isTrivialFact fs]
-                   , isTrivialFact fs]
- -}
-
-{-
--- Gebe alle gefundenen aus
-problem1c e deg = do
-  print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
-    ++ show deg
-  mapM_ print irreds
-  print $ ("Anzahl Irred: " ++) $ show $ length irreds
-    where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
-                     [fs | fs <- parMap rpar appSff
-                           [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
-                                              , f /= pList[]]
-                         , isTrivialFact fs]
-                   , isTrivialFact fs]
- -}
-
--- Gebe alle gefundenen aus
-problem1d e deg = do
-  print $ "Berechne monischen irred Polynome /=0 bis zu Grad "
-    ++ show deg
-  print $ length $ findIrreds $ getAllMonicPs (elems e) [deg]
-
-problem1e e deg = do
-  P.writeFile file ""
-  print "start"
-  writeFile file $ encode $ findIrreds $ getAllMonicPs (elems e) [deg]
-  print "done"
-    where file = "/tmp/irreds" ++ show e
-
-problem1eMap e deg = do
-  P.writeFile file ""
-  print "start"
-  mapM_ (appendFile file . encode) $
-    findIrreds $
-    getAllMonicPs (elems e) [deg]
-  print "done"
-    where file = "/tmp/irreds" ++ show e
-
-problem1eRead = do
-  r <- readFile file
-  print (decode r:: Polynom (FFElem PF))
-    where file = "/tmp/irreds"
+-}
 \end{code}
 
+Als nächstes lesen wir die Daten wieder aus der Datei aus.
+
 \begin{code}
---------------------------------------------------------------------------------
---  Problem2:
---      Finde ein irreduziblen Polynom über Endlichem Körper, welcher `e`
---      enthält, von einem vorgegebenem Grad `deg`.
-
 {-
-problem2 e deg = do
-  let es = elems e
-  let list = [(toFact . aggP) f | f <- getAllMonicPs es [deg], f /= pList[]]
-  print $ "Anzahl aller monischen Polynome /=0 bis zu Grad "
-    ++ show deg ++ ": " ++ show (length list)
-  let sffList = [fs | fs <- parMap rpar appSff list, isTrivialFact fs]
-  let bList = [fs | fs <- parMap rpar appBerlekamp sffList, isTrivialFact fs]
 
-  print "Irred:"
-  print $ snd $ head $ head bList
- -}
+step2 = do
+  -- Lese die Binärdatei
+  raw <- readFile outputFile
+  let ls = B.decode raw :: [Polynom (FFElem PF)]
+  return ls
 
-{-
-problem2b e deg = do
-  print "Irred:"
-  print $ head irreds
-    where irreds = [unFact fs | fs <- parMap rpar appBerlekamp
-                     [fs | fs <- parMap rpar appSff
-                           [(toFact . aggP) f | f <- getAllMonicPs (elems e) [deg]
-                                              , f /= pList[]]
-                         , isTrivialFact fs]
-                   , isTrivialFact fs]
- -}
-
-problem2c e deg = do
-  print "Irred:"
-  print $ findIrred $ getAllMonicPs (elems e) deg
+-}
 \end{code}
 
-\begin{code}
---------------------------------------------------------------------------------
---  Problem3:
---      Finde den Körper e5e2pf bzw. e5e4pf
+Nun begeben wir uns in den gefundenen Polynomen auf die Suche nach möglichst
+dünnen Polynomen.
 
-problem3 = print $ length $ elems e5e2pf
-problem3b = print $ length $ elems e5e4pf
-problem3c = print $ length $ elems e99pf
+\begin{code}
+{-
+
+step3 ls = do
+  print $ "Die dünnsten Polynome enthalten " ++ show minC ++ " Monome"
+  print $ "Es gibt " ++ show (length minCPs) ++ " von ihnen"
+    where ls'    = map (\f -> ((length . p2Tup) f,f)) ls
+          cs     = map fst ls'
+          minC   = minimum cs
+          minCPs = [ f | (c,f) <- ls' , c == minC ]
+
+-}
 \end{code}
 
+\subsection{Alles zusammenfügen und ausführen}
 \begin{code}
---------------------------------------------------------------------------------
---  Main
-
-dispatch :: [(String, String -> IO ())]
-dispatch =  [ ("1d", \s -> problem1d e4pf (read s :: Int))
-            , ("1e", \s -> problem1e e4pf (read s :: Int))
-            , ("1eRead", const problem1eRead)
-            , ("2c", \s -> problem2c e4pf [read s :: Int])
-            , ("3", const problem3)
-            , ("3b", const problem3b)
-            , ("3c", const problem3c) ]
+{-
 
 main :: IO ()
 main = do
-  (grp:(arg:_)) <- getArgs
-  let (Just action) = lookup grp dispatch
-  action arg
+  step1
+  ls <- step2
+  step3 ls
+
+-}
 \end{code}
