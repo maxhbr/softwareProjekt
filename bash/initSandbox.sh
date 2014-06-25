@@ -6,10 +6,11 @@ if [ ! -f "${DIR}/cabal.sandbox.config" ]; then
   pushd $DIR
   cabal sandbox init \
     && cabal install --only-dependencies -j \
-    && cabal configure\
+    && cabal configure \
     && cabal build
     #&& cabal install -j \
   popd
 fi
 
-cabal sdist
+cabal configure \
+  && cabal sdist
