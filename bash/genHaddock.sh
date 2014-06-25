@@ -2,7 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 pushd $DIR
-cabal configure --enable-benchmarks --enable-tests \
+cabal configure \
   && cabal build \
   && cabal haddock
 popd

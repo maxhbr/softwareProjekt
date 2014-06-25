@@ -6,7 +6,8 @@ if [ ! -f "${DIR}/cabal.sandbox.config" ]; then
   pushd $DIR
   cabal sandbox init \
     && cabal install --only-dependencies -j \
-    && cabal install -j \
-    && cabal configure --enable-benchmarks --enable-tests
+    && cabal build
+    #&& cabal install -j \
+    #&& cabal configure --enable-benchmarks --enable-tests
   popd
 fi

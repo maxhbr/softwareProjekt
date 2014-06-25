@@ -12,7 +12,7 @@ fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 pushd $DIR
-cabal configure --enable-benchmarks --enable-tests \
+cabal configure --enable-tests \
   && cabal build \
   && time cabal +RTS -N${N} -RTS test --show-details=streaming
 popd
