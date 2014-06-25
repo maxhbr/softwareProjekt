@@ -14,10 +14,16 @@ maintainer:          mail@maximilian-huber.de
 -- copyright:
 category:            Math
 build-type:          Simple
+Bug-Reports:         https://github.com/maximilianhuber/softwareProjekt/issues
 extra-source-files:  README.md, src/Example.lhs
 cabal-version:       >=1.10
 
+source-repository head
+  type:              git
+  location:          git://github.com/maximilianhuber/softwareProjekt.git
+
 library
+  Exposed: True
   ghc-options:       -threaded -O2 -fllvm -rtsopts
 --                     -fmax-simplifier-iterations=10
 --                     -fdicts-cheap
