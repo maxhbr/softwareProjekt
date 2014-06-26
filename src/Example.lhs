@@ -87,7 +87,7 @@ e99pf = FFElem (pList[0,pf]) e99fpMipo
 main = do
   mapM_ (\d -> putStrLn $ show d ++ "  " ++ show (irred d)) [2..]
     where es      = elems pf
-          irred d = findIrred $ getAllMonicPs es [d]
+          irred d = findIrredRabin $ getAllMonicPs es [d]
 
 \end{code}
 

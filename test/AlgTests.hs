@@ -39,6 +39,7 @@ primFactors n = let divisors = dropWhile ((/= 0) . mod n)
                                 [2 .. ceiling $ sqrt $ fromIntegral n]
            in let prime = if null divisors then n else head divisors
               in (prime :) $ factor $ div n prime
+
 --------------------------------------------------------------------------------
 testSize = 100
 
@@ -53,11 +54,20 @@ irredTestsF5 func = [it ("findIrreds von Grad "++show n++" über F_5") $
     (length $ func $ getAllMonicPs (elems (1::F5)) [n])
     `shouldBe` (countMonicIrreds 5 n) | n <- [1..6]]
 
+--------------------------------------------------------------------------------
+compareBerlekampRabin = it "compare Berlekamp und Rabin" $
+  and ls `shouldBe` True
+    where ls = map (\f -> (isTrivialFact (appFact berlekamp (sff f)))== rabin f)
+                   $ take 100
+                   $ getAllMonicPs (elems (1 :: F3)) [40]
+
 main :: IO ()
 main = do
   list1 <- rndSelect (getAllPs (elems e2e2f2) [5,4]) testSize
   list2 <- rndSelect (getAllPs (elems e4f2) [5,4]) testSize
   hspec $ do
+    describe "GalFld.Algorithmen.Rabin" $ do
+      compareBerlekampRabin
     describe "GalFld.Algorithmen.SFreeFactorization" $ do
       it "sff and unFact should be inverse (example f over F3)" $
         unFact (sff f) `shouldBe` f
