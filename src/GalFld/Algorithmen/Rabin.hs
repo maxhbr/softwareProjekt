@@ -72,9 +72,9 @@ rabin f = rabin' f ns
         -- eigentlicher Rabin für x^(q^n_j) - x mit n_j = n / p_j
         rabin' f (n:ns) | g /= pKonst 1  = False
                         | otherwise = rabin' f ns
-          where g  = trace ("rabin: ggTP for f="++show f++" h'-pX="++show (p2Tup (h'-pX))) $ 
+          where g  = --trace ("rabin: ggTP for f="++show f++" h'-pX="++show (p2Tup (h'-pX))) $ 
                       (ggTP f (h'-pX))
-                h' = trace ("x^"++show q++"^"++show n++" mod f = h'="++show (modMonom q n f )) $ 
+                h' = --trace ("x^"++show q++"^"++show n++" mod f = h'="++show (modMonom q n f )) $ 
                       modMonom q n f
 
 -------------------------------------------------------------------------------
