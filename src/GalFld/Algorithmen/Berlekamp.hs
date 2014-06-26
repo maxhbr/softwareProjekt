@@ -72,7 +72,6 @@ findIrreds fs = do
   return f
 #endif
 
-
 -- |Gibt alle Faktorisierungen zurück, welche nach Berlekamp noch trivial sind
 -- Wendet zuvor (die offensichtliche Faktorisierung und) SFF an
 --
@@ -81,8 +80,6 @@ findTrivialsB :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> 
 findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp
                        (findTrivialsSff ps)
                      , isTrivialFact fs]
-
-
 
 --------------------------------------------------------------------------------
 --  Algorithmus
