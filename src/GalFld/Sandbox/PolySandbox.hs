@@ -12,6 +12,7 @@
 module GalFld.Sandbox.PolySandbox
   where
 import GalFld.Core
+import GalFld.SpecialPolys
 
 import GalFld.Sandbox.FFSandbox (e2f2,e2e2f2,e4f2)
 

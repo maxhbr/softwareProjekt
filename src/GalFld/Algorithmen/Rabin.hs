@@ -92,7 +92,7 @@ factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ from
 
 
 -- | Schnelles Modulo für Monome, d.h. berechnet
---   x^n mod f
+--   x^(q^d) mod f
 modMonom :: (Show a, Num a, Eq a, Fractional a) => 
                                                 Int -> Int -> Polynom a -> Polynom a
 modMonom q d f  = modMonom' n f

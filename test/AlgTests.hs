@@ -11,6 +11,7 @@ import GalFld.Algorithmen
 import GalFld.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
 import GalFld.Sandbox.PolySandbox hiding (testSize, main)
 import GalFld.Sandbox.AlgSandbox
+import GalFld.NumberTheory
 
 --------------------------------------------------------------------------------
 
@@ -18,27 +19,11 @@ import GalFld.Sandbox.AlgSandbox
 countMonicIrreds :: Int -> Int -> Int
 countMonicIrreds q n = (sum [(möb d)*q^(n `quot` d) | d <- divisors n]) `quot` n
 
-divisors n | n == 1     = div'
-           | otherwise = div' ++ [n]
-  where div' = 1 : filter ((==0) . rem n) [2 .. n `div` 2]
-
-möb n | facs == nub facs && even (length facs) = 1
-      | facs == nub facs && odd (length facs)  = -1
-      | otherwise                             = 0
-  where facs = primFactors n
 
 -- |Anzahl monischer irreduzibler Polynome von Grad n über F_q
 countIrreds :: Int -> Int -> Int
 countIrreds q n = (q-1)*(countMonicIrreds q n)
 
--- |Primfaktorzerlegung (enthält Vielfache!)
---  aus http://www.haskell.org/haskellwiki/99_questions/Solutions/35
-primFactors :: Int -> [Int]
-primFactors 1 = []
-primFactors n = let divisors = dropWhile ((/= 0) . mod n)
-                                [2 .. ceiling $ sqrt $ fromIntegral n]
-           in let prime = if null divisors then n else head divisors
-              in (prime :) $ factor $ div n prime
 
 --------------------------------------------------------------------------------
 testSize = 100

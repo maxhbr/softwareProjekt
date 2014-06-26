@@ -165,4 +165,3 @@ charRootP f | isNullP f     = --trace ("charRootP f="++show f++" => "++show null
 
 hasNSInFF :: (Eq a, Num a, FiniteField a) => Polynom a -> Bool
 hasNSInFF f = not (null [f | e <- elems (getReprP f), evalP e f == 0])
-
