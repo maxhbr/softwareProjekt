@@ -2,11 +2,12 @@
 module Main
   where
 import Control.Arrow as A
-import GalFld.Core
-import GalFld.Algorithmen
+import GalFld.GalFld
+import GalFld.SpecialPolys
 {-import System.Random-}
 import Data.List
 import Debug.Trace
+import Data.Maybe
 
 import GalFld.Core.Polynomials.FFTTuple
 {-import GalFld.Core.Polynomials.Conway-}
@@ -136,9 +137,13 @@ main :: IO ()
 {-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
 {-main = print $ foldr1 (+) $ map (snd) $ p2Tup $ heavyBench testPoly1 200-}
 {-main = print $ foldr1 (+) $ map (snd) $ heavyBench (p2Tup testPoly1) 200-}
-main = do
-  print $ divP (pTup [(3^20,1::F3), (0,-1)]) (pTup [(40,1::F3), (1,1),(0,2)])
+{-main = do-}
+  {-print $ divP (pTup [(3^20,1::F3), (0,-1)]) (pTup [(40,1::F3), (1,1),(0,2)])-}
 {-main = print $ multPMKaratsuba (p2Tup (testPolyF5^1000)) (p2Tup (testPolyF5^1000))-}
 {-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
 {-main = print $ modMonom (5^21) a-}
+main = print $ r
+  where m = berlekampBasis $ ggTP (piPoly $ pTupUnsave [(6,1::F2),(0,-1)]) (cyclotomicPoly (2^6-1) (1::F2))
+        (k,l) = boundsM m
+        r = k-1- fromMaybe (-1) (findIndex (all (==0)) $ reverse $ toListsM m)
 
