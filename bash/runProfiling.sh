@@ -12,6 +12,7 @@ fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 mkdir -p ${DIR}/dist/Profiling
+pushd $DIR
 
 ghc \
   -outputdir ${DIR}/dist/Profiling \
@@ -25,3 +26,5 @@ ghc \
 if [ $? -eq 0 ]; then
   ${DIR}/dist/Profiling/AlgProfiling +RTS -p -sstderr
 fi
+
+popd

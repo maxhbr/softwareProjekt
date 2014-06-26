@@ -68,14 +68,14 @@ rabin f = rabin' f ns
         -- eigentlicher Rabin für den letzen Test mit x^(q^n) - x
         rabin' f [] = isNullP g
           where g  = (h'-pX) `modByP` f
-                h' = modMonom (q^d) f
+                h' = modMonom q d f
         -- eigentlicher Rabin für x^(q^n_j) - x mit n_j = n / p_j
         rabin' f (n:ns) | g /= pKonst 1  = False
                         | otherwise = rabin' f ns
-          where g  = --trace ("rabin: ggTP for f="++show f++" h'-pX="++show (p2Tup (h'-pX))) $ 
+          where g  = trace ("rabin: ggTP for f="++show f++" h'-pX="++show (p2Tup (h'-pX))) $ 
                       (ggTP f (h'-pX))
-                h' = --trace ("h'="++show (p2Tup (modMonom (q^n) f ))) $ 
-                      modMonom (q^n) f
+                h' = trace ("x^"++show q++"^"++show n++" mod f = h'="++show (modMonom q n f )) $ 
+                      modMonom q n f
 
 -------------------------------------------------------------------------------
 -- Helper
@@ -83,7 +83,7 @@ rabin f = rabin' f ns
 
 -- |Primfaktorzerlegung 
 --  aus http://www.haskell.org/haskellwiki/99_questions/Solutions/35
-factor :: Integral a => a -> [a]
+factor :: Int -> [Int]
 factor 1 = []
 factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ fromIntegral n]
            in let prime = if null divisors then n else head divisors
@@ -94,14 +94,18 @@ factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ from
 -- | Schnelles Modulo für Monome, d.h. berechnet
 --   x^n mod f
 modMonom :: (Show a, Num a, Eq a, Fractional a) => 
-                                                Int -> Polynom a -> Polynom a
-modMonom n f | n < df    = --trace ("modMonom n="++show n++" n<df") $
-                            pTupUnsave [(n,1)]
-             | even n    = --trace ("modMonom n="++show n++" n ger") $
-                            g `modByP` f
-             | otherwise = --trace ("modMonom n="++show n++" n unger") $
+                                                Int -> Int -> Polynom a -> Polynom a
+modMonom q d f  = modMonom' n f
+  where n  = (toInteger q)^(toInteger d) 
+        modMonom' n f 
+               | n < (toInteger df)  
+                           = --trace ("modMonom n="++show n++" n<df") $
+                            pTupUnsave [(fromInteger n,1)]
+               | even n    = --trace ("modMonom n="++show n++" n ger") $
+                              g `modByP` f
+               | otherwise = --trace ("modMonom n="++show n++" n unger") $
                             (multMonomP 1 g) `modByP` f
-  where df = uDegP f
-        m  = n `quot` 2
-        g  = h*h
-        h  = modMonom m f
+          where df = uDegP f
+                m  = n `quot` 2
+                g  = h*h
+                h  = modMonom' m f
