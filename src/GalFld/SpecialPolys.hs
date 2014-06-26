@@ -1,9 +1,11 @@
-module GalFld.SpecialPolys 
-  where
+module GalFld.SpecialPolys (
+  cyclotomicPoly
+  , piPoly
+  ) where
 
 import Debug.Trace
 
-import GalFld.NumberTheory
+import GalFld.Core.NumberTheory
 import GalFld.Core
 import GalFld.GalFld
 
