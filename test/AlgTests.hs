@@ -33,7 +33,7 @@ countIrreds q n = (q-1)*(countMonicIrreds q n)
 
 -- |Primfaktorzerlegung (enthält Vielfache!)
 --  aus http://www.haskell.org/haskellwiki/99_questions/Solutions/35
-primFactors :: Integral a => a -> [a]
+primFactors :: Int -> [Int]
 primFactors 1 = []
 primFactors n = let divisors = dropWhile ((/= 0) . mod n)
                                 [2 .. ceiling $ sqrt $ fromIntegral n]
