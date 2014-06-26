@@ -7,6 +7,7 @@ pushd $DIR
     && cabal install --only-dependencies -j \
     && cabal install hspec \
     && cabal install monad-parallel \
+    && cabal install criterion \
     && cabal configure \
     && cabal build
 }
