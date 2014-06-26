@@ -1,5 +1,7 @@
 module GalFld.GalFld
   ( module X
+   , factorP
+   , extendFFBy
   ) where
 import GalFld.Core as X
 import GalFld.Algorithmen as X

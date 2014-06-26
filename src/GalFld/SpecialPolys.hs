@@ -5,7 +5,7 @@ import Debug.Trace
 
 import GalFld.NumberTheory
 import GalFld.Core
-import GalFld.Algorithmen
+import GalFld.GalFld
 
 import qualified Control.Arrow as A
 import Data.List
@@ -33,7 +33,7 @@ piPoly f
   where -- P_(tau f), wobei tau f der quadratfreie Teil von f ist
         piSqFree = foldl (\p f -> (p `odot` f) @/ p) pFst (map snd $ tail facs)
         -- Faktorisierung von f
-        facs = sffAndBerlekamp f--factorP f
+        facs = factorP f
         -- Start der Rekursion mit P_(f1)
         pFst = (assozPoly $ snd $ head facs) @/ (pTupUnsave [(1,1)])
         -- Definition von odot
