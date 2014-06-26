@@ -11,7 +11,6 @@ import GalFld.Algorithmen
 import GalFld.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
 import GalFld.Sandbox.PolySandbox hiding (testSize, main)
 import GalFld.Sandbox.AlgSandbox
-import GalFld.NumberTheory
 
 --------------------------------------------------------------------------------
 

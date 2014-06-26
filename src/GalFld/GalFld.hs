@@ -18,4 +18,4 @@ extendFFBy d e = FFElem (pList[0,onefy]) $ findIrred $ getAllMonicPs (elems e) [
 -- |Nimmt ein Polynom f und faktorisiert dieses komplett mittels SFF und
 -- Berlekamp
 factorP :: (Show a, Num a, Fractional a, FiniteField a) => Polynom a -> [(Int,Polynom a)]
-factorP f = appFact berlekamp $ appFact sff $ obviousFactor f
+factorP f = aggFact $ appFact berlekamp $ appFact sff $ obviousFactor f
