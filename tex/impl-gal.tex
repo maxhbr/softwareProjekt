@@ -1,18 +1,5 @@
 \section{Endliche Körper}
-\subsection{Prim Körper}
-Die Prim Körper werden in der Datei \texttt{Projekt/Core/PrimeFields.hs}
-spezifiziert. Das Modul heißt also \texttt{Projekt.Core.PrimeFields}.
-
-Da wir uns die Charakteristik zu einem solchem Körper auf Typenebene speichern
-wollen, führen wir dazu zunächst eine neue Klasse von Datentypen mit dem Namen
-ħNumeralħ ein, welche als einzige Funktion 
-ħnumValue :: a -> Intħ besitzt. Diese Funktion soll konstant 
-die Charakteristik wiedergeben.
-
-Nun können wir durch
-\haskellinput{Core/PrimeFields}{newtype Mod}
-ein Element in einem endichem Körper definieren, wobei für das \texttt{n} ein
-Datentyp von der Klasse \texttt{Numeral} eingesetzt wird.
+\subsection{Primkörper}
 
 
 \subsection{Erweiterungskörper}

@@ -21,7 +21,7 @@ main = mapM_ (\n -> do
   mapM_ (\(_,f) -> putStr $ "\n\t"++show f) $ snd cpn
   finishTime <- getCPUTime
   putStrLn $ " ("
-    ++ show (fromIntegral (finishTime - startTime) / 1000000000000) ++ "s)") [2..]
+    ++ show (fromIntegral (finishTime - startTime) / 1000000000000) ++ "s)") [2..9]
     where countPrimNorm n = (uDegP ggT, fac)
             where cyP = cyclotomicPoly (p^n-1) pf
                   piP = piPoly $ pTupUnsave [(n,pf),(0,-1)]

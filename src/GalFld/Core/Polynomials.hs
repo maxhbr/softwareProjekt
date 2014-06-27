@@ -460,9 +460,7 @@ divPHorner a b = divPHorner (cleanP a) (cleanP b)
 divPHornerM' _  [] _ _ = []
 divPHornerM' divs ff@((i,f):fs) lc n
   | n > fst (head ff)  = ff
-  | otherwise            = --trace ("horner' divs="++show divs++" f="++show f++" f/lc="++show (f/lc)++
-     -- " ff="++show ff++"\n-> i="++show i++" n="++show n++" => (i,fbar)="++show (i,fbar)++" hs="++show hs) $
-        (i,fbar) : divPHornerM' divs hs lc n
+  | otherwise            = (i,fbar) : divPHornerM' divs hs lc n
   where fbar = f/lc
         {-# INLINE hs #-}
         hs   = addPM fs $! js

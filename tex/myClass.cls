@@ -25,6 +25,9 @@
 
 \usepackage[german]{varioref}
 
+%%%% Listings in footnotes
+\usepackage{cprotect}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  Design / Style  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -267,16 +270,18 @@
 	xrightmargin = 0.1\linewidth,
 	escapechar=!,
 	tabsize=3,
-	morekeywords={if, and, or, is, then, else, endif, while, endwhile, for, from,
+	keywords={if, and, or, is, then, else, endif, while, endwhile, for, from,
 	to, do, endfor, Input, Output, Algorithmus, return},
 	morecomment=[l]{//},
+  deletestring=[b]",
 	columns=flexible,
   caption=#1,
   label=#2
 }}{}
+\renewcommand{\lstlistingname}{Algorithmus}
 
 %%%% Bibliography %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[style=authoryear,natbib=true,backend=biber]{biblatex}
+\usepackage[style=numeric,backend=biber]{biblatex}
 \usepackage{fontspec}
 \usepackage[babel]{csquotes}
 %\usepackage{filecontents}

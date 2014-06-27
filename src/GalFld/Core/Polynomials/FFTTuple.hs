@@ -35,11 +35,8 @@ fftP w n f = fft w (+) (-) 0 1 n (p2List f)
 --   -> [a]         Ausgabeliste
 fft :: (Show a) => (Int -> a -> a) -> (a->a->a) -> (a->a->a) -> a
                                                 -> Int -> Int -> [a] -> [a]
-fft _ _ _ _ _ 1 fs = --trace ("fftEnd: fs="++show fs) $ 
-             fs
-fft w addF subF zero i n fs = --trace ("fft: n="++show n++" m="++show m++" fs="++show fs++" fss="++show fss
-               -- ++"\n\t=>ls="++show ls++" rs="++show rs) $ 
-             intersperseL ls' rs'
+fft _ _ _ _ _ 1 fs = fs
+fft w addF subF zero i n fs = intersperseL ls' rs'
   where !i'  = 2*i
         ls' = fft w addF subF zero i' m ls
         ls  = take m $ zipWith' (addF) zero fs fss
@@ -71,17 +68,8 @@ ss 1 f g = multPM f g
 ss 2 f g = multPM f g
 ss l f g 
   | isNullP' f || isNullP' g = []
-  | otherwise = --trace ("ss with l="++show l++" l'="++show l'++" m="++show m++" m'="++show m'
-      {-++"\nf="++show f++"\ng="++show g-}
-      {-++"\n\t fs="++show fs++" gs="++show gs-}
-      {-++"\n\t fs'="++show fs'++" gs'="++show gs'-}
-      {-++"\n\t fftFs="++show (map (pTup) fftFs)++"\n\tffTGs="++show (map pTup fftGs)-}
-      {-++"\n\t -> ffTHs"++show (map pTup fftHs)-}
-      {-++"\n\t xi*(2*m'-2)="++show (xi*(2*m'-2))++" hs''="++show (map pTup hs'')-}
-      {-++"\n\t hs'="++show hs'++" \n\txi*(2*m'-1)="++show (xi*(2*m'-1)) -}
-      {-++" hs'''="++show (zipWith (multx (xi*(2*m'-1))) [0..] hs' )++" hs="++show hs) $-}
-      foldr1 (addPM) $  
-        reduceModxn (2^l) $ zipWith (multx (m)) [0..] hs
+  | otherwise = foldr1 (addPM) $  
+                              reduceModxn (2^l) $ zipWith (multx (m)) [0..] hs
   where -- << n = 2^l = m * m' >>
         !l' = l `quot` 2
         !m  = 2^l'
@@ -91,8 +79,6 @@ ss l f g
         -- auf FFT vorbereiten
         !fs' = zipWith (multx (xi)) [0..] fs
         !gs' = zipWith (multx (xi)) [0..] gs 
-        {-fs' = zipWith (++|) [take i $ cycle [0] | i<-[0..]] fs-}
-        {-gs' = zipWith (++|) [take i $ cycle [0] | i<-[0..]] gs-}
         -- FFT durchführen
         !xi    = if odd l then 1 else 2
         !fftFs = reduceModxn (2*m) $ fft (multx (xi*2)) 
@@ -101,7 +87,6 @@ ss l f g
                                               (addPM) (subtrPM) [] 1 m' gs'
         -- Multiplikation der Ergebnisse und rekursiver Aufruf von ss
         !fftHs = reduceModxn (2*m) $ zipWith (ss (l'+1)) fftFs fftGs
-        {-fftHs = [[4,4,3,4],[3,3,3,4],[3,3,2,4],[4,4,4,3]]-}
         -- Inverse-FFt
         !hs''  = reduceModxn (2*m) $ fft (multx (xi*(2*m'-2))) 
                                             (addPM) (subtrPM) [] 1 m' fftHs
@@ -111,16 +96,13 @@ ss l f g
         !hs    = reduceModxn (2*m) $ zipWith (multx (xi*(2*m'-1))) [0..] hs'
 
 
-{-[># INLINE reduceModxn #<]-}
+{-# INLINE reduceModxn #-}
 -- | Reduziert die innere Liste modulo x^n+1
 reduceModxn :: (Show a, Num a, Eq a) => Int -> [[(Int,a)]] -> [[(Int,a)]]
-reduceModxn _ [] = --trace ("reduceModxn empty") $ 
-                    []
+reduceModxn _ [] = []
 reduceModxn n x@(xs:xss) 
-    | l >= n     = --trace ("reduceModxn n="++show n++" l="++show l++" l>n x="++show x) $ 
-                  reduceModxn n $ (hs:xss)
-    | otherwise = --trace ("reduceModxn n="++show n++" l="++show l++" l<=n x="++show x++" xs="++show xs++" xss="++show xss)$ 
-                  xs : reduceModxn n xss
+    | l >= n     = reduceModxn n $ (hs:xss)
+    | otherwise = xs : reduceModxn n xss
   where l   = if null xs then 0 else fst $ head xs
         fs' = filter (\(i,x) -> i>=n) xs
         fs  = map (\(i,x) -> (i-n,negate x)) fs'
@@ -128,18 +110,16 @@ reduceModxn n x@(xs:xss)
         hs  = addPM gs fs
 
 
-{-[># INLINE ssBuildBlocks #<]-}
+{-# INLINE ssBuildBlocks #-}
 ssBuildBlocks :: (Show a, Eq a, Num a) => Int -> Int -> [(Int,a)] -> [[(Int,a)]]
 ssBuildBlocks 0 _ fs = [fs]
-ssBuildBlocks n m fs = --trace ("fs="++show fs++" n="++show n++" m="++show m
-                       -- ++"\n\t=>ms'="++show ms'++" ns="++show ns) $
-                      (ssBuildBlocks (n - m) m ns) ++ [ms]
+ssBuildBlocks n m fs = (ssBuildBlocks (n - m) m ns) ++ [ms]
   where ms' = filter (\(i,x) -> i >= n) fs
         ns  = fs \\ ms'
         ms  = map (A.first (\i -> i-n)) ms'
 
 
-{-[># INLINE multx #<]-}
+{-# INLINE multx #-}
 -- | Multipliziert mit x^(i*j)
 multx :: (Num a) => Int -> Int -> [(Int,a)] -> [(Int,a)]
 multx _ _ []    = []
@@ -149,8 +129,7 @@ multx j i xs    = map (A.first (\i->i+k)) xs
 
 -------------------------------------------------------------------------------
 -- Helper
-
-{-[># intersperseL #<]-}
+{-# INLINE intersperseL #-}
 -- |Intersperse mit 2 Listen
 intersperseL :: [a] -> [a] -> [a]
 intersperseL ys   []      = ys
@@ -169,7 +148,7 @@ zipWith' f t (x:xs) (y:ys) = (f x y) : zipWith' f t xs ys
 
 
 
-{-[># INLINE log2 #<]-}
+{-# INLINE log2 #-}
 -- |ineffiziente Log 2 Berechnung
 log2 :: Int -> Int
 log2 0 = 0
@@ -179,8 +158,15 @@ log2 n = log2' 1 n
         log2' i 2 = i
         log2' i n = 1 + (log2' i $! n `quot` 2)
 
-subtrPM :: (Num a, Eq a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
-subtrPM f g = addPM f $ negateM g
-
-negateM :: (Num a) => [(Int,a)] -> [(Int,a)]
-negateM = map (A.second (negate))
+{-# INLINE subtrPM #-}
+-- | subtrahiere Polynome in Monomdarstellung, d.h
+--   [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist
+subtrPM :: (Eq a,Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+subtrPM [] gs          = map (A.second negate) gs
+subtrPM fs []          = fs
+subtrPM ff@((i,f):fs) gg@((j,g):gs)
+  | i==j && c/=0  = (i,c) : subtrPM fs gs
+  | i==j && c==0  = subtrPM fs gs
+  | i<j         = (j,negate g) : subtrPM ff gs
+  | i>j         = (i,f) : subtrPM fs gg
+   where !c = f-g

@@ -1,4 +1,7 @@
 \section{Implementierung von Polynomen}
+\texttt{GalFld/Core/Polynomials.hs}\\
+\texttt{GalFld/Core/Polynomials/FFTTuple.hs}\\
+\texttt{GalFld/Core/Polynomials/Conway.hs}\\
 
 \subsection{Der Datentyp}
 
@@ -13,7 +16,7 @@ implementieren: \emph{sparse} und \emph{dense}, d.h.
     $i \in \{0,\ldots,n\}$ den Index/Exponenten des Koeffizienten $a_i$ angibt
     und alle Koeffizienten, die Null sind, ausgelassen werden.
 \end{itemize}
-In der hier vorliegenden finalen implementierung haben wir uns für letztere
+In der hier vorliegenden finalen Implementierung haben wir uns für letztere
 Variante entschieden, da diese insbesondere bei spärlich besetzten Polynomen
 mit hohem Grad deutliche Performancegewinne zeigt.
 
@@ -83,6 +86,58 @@ Des Weiteren haben wir eine kleine Schreibhilfe zur Erstellung von konstanten
 Polynomen generiert:
 \haskellinput{Core/Polynomials}{pKonst}
 
+\subsection{Einwertige Operationen auf Polynomen}
+
+\paragraph{Der Grad} Der Grad eines Polynoms, lässt sich aufgrund 
+\thref{inv:poly} sehr leicht herausfinden. Es gilt jedoch zu beachten, dass der
+Grad des Nullpolynoms nicht $0$ ist. Wir haben uns daher entschieden, den Grad
+als ħMaybe Intħ zu implementieren:
+\haskellinput{Core/Polynomials}{degP}
+Es ist klar, dass man meistens einen ħIntħ als Grad haben möchte, daher haben
+wir folgende Funktion implementiert:
+\haskellinput{Core/Polynomials}{uDegP}
+
+\paragraph{Auswerten} Natürlich muss auch etwas in ein Polynom einsetzen
+können, was wir mit Hilfe des Hornerschemas (vgl. \autocite{wiki:horner-schema}
+implementiert haben. Dies zeigt eine schöne Anwendung der Haskellfunktion 
+ħfoldlħ:
+\haskellinput{Core/Polynomials}{evalP}
+
+
+\paragraph{Normieren} Über das Normieren braucht man nicht viele Worte
+verlieren.
+\haskellinput{Core/Polynomials}{moniP}
+Da man in vielen Situationen den Leitkoeffizient des Polynoms bei der
+Normierung erhalten möchte, gibt es noch die folgende Variante der Normierung:
+\haskellinput{Core/Polynomials}{moniLcP}
+
+\paragraph{Formale Ableitung} 
+\haskellinput{Core/Polynomials}{deriveP}
+
+\paragraph{Das reziproke Polynom} 
+\begin{definition}
+  Sei $f(X) = \sum_{i=0}^n a_i X^i \in R[X]$ für einen Körper $R$, so ist 
+  das \emph{reziproke Polynom von Ordnung $d$ von $f(X)$} für $d \geq n$ 
+  gegeben durch
+  \[ f^\ast_d(X) := X^d f(\tfrac{1}{X})\,.\]
+\end{definition}
+
+\haskellinput{Core/Polynomials}{reciprocP2}
+
+Das reziproke Polynom, wie man es normalerweise kennt, ist dann für $d=n$ in
+obiger Definition gegeben durch
+
+\haskellinput{Core/Polynomials}{reciprocP}
+
+
+\paragraph{Multiplikation mit Monomen}
+Es ist klar, dass die Multiplikation eines Polynoms mit einem Monom einfacher
+ist, als der allgemeine Fall. Daher verdient dieses Vorgehen eine eigene
+Funktion:
+
+\haskellinput{Core/Polynomials}{multMonomP}
+
+
 
 
 \subsection{Zweiwertige Operationen auf Polynomen}
@@ -116,8 +171,48 @@ implementiert:
 \haskellinput{Core/Polynomials}{multPM}
 \haskellinput{Core/Polynomials}{multPM'\string\''}
 Wir haben jedoch auch die Multiplikation nach Karatsuba und eine Multiplikation
-auf FFT-Grundlage implementiert, wie in \autoref{subsec:multAlg} nachzulesen ist.
+auf FFT-Grundlage implementiert, wie in \autoref{subsec:multAlgs} nachzulesen ist.
 
+\paragraph{Division mit Rest}
+Wie auch schon bei der Multiplikation von Polynomen, kennt man bei der Division
+mit Rest verschiedene Algorithmen. Als erste und einfachste Wahl bietet sich
+die Division mit Rest nach Grundschulmethode an. Diese hat sich jedoch am
+langsamsten erwiesen und wurde daher wieder aus dem Code entfernt. Die nun in
+den meisten Fällen am effizientesten Methode ist die Division mit Hilfe des
+Hornerschemas. Eine sehr gute und ausführliche Erklärung findet sich 
+in \autocite{wiki:synthetic-division}.
+
+\begin{beispiel}
+  
+\end{beispiel}
+
+Wiederum lässt sich die Division per Hornerschema sehr schön rekursiv in
+Haskell niederschreiben.
+\haskellinput{Core/Polynomials}{divPHornerM'\string\''}
+
+Wie in den obigen Funktionen kommt man auch hier nicht ohne Overhead aus, der
+notwendig ist, um die verschiedenen Polynom-Status (ħcleanPħ betreffend) zu
+behandeln und die initialen Parameter festzulegen.
+\haskellinput{Core/Polynomials}{divP}
+\haskellinput{Core/Polynomials}{divPHorner}
+
+\paragraph{"`Division"'} Für den Fall, dass man bereits weiß, dass ein
+Polynom durch ein anderes teilbar ist, haben wir den Operator ħ(@/)ħ definiert
+\footnote{Zu beachten ist hierbei, dass die Benutzung 
+von \lstinline{(/)}nicht möglich 
+ist, da es eine \lstinline{Num}-Instanz erfordern würde, die es auf Polynomen ja
+offenbar nicht gibt.}.
+Dieser ist selbstredend nichts anderes als Division mit Rest, wobei lediglich
+der erste Eintrag des Tupels zurückgegeben wird.
+\haskellinput{Core/Polynomials}{(\string@/)}
+
+
+
+
+
+
+
+\section{Alternative Polynomalgorithmen}
 \subsection{Verschiedene Multiplikationsalgorithmen}
 \label{subsec:multAlgs}
 
@@ -277,5 +372,37 @@ Algorithmus SS($f$,$g$):
   8. Setze $H(Y) := H^\ast(\xi\inv Y)$.
   9. Setze $h(X) := H(X,X^m) \bmod{X^n-1}$.
 \end{pseudocode}
+
+\paragraph{Implementierung}
+Zunächst führen wir ein paar kleine Hilfsfunktionen an, die wir in der
+Implementierung des Schönhagen-Strassen-Algorithmus brauchen werden:
+\haskellinput{Core/Polynomials/FFTTuple}{intersperseL}
+\haskellinput{Core/Polynomials/FFTTuple}{zipWith'\string\''}
+\haskellinput{Core/Polynomials/FFTTuple}{log2}
+
+Nun können wir zu den eigentlichen Funktionen übergehen.
+Wie in der Erklärung beginnen wir mit der Berechnung der FFT nach 
+\autoref{alg:fft}.
+\haskellinput{Core/Polynomials/FFTTuple}{fftP}
+\haskellinput{Core/Polynomials/FFTTuple}{fft}
+
+Damit können wir nun \autoref{alg:ssm} konkret machen; wiederum zunächst auf
+Polynomebene und dann auf den eigentlichen Listen:
+\haskellinput{Core/Polynomials/FFTTuple}{ssP}
+\haskellinput{Core/Polynomials/FFTTuple}{ss}
+
+ħssBuildBlocksħ ist dabei Schritt 3 in \autoref{alg:ssm} und gegeben durch
+\haskellinput{Core/Polynomials/FFTTuple}{ssBuildBlocks}
+
+Des Weiteren ist eine schnelle Reduktion $\pmod x^n+1$ nötig:
+\haskellinput{Core/Polynomials/FFTTuple}{reduceModxn}
+
+Zuletzt haben wir noch die Multiplikation mit dem Monom $x^{j*j}$ als separate
+Funktion gestaltet, die offenbar schneller ist, als der normale
+Multiplikationsalgorithmus.
+\haskellinput{Core/Polynomials/FFTTuple}{multx}
+
+
+
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:
