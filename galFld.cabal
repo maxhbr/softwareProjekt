@@ -34,7 +34,6 @@ library
                      GalFld.SpecialPolys,
                      GalFld.Algorithmen,
                      GalFld.Algorithmen.Berlekamp,
-                     GalFld.Algorithmen.Factorizations,
                      GalFld.Algorithmen.Rabin,
                      GalFld.Algorithmen.SFreeFactorization,
                      GalFld.Core,
