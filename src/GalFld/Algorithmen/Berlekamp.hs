@@ -80,8 +80,7 @@ findIrreds fs = do
 --
 -- Ist parallelisiert mittels Strategie rpar.
 findTrivialsB :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
-findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp
-                       (findTrivialsSff ps)
+findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp (findTrivialsSff ps)
                      , isTrivialFact fs]
 
 --------------------------------------------------------------------------------

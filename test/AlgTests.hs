@@ -16,7 +16,7 @@ import GalFld.Sandbox.AlgSandbox
 
 -- |Anzahl monischer irreduzibler Polynome von Grad n über F_q
 countMonicIrreds :: Int -> Int -> Int
-countMonicIrreds q n = (sum [(möb d)*q^(n `quot` d) | d <- divisors n]) `quot` n
+countMonicIrreds q n = (sum [(möbFkt d)*q^(n `quot` d) | d <- divisors n]) `quot` n
 
 
 -- |Anzahl monischer irreduzibler Polynome von Grad n über F_q

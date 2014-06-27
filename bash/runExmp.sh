@@ -14,5 +14,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 pushd $DIR
 cabal configure \
   && cabal build \
-  && time cabal +RTS -N${N} -RTS run exmp
+  && time cabal run exmp -- +RTS -N${N}
 popd
