@@ -1,4 +1,4 @@
-module GalFld.SpecialPolys (
+module GalFld.More.SpecialPolys (
   cyclotomicPoly
   , piPoly
   ) where

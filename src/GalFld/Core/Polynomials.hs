@@ -18,7 +18,7 @@ module GalFld.Core.Polynomials
   -- unär
   , moniP, moniLcP, deriveP, reciprocP, reciprocP2, multMonomP
   -- binär
-  , divP, (@/), modByP, ggTP, eekP, invHensel, divPHensel
+  , divP, (@/), modByP, ggTP, eekP
   -- weiteres
   , evalP, hasNs
   , addPM, multPM
@@ -484,6 +484,7 @@ divP' a b = fst $ divP a b
 modByP :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 modByP f p = snd $ divP f p
 
+#if 0
 -- |Hensel inverse lift
 --  Input: Polynom h mit h(0) = 1
 --         Int l
@@ -510,7 +511,7 @@ invHensel h k  | isNullP h  = nullP
                       | otherwise = map (\(i,m) -> (i+lold,m)) h0''
                 h0' = h0''' ++ h0
                 c   = map (\(i,m) -> (i-l,m)) $ multPM_ShortUp l (unPMS a) h0'
-
+#endif
 
 
 modMonomP :: (Eq a, Num a) => Int -> Polynom a -> Polynom a
@@ -519,14 +520,14 @@ modMonomP l (PMS ms True) = PMS (dropWhile (\(i,_) -> i>=l) ms) True
 modMonomP l f             = modMonomP l $ cleanP f
 
 
+#if 0
 divPHensel :: (Show a, Eq a, Fractional a) =>
               Polynom a -> Polynom a -> (Polynom a, Polynom a)
 divPHensel a b
     | isNullP a = (nullP, nullP)
     | a == b     = (pKonst 1,nullP)
     | l <= 0     = (nullP,a)
-    | otherwise = --trace ("a="++show a++" b="++show b++"\n=>f="++show f++" g="++show g++" test g*f mod x^l ="++show (modMonomP l (g*f))++" q="++show q) $
-                  (q',r)
+    | otherwise = (q',r)
   where n  = uDegP a
         m  = uDegP b
         l  = n-m+1
@@ -536,8 +537,7 @@ divPHensel a b
         q  = multPShortDown l g $ reciprocP2 n a
         q' = multKonstP lc $ reciprocP2 (l-1) q
         r  = a - b*q'
-
-
+#endif
 
 {-# INLINE eekP #-}
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit

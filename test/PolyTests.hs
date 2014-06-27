@@ -1,14 +1,4 @@
---------------------------------------------------------------------------------
--- |
--- Module      : PolySandbox
--- Note        : Beispiele und Platz zum Spielen und Probieren
---
---  Diese Sandbox ist zum testen von Polynomials gedacht.
---
---  Die main Funktion enthält Hspec unit tests.
---
---------------------------------------------------------------------------------
-
+{-# LANGUAGE CPP #-}
 module Main
   where
 import TestsCommon
@@ -41,9 +31,11 @@ subroutineDiv list = do
   it "test divP generally" $
     pMapM_ (\ (x,y) -> unDivP (divPHensel x y) x y `shouldBe` True) $
           zip (take testSize list) (drop testSize list)
+#if 0
   it "test divPHorner <-> divPHensel" $
     pMapM_ (\ (x,y) -> divPHensel x y `shouldBe` divP x y) $
           zip (take testSize list) (drop testSize list)
+#endif
   it "x/0 throws exception" $
     pMapM_ (\x -> evaluate (divP x nullP) `shouldThrow` anyException) list
   it "test eekP" $

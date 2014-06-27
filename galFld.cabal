@@ -31,7 +31,7 @@ library
 --                     -fdicts-cheap
 --                     -fspec-constr-count=6
   exposed-modules:   GalFld.GalFld,
-                     GalFld.SpecialPolys,
+                     GalFld.More.SpecialPolys,
                      GalFld.Algorithmen,
                      GalFld.Algorithmen.Berlekamp,
                      GalFld.Algorithmen.Rabin,

@@ -3,7 +3,7 @@
 module Main 
   where
 import GalFld.GalFld
-import GalFld.SpecialPolys
+import GalFld.More.SpecialPolys
 import System.CPUTime
 
 $(genPrimeField 2 "PF")
