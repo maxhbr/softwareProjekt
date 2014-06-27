@@ -3,11 +3,12 @@ module Main
   where
 import Criterion.Main
 
-import GalFld.Core
+import GalFld.GalFld
 import GalFld.Algorithmen
 import GalFld.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
+import GalFld.SpecialPolys
 
-#define BENCHFINDIRREDS
+-- #define BENCHFINDIRREDS
 #ifdef BENCHFINDIRREDS
 benchFindIrreds =
   [ bgroup "findIrreds e2f2"
@@ -24,7 +25,7 @@ benchFindIrreds =
         es2 = elems e2e2f2
 #endif
 
-#define HEAVYBENCH
+-- #define HEAVYBENCH
 #ifdef HEAVYBENCH
 heavyBench :: Int -> [(Int,Int)]
 heavyBench n = foldl multPM f (replicate (n-1) f)
@@ -37,11 +38,24 @@ benchHeavyBench =
     , bench "500" $ whnf heavyBench 500 ] ]
 #endif
 
+#define BENCH_PRIMNORM
+#ifdef BENCH_PRIMNORM
+primNormBench n = factorP $ 
+  ggTP (piPoly $ pTupUnsave [(n,1::F2),(0,-1)]) 
+       (cyclotomicPoly (2^n-1) (1::F2)) 
+
+benchPrimNorm = [bgroup "find primitive normal polys"
+  [bench "8" $ whnf primNormBench 8] ]
+#endif
+
 main = defaultMain $
 #ifdef BENCHFINDIRREDS
   benchFindIrreds ++
 #endif
 #ifdef HEAVYBENCH
   benchHeavyBench ++
+#endif
+#ifdef BENCH_PRIMNORM
+  benchPrimNorm ++
 #endif
   []

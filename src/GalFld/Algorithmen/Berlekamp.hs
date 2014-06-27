@@ -92,11 +92,12 @@ findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp
 --  aufspannen bzgl der kanonischen Basis { 1, x, x², x³, ... }
 berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a)
                                                        => Polynom a -> Matrix a
-berlekampBasis f = transposeM $ kernelM $ transposeM $
+berlekampBasis f = transposeM $ kernelM $ transposeM $!
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n
-  where n     = fromJust $ degP f
-        q     = elemCount a
-        a     = getReprP f
+  where !n     = fromJust $ degP f
+        !q     = elemCount a
+        !a     = getReprP f
+        {-# INLINE red #-}
         red i = takeFill 0 n $ p2List $ modByP (pTupUnsave [(i*q,1)]) f
 
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
@@ -144,7 +145,8 @@ doBerlekamp f = berlekampFactor' f m
 berlekampFactor f | isNullP f   = []
                   | uDegP f < 2 = [(1,f)]
                   | otherwise   = berlekampFactor' f m
-  where m = berlekampBasis f
+  where !m = berlekampBasis f
+        {-# INLINE berlekampFactor' #-}
         berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)
                                       => Polynom a -> Matrix a -> [(Int,Polynom a)]
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]

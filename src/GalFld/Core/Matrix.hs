@@ -135,14 +135,20 @@ instance (Eq a, Num a) => Eq (Matrix a) where
   M a == M b   = a == b
 
 instance (Num a, Eq a) => Num (Matrix a) where
+  {-# INLINE (+) #-}
   x + y         = addM x y
+  {-# INLINE (*) #-}
   x * y         = multM x y
+  {-# INLINE fromInteger #-}
   fromInteger i = Mdiag (fromInteger i)
+  {-# INLINE abs #-}
   abs           = absM
-    where absM :: (Num a) => Matrix a -> Matrix a
+    where {-# INLINE absM #-}
+          absM :: (Num a) => Matrix a -> Matrix a
           absM (Mdiag x) = Mdiag $ abs x
           absM (M m)     = M $ amap abs m
   signum _      = error "Prelude.Num.signum: inappropriate abstraction"
+  {-# INLINE negate #-}
   negate        = negateM
     where {-# INLINE negateM #-}
           negateM :: (Num a) => Matrix a -> Matrix a

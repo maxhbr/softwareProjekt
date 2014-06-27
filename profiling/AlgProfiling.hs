@@ -143,5 +143,5 @@ main :: IO ()
 {-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
 {-main = print $ modMonom (5^21) a-}
 main = print $ m
-  where m = factorP $ ggTP (piPoly $ pTupUnsave [(9,1::F2),(0,-1)]) (cyclotomicPoly (2^9-1) (1::F2))
+  where m = factorP $ ggTP (piPoly $ pTupUnsave [(5,1::F3),(0,-1)]) (cyclotomicPoly (3^5-1) (1::F3))
 
