@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP, BangPatterns #-}
 --------------------------------------------------------------------------------
 -- |
 -- Module      : GalFld.Algorithmen.Berlekamp
@@ -17,6 +17,9 @@ module GalFld.Algorithmen.Berlekamp
   , berlekampBasis
   , berlekampFactor
   )where
+
+import Debug.Trace
+
 import Data.Maybe
 import Data.List
 import Control.Monad
@@ -148,25 +151,32 @@ berlekampFactor f | isNullP f   = []
                              | getNumRowsM m == 1 = [(1,f)]
                              | otherwise         = --trace ("berlekamp f="++show f++" m=\n"++show m)
                               berlekampFactor' g n ++ berlekampFactor' g' n'
-          where g  = --trace ("list="++show [x | x <- [ggTP f (h - P [s]) | s <- elems (getReprP f)]
+          where {-# INLINE g #-}
+                g  = --trace ("list="++show [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
                      --        , x /= 1])$
                      head [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
                              , x /= 1]
+                {-# INLINE g' #-}
                 g' = --trace ("f= "++show f) $ 
                      f @/ g
+                {-# INLINE h #-}
                 h  = pList $ getRowM m 2
+                {-# INLINE n #-}
                 n  = newKer m g
+                {-# INLINE n' #-}
                 n' = newKer m g'
-                newKer m g  = fromListsM $ take r m'
-                  where (k,l) = boundsM m
-                        m'    = toListsM $ echelonM $ fromListsM
+                {-# INLINE newKer #-}
+                newKer m g  = fromListsM $! take r m'
+                  where !(k,l) = boundsM m
+                        !m'    = toListsM $ echelonM $ fromListsM
                               [takeFill 0 l $ p2List $ modByP (pList (getRowM m i)) g
                                    | i <- [1..k]]
-                        r     = k-1- fromMaybe (-1) (findIndex (all (==0))
+                        !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
 
 #endif
 
+{-# INLINE takeFill #-}
 takeFill :: Num a => a -> Int -> [a] -> [a]
 takeFill a n [] = replicate n a
 takeFill a n (x:xs) = x : takeFill a (n-1) xs

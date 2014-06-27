@@ -142,8 +142,6 @@ main :: IO ()
 {-main = print $ multPMKaratsuba (p2Tup (testPolyF5^1000)) (p2Tup (testPolyF5^1000))-}
 {-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
 {-main = print $ modMonom (5^21) a-}
-main = print $ r
-  where m = berlekampBasis $ ggTP (piPoly $ pTupUnsave [(6,1::F2),(0,-1)]) (cyclotomicPoly (2^6-1) (1::F2))
-        (k,l) = boundsM m
-        r = k-1- fromMaybe (-1) (findIndex (all (==0)) $ reverse $ toListsM m)
+main = print $ m
+  where m = factorP $ ggTP (piPoly $ pTupUnsave [(9,1::F2),(0,-1)]) (cyclotomicPoly (2^9-1) (1::F2))
 

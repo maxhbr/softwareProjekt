@@ -24,7 +24,7 @@ ghc \
   ${DIR}/profiling/AlgProfiling.hs
 
 if [ $? -eq 0 ]; then
-  ${DIR}/dist/Profiling/AlgProfiling +RTS -p -sstderr
+  ${DIR}/dist/Profiling/AlgProfiling +RTS -pa -sstderr
 fi
 
 popd
