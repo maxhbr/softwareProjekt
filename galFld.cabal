@@ -158,5 +158,6 @@ Benchmark bench
   Main-is:           Bench.hs
   Build-Depends:     base,
                      criterion >=0.8 && <0.9,
+                     random,
                      galFld
   default-language:  Haskell2010

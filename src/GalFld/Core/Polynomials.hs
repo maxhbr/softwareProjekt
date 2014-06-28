@@ -18,13 +18,14 @@ module GalFld.Core.Polynomials
   -- unär
   , moniP, moniLcP, deriveP, reciprocP, reciprocP2, multMonomP
   -- binär
-  , divP, (@/), modByP, ggTP, eekP
+  , divP, (@/), modByP, ggTP, eekP, divPInv
   -- weiteres
   , evalP, hasNs
   , addPM, multPM
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
   , multPK, multPMKaratsuba
+  , invModMonom
   ) where
 import Data.List
 import qualified Control.Arrow as A
@@ -306,56 +307,6 @@ multKonstP a f  = PMS (map (A.second (*a)) ms) True
   where ms = unPMS $ cleanP f
 
 
-{-# INLINE multPShortDown #-}
--- |Multipliziert 2 Polynome miteinander, bei
---  gleichzeitiger Reduktion mod x^l, d.h.
---  schneidet alle Terme >= x^l ab
-multPShortDown :: (Eq a, Num a) => Int -> Polynom a -> Polynom a -> Polynom a
-multPShortDown l f g  = PMS c True
-  where c = multPM_ShortDown l (unPMS $ cleanP f) (unPMS $ cleanP g)
-
-{-# INLINE multPShortUp #-}
--- |Multipliziert 2 Polynome miteinander, bei
---  gleichzeitiger Reduktion mod x^l, d.h.
---  schneidet alle Terme < x^l ab
-multPShortUp :: (Eq a, Num a) => Int -> Polynom a -> Polynom a -> Polynom a
-multPShortUp l f g  = PMS c True
-  where c = multPM_ShortUp l (unPMS $ cleanP f) (unPMS $ cleanP g)
-
-{-# INLINE multPM_ShortDown #-}
--- | Multiplikation von absteigend sortierten [(Int,a)] Listen
-multPM_ShortDown :: (Eq a, Num a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
-multPM_ShortDown l ms  []     = []
-multPM_ShortDown l []  ns     = []
-multPM_ShortDown l ((i,m):ms) ns
-                    = addPM (multPM'_ShortDown l i m ns)
-                            (multPM_ShortDown l ms ns)
-
-{-# INLINE multPM_ShortUp #-}
--- | Multiplikation von absteigend sortierten [(Int,a)] Listen
-multPM_ShortUp :: (Eq a, Num a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
-multPM_ShortUp l ms  []     = []
-multPM_ShortUp l []  ns     = []
-multPM_ShortUp l ((i,m):ms) ns
-                    = addPM (multPM'_ShortUp l i m ns)
-                            (multPM_ShortUp l ms ns)
-
-
-{-# INLINE multPM'_ShortDown #-}
-multPM'_ShortDown l i m []  = []
-multPM'_ShortDown l i m ((j,n):ns)
-    | c == 0 || k >= l = multPM'_ShortDown l i m ns
-    | otherwise      = (k,c) : multPM'_ShortDown l i m ns
-  where c = n*m
-        k = i+j
-
-{-# INLINE multPM'_ShortUp #-}
-multPM'_ShortUp l i m []  = []
-multPM'_ShortUp l i m ((j,n):ns)
-    | c == 0 || k < l = multPM'_ShortUp l i m ns
-    | otherwise      = (k,c) : multPM'_ShortUp l i m ns
-  where c = n*m
-        k = i+j
 
 {-# INLINE getLcP #-}
 getLcP :: (Num a, Eq a) => Polynom a -> a
@@ -482,46 +433,86 @@ divP' a b = fst $ divP a b
 modByP :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 modByP f p = snd $ divP f p
 
-#if 0
 -- |Hensel inverse lift
 --  Input: Polynom h mit h(0) = 1
---         Int l
+--         Int k
 --  Output: h^(-1) mod x^k
-invHensel :: (Show a, Num a, Eq a, Fractional a) => Polynom a -> Int -> Polynom a
-invHensel h k  | isNullP h  = nullP
-               | otherwise  = invHensel' (pKonst 1) 1 1 [] (unPMS h)
-  where invHensel' !a !l !lold !h0 !h1
-          | l >= k     = -- trace ("invHensel' done l="++show l++" a="++show (length $ unPMS a))$
-                        modMonomP k a
-          | otherwise = --trace ("invHensel' l="++show l++" a="++show a
-                        {-++ ", h0="++show h0++", h1="++show h1++"\n"-}
-                        {-++ ", h0'="++show h0'++", h1'="++show h1'-}
-                        {-++ ", a*h0="++show (a*(PMS h0' True))-}
-                        {-++ ", c="++show c ++", b="++show b++"\n")$-}
-                        invHensel' (a+a') l' l h0' h1'
-          where b = negate $ multPShortDown l a $!
-                            multPShortDown l a (PMS h1' True) + PMS c True
-                a' = multMonomP l b
-                l' = 2*l
-                h1' = map (\(i,m) -> (i-lold,m)) $ takeWhile (\(i,_) -> i>=lold) h1
-                h0'' = filter (\(i,_) -> i<lold) h1
-                h0''' | lold==1 = h0''
-                      | otherwise = map (\(i,m) -> (i+lold,m)) h0''
-                h0' = h0''' ++ h0
-                c   = map (\(i,m) -> (i-l,m)) $ multPM_ShortUp l (unPMS a) h0'
-#endif
+--invModMonom :: (Show a, Num a, Eq a, Fractional a) => Polynom a -> Int -> Polynom a
+--invModMonom h k  | isNullP h  = nullP
+--               | otherwise  = invModMonom' (pKonst 1) 1 1 [] (unPMS h)
+--  where invModMonom' !a !l !lold !h0 !h1
+--          | l >= k     =  trace ("invModMonom' done l="++show l++" a="++show (length $ unPMS a))$
+--                        modMonomP k a
+--          | otherwise = trace ("invModMonom' l="++show l++" a="++show a
+--                        ++ ", h0="++show h0++", h1="++show h1++"\n"
+--                        ++ ", h0'="++show h0'++", h1'="++show h1'
+--                        ++ ", a*h0="++show (a*(PMS h0' True))
+--                        ++ ", c="++show c ++", b="++show b++"\n")$
+--                        invModMonom' (a+a') l' l h0' h1'
+--          where b = negate $ multPShortDown l a $!
+--                            multPShortDown l a (PMS h1' True) + PMS c True
+--                a' = multMonomP l b
+--                l' = 2*l
+--                h1' = map (\(i,m) -> (i-lold,m)) $ takeWhile (\(i,_) -> i>=lold) h1
+--                h0'' = filter (\(i,_) -> i<lold) h1
+--                h0''' | lold==1 = h0''
+--                      | otherwise = map (\(i,m) -> (i+lold,m)) h0''
+--                h0' = h0''' ++ h0
+--                c   = map (\(i,m) -> (i-l,m)) $ multPM_ShortUp l (unPMS a) h0'
+
+invModMonom :: (Show a, Num a, Eq a, Fractional a) => Polynom a -> Int -> Polynom a
+invModMonom h k  | isNullP h  = nullP
+               | otherwise  = PMS (invModMonom' [(0,1)] 1) True
+  where hs = unPMS $ cleanP h
+        invModMonom' !a !l
+          | l >= k     =  a
+          | otherwise = --trace ("invModMonom' l="++show l++" lnew="++show lnew
+                        --  ++"\n\t=> a'="++show (pTup a')++" b="++show (pTup b)) $
+                        invModMonom' b lnew
+          where -- g_i+1 = (2*g_i - h*g_i^2) mod x^(2^i)
+                b = (map (A.second negate) a') ++ a
+                -- a' = h*g_i^2
+                a' = multPMInter lnew l hs $ multPMInter lnew 0 a a
+                -- nächster Schritt
+                lnew = 2*l
+
+{-# INLINE multPInter #-}
+-- |Multipliziert f mit g, wobei nur Terme mit x^l für 
+--  l > lLow und l < lHigh betrachtet werden
+multPInter :: (Show a, Eq a, Num a) => Int -> Int -> Polynom a -> Polynom a -> Polynom a
+multPInter _ _ (PMS [] _) _ = nullP
+multPInter _ _ _ (PMS [] _) = nullP
+multPInter lHigh lLow f g
+      = PMS (multPMInter lHigh lLow ((unPMS.cleanP) f) ((unPMS.cleanP) g)) True
+
+{-# INLINE multPMInter #-}
+-- |Multipliziert f mit g, wobei nur Terme mit x^l für 
+--  l > lLow und l < lHigh betrachtet werden
+multPMInter :: (Show a, Eq a, Num a) => Int -> Int ->
+                                [(Int,a)] -> [(Int,a)] -> [(Int,a)]
+multPMInter _ _ f [] = []
+multPMInter _ _ [] f = []
+multPMInter lHigh lLow ms ns = foldr1 addPM summanden
+  where summanden = [multPMInter'  i m ns | (i,m) <- ms]
+        {-# INLINE multPMInter' #-}
+        multPMInter' i m [] = []
+        multPMInter' i m ((j,n):ns) 
+          | k < lLow || k >= lHigh || c == 0 = multPMInter' i m ns
+          | otherwise                      = (k,c) : multPMInter' i m ns
+          where !c = n*m
+                !k = i+j
 
 
+{-# INLINE modMonomP #-}
 modMonomP :: (Eq a, Num a) => Int -> Polynom a -> Polynom a
 modMonomP _ (PMS [] _)    = nullP
 modMonomP l (PMS ms True) = PMS (dropWhile (\(i,_) -> i>=l) ms) True
 modMonomP l f             = modMonomP l $ cleanP f
 
 
-#if 0
-divPHensel :: (Show a, Eq a, Fractional a) =>
+divPInv :: (Show a, Eq a, Fractional a) =>
               Polynom a -> Polynom a -> (Polynom a, Polynom a)
-divPHensel a b
+divPInv a b
     | isNullP a = (nullP, nullP)
     | a == b     = (pKonst 1,nullP)
     | l <= 0     = (nullP,a)
@@ -531,11 +522,10 @@ divPHensel a b
         l  = n-m+1
         (lc,b') = moniLcP b
         f  = reciprocP2 m b'
-        g  = invHensel f l
-        q  = multPShortDown l g $ reciprocP2 n a
+        g  = invModMonom f l
+        q  = multPInter l 0 g $ reciprocP2 n a
         q' = multKonstP lc $ reciprocP2 (l-1) q
         r  = a - b*q'
-#endif
 
 {-# INLINE eekP #-}
 -- |Erweiterter Euklidischer Algorithmus: gibt (d,s,t) zurück mit

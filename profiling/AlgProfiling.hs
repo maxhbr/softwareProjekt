@@ -3,7 +3,7 @@ module Main
   where
 import Control.Arrow as A
 import GalFld.GalFld
-import GalFld.SpecialPolys
+import GalFld.More.SpecialPolys
 {-import System.Random-}
 import Data.List
 import Debug.Trace
@@ -134,7 +134,7 @@ main :: IO ()
 {-main = print $ length $ findIrreds $ getAllMonicPs (elems (1::F3)) [9]-}
 {-main = mapM_ print $ map sffAndBerlekamp $ getAllMonicPs (elems (1::F3)) [3]-}
 {-main = print $ length $ findIrredsRabin $ getAllMonicPs (elems (1::F3)) [9]-}
-{-main = print $ snd $ (divPHensel (pTupUnsave [(3^11,1),(1,-1)]) f)-}
+{-main = print $ snd $ (divPInv (pTupUnsave [(3^11,1),(1,-1)]) f)-}
 {-main = print $ foldr1 (+) $ map (snd) $ p2Tup $ heavyBench testPoly1 200-}
 {-main = print $ foldr1 (+) $ map (snd) $ heavyBench (p2Tup testPoly1) 200-}
 {-main = do-}
@@ -142,6 +142,11 @@ main :: IO ()
 {-main = print $ multPMKaratsuba (p2Tup (testPolyF5^1000)) (p2Tup (testPolyF5^1000))-}
 {-main = print $ foldr1 (+) $ map snd $ p2Tup $ heavyBench (multPK) testPolyF5 300-}
 {-main = print $ modMonom (5^21) a-}
-main = print $ m
-  where m = factorP $ ggTP (piPoly $ pTupUnsave [(5,1::F3),(0,-1)]) (cyclotomicPoly (3^5-1) (1::F3))
-
+{-main = print $ m-}
+  {-where m = factorP $ ggTP (piPoly $ pTupUnsave [(5,1::F3),(0,-1)]) (cyclotomicPoly (3^5-1) (1::F3))-}
+main = do
+  let list = getAllP (elems (1::F5)) 8
+  putStrLn $ (\(f,g,a,b) -> "f="++show f++"\ng="++show g++"\ndivP f g = "++show a++"\ndivPInv="++show b) $ 
+               head $ filter (\(_,_,a,b) -> a /= b) $ 
+               map (\(x,y) -> (x,y,divP x y, divPInv x y)) $ 
+               zip list $ reverse list
