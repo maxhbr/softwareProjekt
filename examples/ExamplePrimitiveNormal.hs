@@ -31,7 +31,11 @@ if' False _ y = y
 
 main = do
   args <- getArgs
-  let indxs = if' (length args == 1) [2..(read $ head args)] [2..]
+  let indxs = if' (length args == 2) 
+                  [(read $ head args)..(read $ head $ tail args)] 
+                  ( if' (length args == 1) 
+                        [2..(read $ head args)] 
+                        [2..] )
   mapM_ (\n -> do
     st <- getCPUTime
     let gpn = genPrimNorm n
