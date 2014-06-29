@@ -2,11 +2,12 @@
 module Main
   where
 import Criterion.Main
+import System.Random
 
 import GalFld.GalFld
 import GalFld.Algorithmen
 import GalFld.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
-import GalFld.SpecialPolys
+import GalFld.More.SpecialPolys
 
 -- #define BENCHFINDIRREDS
 #ifdef BENCHFINDIRREDS
@@ -38,7 +39,7 @@ benchHeavyBench =
     , bench "500" $ whnf heavyBench 500 ] ]
 #endif
 
-#define BENCH_PRIMNORM
+-- #define BENCH_PRIMNORM
 #ifdef BENCH_PRIMNORM
 primNormBench n = factorP $ 
   ggTP (piPoly $ pTupUnsave [(n,1::F2),(0,-1)]) 
@@ -48,14 +49,37 @@ benchPrimNorm = [bgroup "find primitive normal polys"
   [bench "8" $ whnf primNormBench 8] ]
 #endif
 
-main = defaultMain $
+-- Testwise
+#define BENCH_DIV
+benchDivInv f g = divPInv f g
+benchDivHorn f g = divP f g
+
+benchDiv l = [bgroup "divP: Horner <-> InvMod"
+  [bgroup ("degs "++show (n,m))
+    [bench "horn" $ whnf (benchDivHorn f) g ,
+     bench "inv" $ whnf (benchDivInv f) g] ]
+    | f <- take 100 l,
+      g <- drop 100 l, 
+      let n = uDegP f, let m = uDegP g]
+--
+rndSelect xs n = do
+    gen <- getStdGen
+    return $ take n [x | x <- randomRs (0, length xs - 1) gen]
+
+
+main = do
+  l1 <- rndSelect (getAllMonicPs (elems (1::F5)) [1..8]) 200
+  defaultMain $
 #ifdef BENCHFINDIRREDS
-  benchFindIrreds ++
+    benchFindIrreds ++
 #endif
 #ifdef HEAVYBENCH
-  benchHeavyBench ++
+    benchHeavyBench ++
 #endif
 #ifdef BENCH_PRIMNORM
-  benchPrimNorm ++
+    benchPrimNorm ++
 #endif
-  []
+#ifdef BENCH_DIV
+    benchDiv l1 ++
+#endif
+    []

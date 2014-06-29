@@ -118,7 +118,7 @@
 
 
 \theoremstyle{remark}
-%\newtheorem{rem}[thm]{Bemerkung}
+\newtheorem{bemerkung}[thm]{Bemerkung}
 %\newtheorem{bem}[thm]{Bemerkung}
 %\newtheorem{beo}[thm]{Beobachtung}
 %\newtheorem{note}[thm]{Notiz}

@@ -115,7 +115,8 @@ Normierung erhalten möchte, gibt es noch die folgende Variante der Normierung:
 \haskellinput{Core/Polynomials}{deriveP}
 
 \paragraph{Das reziproke Polynom} 
-\begin{definition}
+\begin{definition}[reziprokes Polynom]
+  \label{def:reziprokesPoly}
   Sei $f(X) = \sum_{i=0}^n a_i X^i \in R[X]$ für einen Körper $R$, so ist 
   das \emph{reziproke Polynom von Ordnung $d$ von $f(X)$} für $d \geq n$ 
   gegeben durch
@@ -204,7 +205,7 @@ ist, da es eine \lstinline{Num}-Instanz erfordern würde, die es auf Polynomen j
 offenbar nicht gibt.}.
 Dieser ist selbstredend nichts anderes als Division mit Rest, wobei lediglich
 der erste Eintrag des Tupels zurückgegeben wird.
-\haskellinput{Core/Polynomials}{(\string@/)}
+%\haskellinput{Core/Polynomials}{(\string@/)}
 
 
 
@@ -401,6 +402,151 @@ Zuletzt haben wir noch die Multiplikation mit dem Monom $x^{j*j}$ als separate
 Funktion gestaltet, die offenbar schneller ist, als der normale
 Multiplikationsalgorithmus.
 \haskellinput{Core/Polynomials/FFTTuple}{multx}
+
+\subsection{Division mit Rest mit Inversen $\bmod x^l$}
+Die Idee für eine schöne und zugleich schnelle Methode die 
+Division mit Rest für Polynome durchzuführen liefert folgende Proposition.
+
+\begin{prop}
+  Sei $f(X) \in R[X]$ für einen Ring $R$. Sei $f(0) = 1$ und 
+  $l \in \N$. Dann lässt sich $h \in R[X]$ mit
+  \[ h(X)\, f(X) \quad\equiv\quad 1 \quad \bmod X^l\]
+  in $\cO(m(l))$ berechnen,
+  wobei $m(l)$ die Anzahl der Multiplikationen in $R$ ist, die nötig sind 
+  um zwei Polynome in $R[X]$ von Grad $l$ zu multiplizieren.%
+  \footnote{Man spricht auch von \emph{Multiplikationszeit}, 
+  vgl. \autocite[Definition 2]{divHensel}.}
+\end{prop}
+\begin{proof}
+  Betrachte \autoref{alg:invModPol} und die genauere Analyse im Beweis von
+  \autocite[Theorem 2]{divHensel}.
+\end{proof}
+
+Die konkrete Antwort liefert der folgende Algorithmus.
+
+\begin{pseudocode}{Invertieren $\bmod X^l$}{alg:invModPol}
+Input: $f(X) \in R[X]$ mit $f(0)=1$, $l\in \N$
+Output: $h(X) \in R[X]$ mit $h(X)\,f(X) \equiv 1 \bmod X^l$
+Algorithmus INV_MOD_MONOM($f$,$l$):
+  1. Setze $g_0 := 1$, $r := \lceil \log_2(l)\rceil$.
+  2. for $i:=1$ to $l$ do
+        $g_i(X) := (2 g_{i-1}(X) - f(X)\,g_{i-1}(X)^2)\ \bmod X^{2^i}$
+     endfor
+  3. Setze $h(X) := g_r(X)$.
+\end{pseudocode}
+
+\begin{bemerkung}
+  \label{bem:divPInv}
+  Man beachte, dass in \autoref{alg:invModPol} stets $g_i \equiv g_{i-1} \bmod
+  X^{2^{i-1}}$ gilt. Das bedeutet, dass man innerhalb der Schleife zur
+  Berechnung von $g_i$ lediglich Polynome von Grad maximal $2^{i-1}$
+  multiplizieren muss. Dies sollte man (um ein effizientes Vorgehen
+  sicherzustellen) bei der Implementierung unbedingt beachten.
+\end{bemerkung}
+
+Nun kann man damit einen Algorithmus zur Division mit Rest aufstellen. (Man
+erinnere sich kurz an die Definition des reziproken Polynoms von Ordnung $d$
+aus \thref{def:reziprokesPoly})
+
+\begin{pseudocode}{Division mit Rest durch Invertieren $\bmod X^l$}{alg:divInv}
+Input: $a,b\in R[X]$ mit $\deg b \leq \deg a$.
+Output $q,r \in R[X]$ mit $a = qb + r$.
+Algorithmus DIV_INV($a$,$b$):
+  1. Setze $n := \deg a$, $m := \deg b$, $l:= n-m+1$
+  2. Setze $\bar b(X) := \tfrac{1}{b_m} b(X)$ für $b_m$ den Leitkoeffizienten von $b$
+  2. Setze $f(X) := \bar b^\ast_l(X)$
+  3. Berechne $g(X) := $ INV_MOD_MONOM($f$,$l$)
+  4. Berechne $q'(X) := g(X)\,a^\ast_l(X)\ \bmod X^l$
+  5. Setze $q(X) := b_m \cdot {q'}^\ast_{n-m}(X)$ und $r(X) := a(X) - b(X) q(X)$.
+\end{pseudocode}
+
+\begin{thm}
+  \autoref{alg:divInv} führt die Division mit Rest für $a,b\in R[X]$ mit
+  $n := \deg a$, $m := \deg b$ in $\cO(m(\max\{n-m,m\}))$ durch.
+\end{thm}
+\begin{proof}
+  \cite[Theorem 3]{divHensel}.
+\end{proof}
+
+\subsubsection{Implementierung}
+
+Betrachten wir nun die konkrete Implementierung und beginnen bei 
+\autoref{alg:divInv}.
+
+\haskellinput{Core/Polynomials}{divPInv}
+
+ħreciprocP2ħ ist dabei gerade die Berechnung des reziproken Polynoms passender
+Ordnung, wie bereits oben beschrieben. ħmultPInter l 0ħ berechnet dabei das
+Produkt der Polynome -- in diesem Fall -- nur bis zum Grad $<l$; liefert also
+gerade das $\bmod X^l$ in Schritt 4 von \autoref{alg:divInv}.
+
+\haskellinput{Core/Polynomials}{multPInter}
+\haskellinput{Core/Polynomials}{multPMInter}
+
+Letztlich bleibt dann noch die Angabe des eigentlichen Invertierens $\bmod
+X^l$.
+
+\haskellinput{Core/Polynomials}{invModMonom}
+
+ħmultPInter lnew lħ stellt -- wie in \thref{bem:divPInv} erwähnt -- sicher, dass 
+man nur die Multiplikationen durchführt, die auch wirklich notwendig sind.
+
+Dazu ein kleines Beispiel.
+
+\begin{beispiel}
+  Wir wollen $q(X),r(X)\in \F_5[X]$ finden mit
+  $a(X) = b(X) q(X) + r(X)$ für 
+  \begin{alignat*}{3}
+    a(X) &:= X^5 + 4X^4 + 3 X^3 + 3 X^2 + 3 X + 1 &&\quad n:= \deg a = 5\,,\\
+    b(X) &:= 4 X^3 + X^2 + X + 1 &&\quad m := \deg b = 3\,.
+  \end{alignat*}
+  Dazu normieren wir zunächst $b$ zu 
+  \[ \bar b(X) = \tfrac{1}{4} b(X) = 4 b(X) = X^3 + 4 X^2 +4X +4\]
+  und berechnen 
+  \[ f(X) := b^\ast_m(X) = b^\ast_3(X) = 4X^3 + 4X^2 + 4X + 1\,.\]
+  Nun gilt also $f(0) = 1$ und wir können mit dem eigentlichen Invertieren
+  $\mod X^l$ für $ l = n-m+1 = 3$, also \autoref{alg:divInv}, beginnen:\\
+  Setze $g_0 := 1$, $r := \lceil \log_2(3)\rceil = 2$.\\
+  $\begin{array}{lrll}
+    i=1: & g_1 & := 2g_0 - fg_0^2 & \bmod X^{2^i}\\
+              && = 2 - (4X^3+4X^2+4X+1) &\bmod X^2 \\
+              && = -4X +1 = X+1
+  \end{array}$\\
+  Man beachte, dass der Term $2g_0 - fg_0^2$ lediglich für die Koeffizienten
+  der Monome mit $X^k$ für $k=1$ interessant ist (vgl wieder 
+  \thref{bem:divPInv})! Wie man in der vorliegenden Implementierung erkennt,
+  wurde genau dies ausgenutzt und die Rechnung sieht in diesem Fall wie folgt
+  aus:\\
+  \begin{tabular}{lrll}
+    $i=1:$ & $g_1'$&$:=$ ħmultPInterħ $2$ $1$ $f$ (ħmultPInterħ $2$ $0$ $g_0$ $g_0$)\\
+            &&$=$ ħmultPInterħ $2$ $1$ $f$ $1$\\
+            &&$= 4X$\\
+        & $g_1$&$:= g_1' + g_0 = X+1$
+  \end{tabular}\\
+  Analog dazu sind im nächsten Schritt nur Terme mit $X^k$ für 
+  $k=3,2$ interessant:\\
+  \begin{tabular}{lrll}
+    $i=2:$ & $g_2'$&$:=$ ħmultPInterħ $4$ $2$ $f$ (ħmultPInterħ $4$ $0$ $g_1$ $g_1$)\\
+            &&$=$ ħmultPInterħ $4$ $2$ $f$ $(X^2+X+1)$\\
+            &&$= 4X^3+2X^2$\\
+        & $g_2$&$:= g_2' + g_1 = 4X^3+2X^2+X+1$
+  \end{tabular}\\
+  Das selbe Ergebnis erreicht man durch $g_2 := (2g_1 - fg_1^2) \bmod X^4$.
+  Da $r=2$, ist dies $g(X)$ mit $g(X)f(X) \equiv 1 \bmod X^3$.
+  Nun können wir fortfahren mit Schritt 4 in \autoref{alg:divInv} und 
+  \begin{align*}
+    q'(X) &:= g(X) a^\ast_n(X) \bmod X^l\\
+    &= (4X^3+2X^2+X+1)(X^5+3X^4+3X^3 + 3X^2 + 4X + 1) \bmod X^3\\
+    &= 4X^2 + 1
+  \end{align*}
+  und damit letztlich
+  \begin{align*}
+    q(X) &:= b_m\ {q'}^\ast_{n-m}(X) = 4\ (4X^2+1)^\ast_{2} \\
+    &= 4 (X^2 + 4) = 4X^2 + 1
+  \end{align*}
+  berechnen. Den Rest erhalten wir dann durch 
+  \[ r(X) := q(X)b(X) - a(X) = 3X^2 + 2X\,. \]
+\end{beispiel}
 
 
 
