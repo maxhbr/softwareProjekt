@@ -1,5 +1,21 @@
 \section{Weiteres}
 \subsection{Die Klasse \texttt{ShowTex}}
+Im Modul \texttt{GalFld.Core.ShowTex} wird eine Klasse \texttt{ShowTex}
+implementiert, welche es entsprechenden Datentypen mit dieser Klasse
+ermöglicht, nach \LaTeX{} zu rendern.
+
+Die einzige zur Klasse gehörende Funktion ist \texttt{showTex}, welche einen
+String mit \LaTeX{} code zurückgibt.
+
+Es sind auch noch Funktionen implementiert, die 
+\begin{itemize}
+  \item ein Datentyp der Klasse \texttt{ShowTex} zu einem PNG rendern können
+    bzw.
+  \item einen String mit \LaTeX{} code rendern.
+  \item Sowie eine Funktion, die das Programm \texttt{sxiv} nutzt, um diese PNG
+    anzuzeigen.
+\end{itemize}
+Diese drei Funktionen sind leider nur unter Linux verfügbar.
 
 \haskellinput{Core/ShowTex}{renderTex}
 \haskellinput{Core/ShowTex}{renderRawTex}
