@@ -17,7 +17,8 @@ build-type:          Simple
 Bug-Reports:         https://github.com/maximilianhuber/softwareProjekt/issues
 extra-source-files:  README.md,
                      --src/GalFld/Core/Polynomials/Conway.hs,
-                     src/Example.lhs
+                     examples/Example.lhs,
+                     examples/ExamplePrimitiveNormal.lhs
 cabal-version:       >=1.10
 
 source-repository head
