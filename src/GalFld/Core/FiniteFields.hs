@@ -110,7 +110,7 @@ instance (Show a, Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFEl
   {-# INLINE getReprP #-}
   getReprP                    = getReprP'
 
-instance (NFData a) => NFData (FFElem a) where
+instance (Num a, Eq a, NFData a) => NFData (FFElem a) where
   rnf (FFElem f p) = rnf (f,p)
   rnf (FFKonst x)  = rnf x
 
