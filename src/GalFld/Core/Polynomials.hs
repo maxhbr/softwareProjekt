@@ -25,7 +25,6 @@ module GalFld.Core.Polynomials
   , getAllP, getAllPs
   , getAllMonicP, getAllMonicPs
   , multPK, multPMKaratsuba
-  , invModMonom
   ) where
 import Data.List
 import qualified Control.Arrow as A

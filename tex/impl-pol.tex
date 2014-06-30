@@ -205,7 +205,21 @@ ist, da es eine \lstinline{Num}-Instanz erfordern würde, die es auf Polynomen j
 offenbar nicht gibt.}.
 Dieser ist selbstredend nichts anderes als Division mit Rest, wobei lediglich
 der erste Eintrag des Tupels zurückgegeben wird.
+
 %\haskellinput{Core/Polynomials}{(\string@/)}
+
+
+\paragraph{Modulo} Dual zu ħ(@/)ħ ist ħmodByPħ, das einfach den zweiten Eintrag
+von ħdivPħ liefert:
+
+\haskellinput{Core/Polynomials}{modByP}
+
+
+\paragraph{Erweiterter Euklidischer Algorithmus} Auch der erweiterte
+Euklidische Algorithmus basiert auf ħdivPħ. Er ist -- selbstverständlich
+rekursiv -- hier gegeben durch
+
+\haskellinput{Core/Polynomials}{eekP}
 
 
 
