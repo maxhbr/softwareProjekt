@@ -43,6 +43,7 @@ module GalFld.Core.PrimeFields
   ) where
 import Data.Binary
 import Language.Haskell.TH
+import Control.DeepSeq
 
 import GalFld.Core.FiniteField
 import GalFld.Core.ShowTex
@@ -171,8 +172,9 @@ genPrimeField p pfName = do
 -- Erzeugen von Primkörpern mittels CPP Compiler Befehlen
 #define PFInstance(MName,MValue,PFName) \
 data MName; \
-instance Numeral MName where {numValue x = MValue} ;\
-instance Show MName where {show = show} ;\
+instance Numeral MName where {numValue x = MValue} ; \
+instance Show MName where {show = show} ; \
+instance NFData MName where {rnf _ = ()} ; \
 type PFName = Mod MName
 
 PFInstance(Numeral2,2,F2)

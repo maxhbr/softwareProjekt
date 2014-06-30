@@ -22,12 +22,7 @@ instance (Eq a, Num a, NFData a) => NFData (Polynom a) where
   rnf = rnf . (map fst) . p2Tup
 
 instance (Numeral a, NFData a) => NFData (Mod a) where
-  rnf = rnf . unMod
-
-instance NFData F2 where
-  rnf _ = ()
-
-
+  rnf _ = () -- rnf . unMod
 
 -- |generiert n zufällige Polynome von maximal Grad d über e
 getRndPol :: (Num a, FiniteField a, RandomGen g) =>
@@ -56,9 +51,9 @@ benchMult gen = [ benchMult' gen p
   | p <- map ((\ n -> (n, getRndPol gen n (1 :: F2) samples)) . (2 ^)) [1..12] ]
 
 benchMult' gen (n,list) = bgroup ("multBench @ "++show n)
-  [ bench ("multNorm @ "++show n) $ whnf (multBench (*)) list,
-    bench ("multKar @ "++show n) $ whnf (multBench multPK) list,
-    bench ("multFFT @ "++show n) $ whnf (multBench ssP) list ]
+  [ bench ("multNorm @ "++show n) $ nf (multBench (*)) list,
+    bench ("multKar @ "++show n) $ nf (multBench multPK) list,
+    bench ("multFFT @ "++show n) $ nf (multBench ssP) list ]
 
 multBench mulFunc list = zipWith mulFunc (take n list) (drop n list)
   where n = length list `quot` 2
