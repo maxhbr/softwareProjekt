@@ -9,6 +9,7 @@ import System.Random
 import Criterion.Main
 import Criterion.Config
 import qualified Data.Monoid as M
+import Control.DeepSeq
 
 import Data.List
 import Debug.Trace
@@ -16,6 +17,16 @@ import Data.Maybe
 
 import GalFld.Core.Polynomials.FFTTuple
 {-import GalFld.Core.Polynomials.Conway-}
+
+instance (Eq a, Num a, NFData a) => NFData (Polynom a) where
+  rnf = rnf . (map fst) . p2Tup
+
+instance (Numeral a, NFData a) => NFData (Mod a) where
+  rnf = rnf . unMod
+
+instance NFData F2 where
+  rnf _ = ()
+
 
 
 -- |generiert n zufällige Polynome von maximal Grad d über e
