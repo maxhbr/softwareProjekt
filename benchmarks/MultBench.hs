@@ -19,19 +19,21 @@ import GalFld.Core.Polynomials.FFTTuple
 
 
 -- |generiert n zufällige Polynome von maximal Grad d über e
-getRndPol :: (Num a, FiniteField a, RandomGen g) => 
+getRndPol :: (Num a, FiniteField a, RandomGen g) =>
                                             g -> Int -> a -> Int -> [Polynom a]
-getRndPol gen d e n = map pList $ map findFstNonZero $ splitList (d+1) $ 
-        map (els!!) $ take (n*(d+1)) $ randomRs (0,(length els)-1) gen
-  where els = elems e
+getRndPol gen d e n = map (pList . findFstNonZero) (splitList (d + 1)
+  $ map (els !!)
+  $ take (n * (d + 1))
+  $ randomRs (0, length els - 1) gen)
+    where els = elems e
 
 splitList _ [] = []
-splitList n xs = (take n xs) : (splitList n $ drop n xs)
+splitList n xs = take n xs : splitList n (drop n xs)
 
 
 findFstNonZero [] = []
-findFstNonZero xs 
-  | x == 0     = x : (findFstNonZero $ init xs)
+findFstNonZero xs
+  | x == 0     = x : findFstNonZero (init xs)
   | otherwise = xs
   where x = last xs
 
@@ -39,14 +41,16 @@ findFstNonZero xs
 
 samples = 30::Int
 
-benchMul gen e = [ bgroup "multBench" $ 
-  concat [ [bench ("multNorm @ "++show n) $ whnf (mulBench (*)) list,
-    bench ("multKar @ "++show n) $ whnf (mulBench (multPK)) list,
-    bench ("multFFT @ "++show n) $ whnf (mulBench (ssP)) list]
-    | (n,list) <- map (\n -> (n,getRndPol gen n e samples)) $ map (2^) [1..10] ] ]
+benchMult gen = [ benchMult' gen p
+  | p <- map ((\ n -> (n, getRndPol gen n (1 :: F2) samples)) . (2 ^)) [1..12] ]
 
-mulBench mulFunc list = zipWith (mulFunc) (take n list) (drop n list)
-  where n = (length list) `quot` 2
+benchMult' gen (n,list) = bgroup ("multBench @ "++show n)
+  [ bench ("multNorm @ "++show n) $ whnf (multBench (*)) list,
+    bench ("multKar @ "++show n) $ whnf (multBench multPK) list,
+    bench ("multFFT @ "++show n) $ whnf (multBench ssP) list ]
+
+multBench mulFunc list = zipWith mulFunc (take n list) (drop n list)
+  where n = length list `quot` 2
 
 -------------------------------------------------------------------------------
 myConfig = defaultConfig {
@@ -56,6 +60,4 @@ main :: IO ()
 main = do
   gen <- getStdGen
   defaultMainWith myConfig (return ()) $
-    benchMul gen (1::F2)
-
-
+    benchMult gen
