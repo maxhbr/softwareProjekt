@@ -53,7 +53,8 @@ fft w addF subF zero i n fs = intersperseL ls' rs'
 {-# INLINE ssP #-}
 -- | Schönhagen-Strassen für Polynome
 ssP :: (Show a, Fractional a, Num a, Eq a) => Polynom a -> Polynom a -> Polynom a
-ssP f g  = pTup $ ss l fs gs
+ssP f g | isNullP f || isNullP g = nullP
+        | otherwise              = pTup $ ss l fs gs
   where fs = p2Tup f
         gs = p2Tup g
         -- || deg f*g < 2^l ||
