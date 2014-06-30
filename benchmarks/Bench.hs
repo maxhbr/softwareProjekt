@@ -9,7 +9,7 @@ import GalFld.Algorithmen
 import GalFld.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
 import GalFld.More.SpecialPolys
 
--- #define BENCHFINDIRREDS
+#define BENCHFINDIRREDS
 #ifdef BENCHFINDIRREDS
 benchFindIrreds =
   [ bgroup "findIrreds e2f2"
@@ -50,7 +50,8 @@ benchPrimNorm = [bgroup "find primitive normal polys"
 #endif
 
 -- Testwise
-#define BENCH_DIV
+-- #define BENCH_DIV
+#ifdef BENCH_DIV
 benchDivInv f g = divPInv f g
 benchDivHorn f g = divP f g
 
@@ -61,14 +62,17 @@ benchDiv l = [bgroup "divP: Horner <-> InvMod"
     | f <- take 100 l,
       g <- drop 100 l, 
       let n = uDegP f, let m = uDegP g]
---
+
 rndSelect xs n = do
     gen <- getStdGen
     return $ take n [x | x <- randomRs (0, length xs - 1) gen]
+#endif
 
 
 main = do
+#ifdef BENCH_DIV
   l1 <- rndSelect (getAllMonicPs (elems (1::F5)) [1..8]) 200
+#endif
   defaultMain $
 #ifdef BENCHFINDIRREDS
     benchFindIrreds ++
@@ -80,6 +84,6 @@ main = do
     benchPrimNorm ++
 #endif
 #ifdef BENCH_DIV
-    benchDiv l1 ++
+    (benchDiv l1) ++
 #endif
     []
