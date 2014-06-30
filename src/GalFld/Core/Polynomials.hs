@@ -178,9 +178,6 @@ instance (Num a, Eq a) => Num (Polynom a) where
   signum _          = error "Prelude.Num.signum: inappropriate abstraction"
   negate (PMS ms b) = PMS ((map . A.second) negate ms) b
 
-instance (NFData a) => NFData (Polynom a) where
-  rnf = rnf . unPMS
-
 {-# INLINE addPM #-}
 -- | addiere Polynome in Monomdarstellung, d.h
 --   [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist
