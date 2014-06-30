@@ -9,6 +9,7 @@ import System.Random
 import Criterion.Main
 import Criterion.Config
 import qualified Data.Monoid as M
+import Control.DeepSeq
 
 import Data.List
 import Debug.Trace
