@@ -342,6 +342,9 @@ instance (Num a, Binary a) => Binary (Polynom a) where
    get       = do x <- get
                   return $ PMS x False
 
+instance (Eq a, Num a, NFData a) => NFData (Polynom a) where
+  rnf = rnf . (map fst) . p2Tup
+
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen
 --

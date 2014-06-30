@@ -43,6 +43,7 @@ module GalFld.Core.PrimeFields
   ) where
 import Data.Binary
 import Language.Haskell.TH
+import Language.Haskell.TH.Syntax
 import Control.DeepSeq
 
 import GalFld.Core.FiniteField
@@ -147,6 +148,9 @@ instance (Numeral a) => Binary (Mod a) where
   get           = do x <- get
                      return $ MkMod x
 
+instance (Numeral a, NFData a) => NFData (Mod a) where
+  rnf = rnf . unMod
+
 --------------------------------------------------------------------------------
 --  Erzeugen von Primkörpern
 
@@ -163,6 +167,8 @@ genPrimeField p pfName = do
     (appT (conT ''Show) (conT (mkName mName)))
     [funD (mkName "show")
       [clause [] ( normalB $ appsE [varE (mkName "show")] ) [] ] ]
+  i3 <- instanceD (cxt [])
+    (appT (conT ''NFData) (conT (mkName mName))) []
   t <- tySynD (mkName pfName) []
     (appT (conT ''Mod) (conT $ mkName mName))
   return [d,i1,i2,t]
@@ -172,7 +178,7 @@ genPrimeField p pfName = do
 -- Erzeugen von Primkörpern mittels CPP Compiler Befehlen
 #define PFInstance(MName,MValue,PFName) \
 data MName; \
-instance Numeral MName where {numValue x = MValue} ; \
+instance Numeral MName where {numValue _ = MValue} ; \
 instance Show MName where {show = show} ; \
 instance NFData MName where {rnf _ = ()} ; \
 type PFName = Mod MName

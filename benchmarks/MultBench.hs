@@ -19,9 +19,6 @@ import GalFld.Core.Polynomials.FFTTuple
 {-import GalFld.Core.Polynomials.Conway-}
 
 
-instance (Numeral a, NFData a) => NFData (Mod a) where
-  rnf _ = () -- rnf . unMod
-
 -- |generiert n zufällige Polynome von maximal Grad d über e
 getRndPol :: (Num a, FiniteField a, RandomGen g) =>
                                             g -> Int -> a -> Int -> [Polynom a]
