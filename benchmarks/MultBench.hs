@@ -6,7 +6,10 @@ import GalFld.GalFld
 import GalFld.More.SpecialPolys
 
 import System.Random
-import System.TimeIt
+import Criterion.Main
+import Criterion.Config
+import qualified Data.Monoid as M
+
 import Data.List
 import Debug.Trace
 import Data.Maybe
@@ -15,7 +18,7 @@ import GalFld.Core.Polynomials.FFTTuple
 {-import GalFld.Core.Polynomials.Conway-}
 
 
--- |generiert n zufällige Polynome von Grad d über e
+-- |generiert n zufällige Polynome von maximal Grad d über e
 getRndPol :: (Num a, FiniteField a, RandomGen g) => 
                                             g -> Int -> a -> Int -> [Polynom a]
 getRndPol gen d e n = map pList $ map findFstNonZero $ splitList (d+1) $ 
@@ -32,15 +35,27 @@ findFstNonZero xs
   | otherwise = xs
   where x = last xs
 
-evalF f x y = do 
-  let res = f x y
-  return $! res
+--------------------------------------------------------------------------------
+
+samples = 30::Int
+
+benchMul gen e = [ bgroup "multBench" $ 
+  concat [ [bench ("multNorm @ "++show n) $ whnf (mulBench (*)) list,
+    bench ("multKar @ "++show n) $ whnf (mulBench (multPK)) list,
+    bench ("multFFT @ "++show n) $ whnf (mulBench (ssP)) list]
+    | (n,list) <- map (\n -> (n,getRndPol gen n e samples)) $ map (2^) [1..10] ] ]
+
+mulBench mulFunc list = zipWith (mulFunc) (take n list) (drop n list)
+  where n = (length list) `quot` 2
+
+-------------------------------------------------------------------------------
+myConfig = defaultConfig {
+    cfgSamples = M.Last (Just (10::Int))}
 
 main :: IO ()
 main = do
   gen <- getStdGen
-  let list =  getRndPol gen 1000 (1::F2) 3
-  (t,_) <- timeItT (evalF (*) (head list) (head list))
-  print t
+  defaultMainWith myConfig (return ()) $
+    benchMul gen (1::F2)
 
 

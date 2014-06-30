@@ -49,30 +49,8 @@ benchPrimNorm = [bgroup "find primitive normal polys"
   [bench "8" $ whnf primNormBench 8] ]
 #endif
 
--- Testwise
--- #define BENCH_DIV
-#ifdef BENCH_DIV
-benchDivInv f g = divPInv f g
-benchDivHorn f g = divP f g
-
-benchDiv l = [bgroup "divP: Horner <-> InvMod"
-  [bgroup ("degs "++show (n,m))
-    [bench "horn" $ whnf (benchDivHorn f) g ,
-     bench "inv" $ whnf (benchDivInv f) g] ]
-    | f <- take 100 l,
-      g <- drop 100 l, 
-      let n = uDegP f, let m = uDegP g]
-
-rndSelect xs n = do
-    gen <- getStdGen
-    return $ take n [x | x <- randomRs (0, length xs - 1) gen]
-#endif
-
 
 main = do
-#ifdef BENCH_DIV
-  l1 <- rndSelect (getAllMonicPs (elems (1::F5)) [1..8]) 200
-#endif
   defaultMain $
 #ifdef BENCHFINDIRREDS
     benchFindIrreds ++
@@ -82,8 +60,5 @@ main = do
 #endif
 #ifdef BENCH_PRIMNORM
     benchPrimNorm ++
-#endif
-#ifdef BENCH_DIV
-    (benchDiv l1) ++
 #endif
     []
