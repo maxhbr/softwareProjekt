@@ -31,6 +31,7 @@ import qualified Control.Arrow as A
 import Data.Maybe
 import Data.Binary
 import Data.Ord
+import Control.DeepSeq
 
 import Debug.Trace
 
@@ -176,6 +177,9 @@ instance (Num a, Eq a) => Num (Polynom a) where
   abs _             = error "Prelude.Num.abs: inappropriate abstraction"
   signum _          = error "Prelude.Num.signum: inappropriate abstraction"
   negate (PMS ms b) = PMS ((map . A.second) negate ms) b
+
+instance (NFData a) => NFData (Polynom a) where
+  rnf = rnf . unPMS
 
 {-# INLINE addPM #-}
 -- | addiere Polynome in Monomdarstellung, d.h

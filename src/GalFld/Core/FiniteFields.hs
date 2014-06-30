@@ -18,6 +18,7 @@ import Control.Exception
 import Data.Binary
 import Control.Monad
 import Data.Ord (Ordering (..))
+import Control.DeepSeq
 
 import GalFld.Core.FiniteField as X
 import GalFld.Core.PrimeFields as X
@@ -108,6 +109,10 @@ instance (Show a, Eq a, Num a, Fractional a, FiniteField a) => FiniteField (FFEl
   elemCount (FFElem _ m)      = elemCount (getReprP m) ^ uDegP m
   {-# INLINE getReprP #-}
   getReprP                    = getReprP'
+
+instance (NFData a) => NFData (FFElem a) where
+  rnf (FFElem f p) = rnf (f,p)
+  rnf (FFKonst x)  = rnf x
 
 -- |Nimmt ein Element aus einem Endlichen Körper und gibt eine Liste aller
 -- anderen Elemente zurrück.

@@ -18,8 +18,6 @@ import Data.Maybe
 import GalFld.Core.Polynomials.FFTTuple
 {-import GalFld.Core.Polynomials.Conway-}
 
-instance (Eq a, Num a, NFData a) => NFData (Polynom a) where
-  rnf = rnf . (map fst) . p2Tup
 
 instance (Numeral a, NFData a) => NFData (Mod a) where
   rnf _ = () -- rnf . unMod
@@ -47,8 +45,8 @@ findFstNonZero xs
 
 samples = 30::Int
 
-benchMult gen = [ benchMult' gen p
-  | p <- map ((\ n -> (n, getRndPol gen n (1 :: F2) samples)) . (2 ^)) [1..12] ]
+benchMult gen e = [ benchMult' gen p
+  | p <- map ((\ n -> (n, getRndPol gen n e samples)) . (2 ^)) [1..7] ]
 
 benchMult' gen (n,list) = bgroup ("multBench @ "++show n)
   [ bench ("multNorm @ "++show n) $ nf (multBench (*)) list,
@@ -66,4 +64,4 @@ main :: IO ()
 main = do
   gen <- getStdGen
   defaultMainWith myConfig (return ()) $
-    benchMult gen
+    benchMult gen (FFElem (pList [0,1::F5]) (pList [3,3,0,1]))
