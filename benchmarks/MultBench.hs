@@ -57,11 +57,11 @@ multBench = pfold
 
 pfold :: (a -> a -> a) -> [a] -> a
 pfold _ [x] = x
-pfold mappend xs  = (ys `par` zs) `pseq` (ys `mappend` zs) where
-  len = length xs
-  (ys', zs') = splitAt (len `div` 2) xs
-  ys = pfold mappend ys'
-  zs = pfold mappend zs'
+pfold mappend xs  = (ys `par` zs) `pseq` (ys `mappend` zs)
+  where len = length xs
+        (ys', zs') = splitAt (len `div` 2) xs
+        ys = pfold mappend ys'
+        zs = pfold mappend zs'
 
 -------------------------------------------------------------------------------
 myConfig = defaultConfig {
