@@ -18,11 +18,11 @@ mkdir -p ${DIR}/dist/bench_out
 STAMP=$( date +%Y-%m-%d_%H:%M:%S )
 
 pushd $DIR
-#cabal configure --enable-benchmarks \
-  #&& cabal build -j \
-  #&& cabal bench benchMult \
-    #--benchmark-options="-u ${DIR}/dist/bench_out/benchMult_${STAMP}.csv"
-STAMP=2014-06-30_17:57:31
+cabal configure --enable-benchmarks \
+  && cabal build -j \
+  && cabal bench benchMult \
+    --benchmark-options="-u ${DIR}/dist/bench_out/benchMult_${STAMP}.csv +RTS -N$( nproc )"
+#STAMP=2014-06-30_17:57:31
 
 echo -e "deg\tNorm\tKarat" >${DIR}/dist/bench_out/benchMult_${STAMP}.dat
 paste <(myawk Norm) <(myawk2 Kar) \

@@ -98,7 +98,8 @@ wir folgende Funktion implementiert:
 \haskellinput{Core/Polynomials}{uDegP}
 
 \paragraph{Auswerten} Natürlich muss auch etwas in ein Polynom einsetzen
-können, was wir mit Hilfe des Hornerschemas (vgl. \autocite{wiki:horner-schema}
+können, was wir mit Hilfe des Hornerschemas (vgl.
+\autocite{wiki:horner-schema})
 implementiert haben. Dies zeigt eine schöne Anwendung der Haskellfunktion 
 ħfoldlħ:
 \haskellinput{Core/Polynomials}{evalP}
@@ -107,8 +108,8 @@ implementiert haben. Dies zeigt eine schöne Anwendung der Haskellfunktion
 \paragraph{Normieren} Über das Normieren braucht man nicht viele Worte
 verlieren.
 \haskellinput{Core/Polynomials}{moniP}
-Da man in vielen Situationen den Leitkoeffizient des Polynoms bei der
-Normierung erhalten möchte, gibt es noch die folgende Variante der Normierung:
+Da man in vielen Situationen das Inverse des Leitkoeffizienten des Polynoms 
+bei der Normierung erhalten möchte, gibt es noch die folgende Variante der Normierung:
 \haskellinput{Core/Polynomials}{moniLcP}
 
 \paragraph{Formale Ableitung} 
@@ -217,9 +218,15 @@ von ħdivPħ liefert:
 
 \paragraph{Erweiterter Euklidischer Algorithmus} Auch der erweiterte
 Euklidische Algorithmus basiert auf ħdivPħ. Er ist -- selbstverständlich
-rekursiv -- hier gegeben durch
+rekursiv -- hier gegeben durch:
 
 \haskellinput{Core/Polynomials}{eekP}
+
+\paragraph{Größter gemeinsamer Teiler} Aus des erweiterten Euklidischen
+Algorithmus erhält man selbstverständlich auch den $\ggT$ zweier Polynome:
+
+\haskellinput{Core/Polynomials}{ggTP}
+
 
 
 
@@ -562,7 +569,30 @@ Dazu ein kleines Beispiel.
   \[ r(X) := q(X)b(X) - a(X) = 3X^2 + 2X\,. \]
 \end{beispiel}
 
+\subsection{Weiteres}
 
+\paragraph{Nullstellensuche} Möchte man prüfen, ob ein Polynom in einer
+gewissen Menge von Elementen eine Nullstelle besitzt, so ist dies mit folgender
+Funktion möglich.
 
+\haskellinput{Core/Polynomials}{hasNs}
+
+\paragraph{Auflisten aller Polynome} 
+Folgende Funktion listet alle monischen Polynome auf, deren Grad in der Liste
+ħ[Int]ħ vorkommt und deren Koeffizienten in der Liste ħ[a]ħ liegen.
+
+\haskellinput{Core/Polynomials}{getAllMonicPs}
+
+Möchte man Polynome von Grad $0$ bis zu einem gewissen Grad, so liefert dies
+die Funktion ħgetAllMonicPħ.
+
+\haskellinput{Core/Polynomials}{getAllMonicP}
+
+Zuletzt kann man sich natürlich noch zusätzlich die nicht-monischen Polynome
+ausgeben lassen. Wie oben in beiden Varianten (d.h. Gräder als Liste oder als
+Obergrenze gegeben).
+
+\haskellinput{Core/Polynomials}{getAllPs}
+\haskellinput{Core/Polynomials}{getAllP}
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:
