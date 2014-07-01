@@ -156,6 +156,7 @@ Executable exmpPrimNorm
 
 Benchmark bench
   type:              exitcode-stdio-1.0
+  ghc-options:       -threaded -O2 -fllvm -rtsopts
   hs-source-dirs:    benchmarks
   Main-is:           Bench.hs
   Build-Depends:     base,
@@ -166,6 +167,7 @@ Benchmark bench
 
 Benchmark benchMult
   type:              exitcode-stdio-1.0
+  ghc-options:       -threaded -O2 -fllvm -rtsopts
   hs-source-dirs:    benchmarks
   Main-is:           MultBench.hs
   Build-Depends:     base,
@@ -177,6 +179,7 @@ Benchmark benchMult
 
 Benchmark benchDiv
   type:              exitcode-stdio-1.0
+  ghc-options:       -threaded -O2 -fllvm -rtsopts
   hs-source-dirs:    benchmarks
   Main-is:           DivBench.hs
   Build-Depends:     base,

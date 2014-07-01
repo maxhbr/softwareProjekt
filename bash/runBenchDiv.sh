@@ -21,15 +21,16 @@ pushd $DIR
 cabal configure --enable-benchmarks \
   && cabal build -j \
   && cabal bench benchDiv \
-   --benchmark-options="-u ${DIR}/dist/bench_out/benchDiv_${STAMP}.csv"
+  --benchmark-options="-u ${DIR}/dist/bench_out/benchDiv_${STAMP}.csv +RTS -N$( nproc )"
 
 #STAMP=2014-07-01_08:22:43
 
-echo -e "deg\tHorner\tInverse" >${DIR}/dist/bench_out/benchDiv_${STAMP}.dat
-paste <(myawk Horn) <(myawk2 Inv) \
-  >>${DIR}/dist/bench_out/benchDiv_${STAMP}.dat
+if [ $? -eq 0]; then
+  echo -e "deg\tHorner\tInverse" >${DIR}/dist/bench_out/benchDiv_${STAMP}.dat
+  paste <(myawk Horn) <(myawk2 Inv) \
+    >>${DIR}/dist/bench_out/benchDiv_${STAMP}.dat
 
-gnuplot <<EOF
+  gnuplot <<EOF
 set samples 1001
 set key below
 
@@ -50,7 +51,8 @@ plot for [col=2:3] "${DIR}/dist/bench_out/benchDiv_${STAMP}.dat" \
   using 1:col title columnheader with lines
 EOF
 
-epstopdf "${DIR}/dist/bench_out/benchDiv_${STAMP}.eps" \
-  --outfile "${DIR}/dist/bench_out/benchDiv_${STAMP}.pdf"
+  epstopdf "${DIR}/dist/bench_out/benchDiv_${STAMP}.eps" \
+    --outfile "${DIR}/dist/bench_out/benchDiv_${STAMP}.pdf"
+fi
 
 popd

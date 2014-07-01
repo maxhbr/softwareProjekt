@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
 module Main
   where
 import Control.Arrow as A
@@ -19,8 +18,8 @@ import GalFld.Core.Polynomials.FFTTuple
 {-import GalFld.Core.Polynomials.Conway-}
 
 
-instance (Numeral a, NFData a) => NFData (Mod a) where
-  rnf _ = () -- rnf . unMod
+{-instance (Numeral a, NFData a) => NFData (Mod a) where-}
+  {-rnf _ = () -- rnf . unMod-}
 
 -- |generiert n zufällige Polynome von maximal Grad d über e
 getRndPol :: (Num a, FiniteField a, RandomGen g) =>
