@@ -173,6 +173,7 @@ Benchmark benchMult
   Build-Depends:     base,
                      deepseq,
                      criterion >=0.8 && <0.9,
+                     parallel >=3.2 && <3.3,
                      random,
                      galFld
   default-language:  Haskell2010

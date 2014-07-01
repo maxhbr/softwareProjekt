@@ -10,6 +10,7 @@ import Criterion.Main
 import Criterion.Config
 import qualified Data.Monoid as M
 import Control.DeepSeq
+import Control.Parallel
 
 import Data.List
 import Debug.Trace
@@ -49,8 +50,18 @@ benchMult gen e desc = [ benchMult' gen p
             bench ("multKar @ "++show n) $ nf (multBench multPK) list]
             {-bench ("multFFT @ "++show n) $ nf (multBench ssP) list ]-}
 
-multBench mulFunc list = zipWith mulFunc (take n list) (drop n list)
-  where n = length list `quot` 2
+--multBench mulFunc list = zipWith mulFunc (take n list) (drop n list)
+--  where n = length list `quot` 2
+
+multBench = pfold
+
+pfold :: (a -> a -> a) -> [a] -> a
+pfold _ [x] = x
+pfold mappend xs  = (ys `par` zs) `pseq` (ys `mappend` zs) where
+  len = length xs
+  (ys', zs') = splitAt (len `div` 2) xs
+  ys = pfold mappend ys'
+  zs = pfold mappend zs'
 
 -------------------------------------------------------------------------------
 myConfig = defaultConfig {
