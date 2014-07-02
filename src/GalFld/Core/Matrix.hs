@@ -314,8 +314,8 @@ detM m         | isQuadraticM m = detArr $ unM m
           detArr :: (Eq a, Num a, Fractional a) => Array (Int, Int) a -> a
           detArr m | k == 1       = m!(1,1)
                    | m!(1,1) == 0 = - detArrPivot m
-                   | otherwise = (m!(1,1) *) $ detArr $ subArr (2,2) (k,l) $
-                     arrElim m
+                   | otherwise   = (m!(1,1) *) $ detArr $ subArr (2,2) (k,l) $
+                                   arrElim m
             where !(k,l) = snd $ bounds m
 
           {-# INLINE detArrPivot #-}
@@ -349,27 +349,22 @@ echelonM (M m)     = M $ echelonM' m
                     Array (Int,Int) a -> Array (Int,Int) a
         echelonM' m | k == 1       = arrElim m
                     | l == 1       = arrElim m
-                    | hasPivot    = trace ("echelonM' (k,l)="++show (k,l)++" m=\n"++show (M m)++"\t-> hasPivot at "++show (minimum lst)) $ 
-                                    echelonM' $ swapRowsArr 1 (minimum lst) m
-                    | noPivot     = trace ("echelonM' (k,l)="++show (k,l)++" m=\n"++show (M m)++"\t-> noPivot") $ 
-                                    echelonM'_noPivot m
-                    | otherwise   = trace ("echelonM' (k,l)="++show (k,l)++" m=\n"++show (M m)++"\t->(1,1)/=0") $ 
-                                    echelonM'_Pivot m
+                    | hasPivot    = echelonM' $ swapRowsArr 1 (minimum lst) m
+                    | noPivot     = echelonM'_noPivot m
+                    | otherwise   = echelonM'_Pivot m
           where !(k,l)    = snd $ bounds m
                 !lst      = [i | i <- [1..k], m!(i,1) /= 0]
                 !hasPivot = m!(1,1) == 0 && not (null lst)
                 !noPivot  = m!(1,1) == 0 && null lst
 
                 {-# INLINE echelonM'_Pivot #-}
-                echelonM'_Pivot m = trace ("echeonM'_Pivot m'=\n"++show (M m')) $
-                                    m' // shifted
+                echelonM'_Pivot m = m' // shifted
                   where !m' = arrElim m
                         !shifted = map (\((i,j),x) -> ((i+1,j+1),x)) $ assocs m''
                         !m''     = echelonM' $ subArr (2,2) (k,l) m'
 
                 {-# INLINE echelonM'_noPivot #-}
-                echelonM'_noPivot m = trace ("echelonM'_noPivot") $
-                                      m // shifted
+                echelonM'_noPivot m = m // shifted
                   where !m' = echelonM' $ subArr (1,2) (k,l) m
                         !shifted = map (\((i,j),x) -> ((i,j+1),x)) $ assocs m'
 

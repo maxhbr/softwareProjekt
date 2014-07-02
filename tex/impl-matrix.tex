@@ -116,4 +116,88 @@ bekannten Algorithmus.
 
 \haskellinput{Core/Matrix}{echelonM}
 
-Nahezu selbsterklärend 
+Nahezu selbsterklärend beginnt der Algorithmus mit einer Fallunterscheidung.
+Ist das aktuell zu bearbeitende Element $0$ und die gesamte darunterliegende
+Spalte auch, so geht es mit ħechelonM'_noPivotħ weiter. Ist der aktuelle 
+Eintrag $0$, wird aber ein Pivotelement gefunden, so vertauscht man die Zeilen
+passend (ħswapRowsArrħ). Ist der aktuelle Eintrag $\neq 0$, so liefert 
+ħechelonM'_Pivotħ den passenden Eliminationsschritt, durch die Anwendung von
+ħarrElimħ.
+
+\haskellinput{Core/Matrix}{arrElim}
+
+
+\begin{beispiel}
+  Wir versuchen einmal die "`Telefonmatrix"' 
+  \[ M = \begin{bmatrix} 7&8&9\\ 4&5&6\\ 1&2&3\end{bmatrix} = 
+      \begin{bmatrix}2&3&4 \\ 4&0&1\\ 1&2&3\end{bmatrix} \ 
+      \in \F_5^{3\times 3}\]
+  in Zeilenstufenform zu bringen. Lässt man sich die einzelnen 
+  Zwischenschritte von ħechelonMħ ausgeben, so erhält man:
+  \begin{hcode}
+echelonM' (k,l)=(3,3) m=
+2₅ 3₅ 4₅ 
+4₅ 0₅ 1₅ 
+1₅ 2₅ 3₅ 
+	->(1,1)/=0
+echeonM'_Pivot m'=
+1₅ 4₅ 2₅ 
+0₅ 4₅ 3₅ 
+0₅ 3₅ 1₅
+echelonM' (k,l)=(2,2) m=
+4₅ 3₅ 
+3₅ 1₅ 
+	->(1,1)/=0
+echeonM'_Pivot m'=
+1₅ 2₅ 
+0₅ 0₅ 
+  \end{hcode}
+  Die eigentliche Ausgabe der Funktion ħechelonMħ ist dann selbstverständlich:
+\begin{hcode}
+1₅ 4₅ 2₅ 
+0₅ 1₅ 2₅ 
+0₅ 0₅ 0₅ 
+\end{hcode}
+\end{beispiel}
+
+
+\paragraph{Kern} Mit Hilfe der Zeilenstufenform kann man wie folgt den Kern 
+einer Matrix berechnen: Fügt man die Einheitsmatrix passender Größe unten an
+die ursprüngliche Matrix an, berechnet dann die Spaltenstufenform der
+zusammengesetzten Gesamtmatrix, so sind die Nichtnullspalten des unteren Teils
+des Ergebnisses gerade eine Basis des Kerns der ursprünglichen Matrix (vgl.
+\cite[Abschnitt Basis]{wiki:matrix-kernel}). Dies lässt sich durch
+Transponieren natürlich leicht auf die Berechnung einer Zeilenstufenform
+zurückführen.
+
+\haskellinput{Core/Matrix}{kernelM}
+
+\paragraph{Determinante} Offensichtlich kann man mit der Zeilenstufenform auch
+die Determinante einer Matrix berechnen.
+
+\haskellinput{Core/Matrix}{detM}
+
+Hier wurde der Algorithmus zur Zeilenstufenform nahezu erneut implementiert, um
+die konkrete Elimination in den einzelnen Spalten auslassen zu können, die bei
+der Berechnung der Determinante ja unnötig ist.
+
+\paragraph{Determinante ohne \lstinline{Fractional}} Bekanntlich lässt sich die
+Determinante einer Matrix über jedem Ring definieren. Das bedeutet, dass es
+auch ohne die zur Berechnung der Zeilenstufenform nötigen ħFractionalħ-Instanz
+geht, was ħdetLapMħ liefert.\footnote{Man hätte auch die Berechnung der
+Smithschen-Normalform implementieren können, die ebenfalls ohne
+\lstinline{Fractional}
+ausgekommen wäre. Jedoch haben wir uns entschieden darauf zu verzichten, da im
+vorliegenden Anwendungsfall der endlichen Körper stets Inverse zur Verfügung
+stehen.}
+
+\haskellinput{Core/Matrix}{detLapM}
+
+
+\subsection{Weiteres}
+
+\paragraph{Alle Matrizen mit gewissen Einträgen} Möchte man alle Matrizen
+erzeugen, die eine vorgegebene Größe und vorgegebene Einträge besitzen, so
+liefert ħgetAllMħ die Antwort.
+
+\haskellinput{Core/Matrix}{getAllM}
