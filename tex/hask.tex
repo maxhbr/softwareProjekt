@@ -1,11 +1,79 @@
+Gute Bücher zum Einstieg in Haskell sind beispielsweiße \cite{Hutton} und
+\cite{lyahfgg}. Basierend auf \cite{Hutton} gibt es von Erik Meijer auch eine
+ausführliche Video Reihe, die leicht im Internet zu finden ist.
+
+Eine ausführliche Übersicht über Tutorials bietet die Seite
+\url{http://www.haskell.org/haskellwiki/Tutorials}.
+
 \section{Über die Programmiersprache}
+Die Einleitung in \cite{lyahfgg} sagt folgendes über Haskell.
 
-\subsection{Hello World}
+\begin{itemize}
+  \item 
+Haskell ist eine \emph{rein funktionale} Programmiersprache.
+In einer \emph{imperativen} Programmiersprache gibt man dem Computer eine Folge
+von Aufgaben, welche dann ausgeführt werden.  Dazu gibt es Strukturen, die den
+Ablauf steuern, wie beispielsweise \texttt{for} und \texttt{while}.
 
-\subsection{Extensions}
-\subsection{Template Haskell}
+Anders hingegen in einer funktionalen Programmiersprache. Man sagt dem Computer
+nicht, was er tun soll. Stattdessen sagt man ihm eher, was die Sachen sind.
+Zum Beispiel, kann man dem Computer sagen, dass die Fakultät einer Zahl das
+Produkt aller Zahlen von $1$ bis zu dieser Zahl ist.
+Dies wird als eine, häufig rekursive, Funktion ausgedrückt.
+
+Beim funktionalen Programmieren kann man keine Werte von Variablen verändern.
+In einer rein funktionalen Programmiersprache hat eine Funktion keine
+Seiteneffekte. Das einzige was eine Funktion tun kann, ist eine Berechnung,
+basierend auf ihren Eingaben. Das scheint eine Einschränkung zu sein, aber in
+der Tat hat dies einige positive Konsequenzen. Beispielsweise liefert eine
+Funktion bei gleichen Eingaben, unabhängig von der Umgebung, immer den gleichen
+Rückgabe Wert. Diese Eigenschaft heißt \emph{Referentielle Transparenz}.
+
+  \item 
+Haskell ist \emph{lazy}.
+Das bedeutet, dass Haskell Funktionen nicht auswertet, solange das Ergebnis
+nicht benötigt wird. Dies wird durch Referentielle Transparenz ermöglicht.
+Haskell bemüht sich, die Auswertungen von Ausdrücken so lange wie möglich zu
+vermeiden.
+Es wird damit auch ermöglicht scheinbar unendliche Datenstrukturen zu
+verwenden, da nur Teile, also so weit wie nötig, evaluiert werden.
+
+  \item 
+Haskell ist \emph{statisch Typisiert}.
+Das bedeutet, dass der Computer bereits zur Compilezeit weiß, welcher Teil eine
+Zahl ist und was eine Funktion ist, die aus einer Liste von Zahlen einen String
+macht, usw. Das bedeutet, dass viele Fehler bereits wärend des Compilierens
+erkannt werden können.
+
+Zusätzlich ist Haskell auch noch sehr gut darin, Typen zu inferieren. Das
+bedeutet, das man meist nicht extra angeben muss, welchen Typ jeder Teil im
+Code hat. Beispielsweise erkennt Haskell aus \texttt{a = 4 + 5} dass
+\texttt{a} eine Zahl sein muss.
+Damit ist es auch leichter, allgemeineren Code zu schreiben, der an vielen
+Stellen anwendbar ist.
+
+  \item 
+Haskell ist \emph{elegant und präzise}.
+Da Haskell viele Konzepte höherer Programmiersprachen nutzt, sind in Haskell
+geschriebene Programme meist kürzer als ein vergleichbares imperatives. Und
+kürzere Programme sind einfacher zu Warten und enthalten weniger Fehler.
+\end{itemize}
+
+Die Haskell Entwicklung begann 1987, als sich eine Gruppe von Wissenschaftlern
+zusammengetan hat, um eine Programmiersprache zu entwickeln, die ihren
+Ansprüchen genügt. Der \emph{Haskell Report}, welcher die erste stabile Version
+beschreibt, wurde 1999 publiziert (überarbeitet Version: \cite{haskell98}).
+Der aktuelle Standard wird beschrieben in \cite{haskell2010}.
+
+\section{Hello World}
 
 \section{Ausführen von Haskell Programmen}
+
+Haskell kann jederzeit interpretiert oder compiliert werden. Mit dem
+Interpreter \texttt{ghci} oder \texttt{hugs} kann man einfach Programme oder
+Code-Schnipsel testen.
+Alternativ erhält man durch compilieren mit \texttt{ghc} ausführbare Dateien,
+welche dank recht umfangreicher Optimierung performanter sind.
 
 \subsection{Compiler basierte Optimierung}
 
@@ -13,34 +81,38 @@
 
 \section{Testing: \texttt{hspec}}
 \begin{itemize}
-  \item \url{https://hackage.haskell.org/package/hspec}
   \item \url{http://hspec.github.io/}
-\end{itemize}
-Hspec is roughly based on the Ruby library RSpec. However, Hspec is just a
-framework for running HUnit and QuickCheck tests. Compared to other options, it
-provides a much nicer syntax that makes tests very easy to read.
+\end{itemize}   
+\begin{quote}
+  Hspec is roughly based on the Ruby library RSpec. However, Hspec is just a
+  framework for running HUnit and QuickCheck tests. Compared to other options,
+  it provides a much nicer syntax that makes tests very easy to
+  read.\footnote{\url{https://hackage.haskell.org/package/hspec}}
+\end{quote}
 
 \section{Benchmarking: \texttt{criterion}}
-\begin{itemize}
-  \item \url{https://hackage.haskell.org/package/criterion}
-\end{itemize}
-This library provides a powerful but simple way to measure software
-performance. It provides both a framework for executing and analysing
-benchmarks and a set of driver functions that makes it easy to build and run
-benchmarks, and to analyse their results.
+\begin{quote}
+  This library provides a powerful but simple way to measure software
+  performance. It provides both a framework for executing and analysing
+  benchmarks and a set of driver functions that makes it easy to build and run
+  benchmarks, and to analyse their
+  results.\footnote{\url{https://hackage.haskell.org/package/criterion}}
+\end{quote}
 
 \section{Zusammenfügen: \texttt{cabal}}
+\begin{quote}
+  The Haskell Common Architecture for Building Applications and Libraries: a
+  framework defining a common interface for authors to more easily build their
+  Haskell applications in a portable way.
+
+  The Haskell Cabal is part of a larger infrastructure for distributing,
+  organizing, and cataloging Haskell libraries and
+  tools.\footnote{\url{https://hackage.haskell.org/package/Cabal}}
+\end{quote}
+Weitere Quellen:
 \begin{itemize}
-  \item \url{https://hackage.haskell.org/package/Cabal}
   \item \url{http://www.haskell.org/haskellwiki/How_to_write_a_Haskell_program}
 \end{itemize}
-The Haskell Common Architecture for Building Applications and Libraries: a
-framework defining a common interface for authors to more easily build their
-Haskell applications in a portable way.
-
-The Haskell Cabal is part of a larger infrastructure for distributing,
-organizing, and cataloging Haskell libraries and tools.
-
 
 %\lstinputlisting[ firstline=2
                 %, lastline=18 ]{../galFld.cabal}
@@ -58,3 +130,7 @@ organizing, and cataloging Haskell libraries and tools.
                 %, lastline=105 ]{../galFld.cabal}
 
 \section{Dokumentation: \texttt{haddock}}
+\begin{quote}
+  Haddock is a tool for automatically generating documentation from annotated
+  Haskell source code.\footnote{\url{http://www.haskell.org/haddock/}}
+\end{quote}
