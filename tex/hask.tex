@@ -65,30 +65,33 @@ Ansprüchen genügt. Der \emph{Haskell Report}, welcher die erste stabile Versio
 beschreibt, wurde 1999 publiziert (überarbeitet Version: \cite{haskell98}).
 Der aktuelle Standard wird beschrieben in \cite{haskell2010}.
 
-\section{Hello World}
-
 \section{Ausführen von Haskell Programmen}
 
 Haskell kann jederzeit interpretiert oder compiliert werden. Mit dem
 Interpreter \texttt{ghci} oder \texttt{hugs} kann man einfach Programme oder
 Code-Schnipsel testen.
 Alternativ erhält man durch compilieren mit \texttt{ghc} ausführbare Dateien,
-welche dank recht umfangreicher Optimierung performanter sind.
+welche dank recht umfangreicher Optimierung performanter sind. Für eine
+ausführlichere Optimierung gibt es den Compiler Parameter \texttt{-O}. Noch
+mehr Optimierung verspricht \texttt{-O2}, wobei das compilieren damit
+nochmals deutlich länger dauert.
 
-\subsection{Compiler basierte Optimierung}
-
-\subsection{Paralleles ausführen}
+Die Compileroption \texttt{-threaded} bereitet die ausführbare Datei darauf
+vor, parallel ausgeführt zu werden. Zusätzlich muss man beim ausführen dann
+noch die Parameter \texttt{-RTS -N4} mitgeben, wobei die $4$ die Anzahl der
+Prozessorkerne angibt, die genutzt werden sollen.
 
 \section{Testing: \texttt{hspec}}
-\begin{itemize}
-  \item \url{http://hspec.github.io/}
-\end{itemize}   
 \begin{quote}
   Hspec is roughly based on the Ruby library RSpec. However, Hspec is just a
   framework for running HUnit and QuickCheck tests. Compared to other options,
   it provides a much nicer syntax that makes tests very easy to
   read.\footnote{\url{https://hackage.haskell.org/package/hspec}}
 \end{quote}
+Weitere Quellen:
+\begin{itemize}
+  \item \url{http://hspec.github.io/}
+\end{itemize}   
 
 \section{Benchmarking: \texttt{criterion}}
 \begin{quote}
@@ -113,21 +116,6 @@ Weitere Quellen:
 \begin{itemize}
   \item \url{http://www.haskell.org/haskellwiki/How_to_write_a_Haskell_program}
 \end{itemize}
-
-%\lstinputlisting[ firstline=2
-                %, lastline=18 ]{../galFld.cabal}
-
-\subsection{Die eigentliche Libary}
-%\lstinputlisting[ firstline=20
-                %, lastline=60 ]{../galFld.cabal}
-
-\subsection{Tests}
-%\lstinputlisting[ firstline=62
-                %, lastline=69 ]{../galFld.cabal}
-
-\subsection{Benchmarks}
-%\lstinputlisting[ firstline=94
-                %, lastline=105 ]{../galFld.cabal}
 
 \section{Dokumentation: \texttt{haddock}}
 \begin{quote}
