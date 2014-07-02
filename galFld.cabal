@@ -32,13 +32,11 @@ library
 --                     -fdicts-cheap
 --                     -fspec-constr-count=6
   exposed-modules:   GalFld.GalFld,
-                     GalFld.More.SpecialPolys,
                      GalFld.Algorithmen,
                      GalFld.Algorithmen.Berlekamp,
                      GalFld.Algorithmen.Rabin,
                      GalFld.Algorithmen.SFreeFactorization,
                      GalFld.Core,
-                     GalFld.Core.NumberTheory,
                      GalFld.Core.Factorization,
                      GalFld.Core.FiniteField,
                      GalFld.Core.FiniteFields,
@@ -54,7 +52,10 @@ library
                      GalFld.Sandbox.MatrixSandbox,
                      GalFld.Sandbox.PFSandbox,
                      GalFld.Sandbox.PolySandbox,
-                     GalFld.Sandbox.SerializeSandbox
+                     GalFld.Sandbox.SerializeSandbox,
+                     GalFld.More
+                     GalFld.More.SpecialPolys,
+                     GalFld.More.NumberTheory
   -- other-modules:
   other-extensions:  QuasiQuotes, TemplateHaskell, CPP, BangPatterns
   build-depends:     base,

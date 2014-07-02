@@ -5,7 +5,7 @@ module GalFld.More.SpecialPolys (
 
 import Debug.Trace
 
-import GalFld.Core.NumberTheory
+import GalFld.More.NumberTheory
 import GalFld.Core
 import GalFld.GalFld
 

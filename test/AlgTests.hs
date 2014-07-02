@@ -12,6 +12,8 @@ import GalFld.Sandbox.FFSandbox (f2,e2f2,e2e2f2,e4f2,e4f2Mipo)
 import GalFld.Sandbox.PolySandbox hiding (testSize, main)
 import GalFld.Sandbox.AlgSandbox
 
+import GalFld.More.NumberTheory
+
 --------------------------------------------------------------------------------
 
 -- |Anzahl monischer irreduzibler Polynome von Grad n über F_q

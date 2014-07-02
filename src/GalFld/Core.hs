@@ -8,5 +8,4 @@ import GalFld.Core.Polynomials as X
 import GalFld.Core.FiniteFields as X
 import GalFld.Core.Factorization as X
 import GalFld.Core.Matrix as X
-import GalFld.Core.NumberTheory as X
 import GalFld.Core.ShowTex as X

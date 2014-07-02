@@ -1,4 +1,4 @@
-module GalFld.Core.NumberTheory (
+module GalFld.More.NumberTheory (
   möbFkt
   , primFactors
   , isPrime
