@@ -96,14 +96,20 @@ noch die Parameter \texttt{-RTS -N4} mitgeben, wobei die $4$ die Anzahl der
 Prozessorkerne angibt, die genutzt werden sollen.
 
 \section{Installieren von Haskell Paketen}
-Zum installieren gibt es das Konsolenwerkzeug \texttt{cabal}. Durch ausführen
-von 
-\begin{lstlisting}[language=bash ,numbers=none ,backgroundcolor=\color{lightgray}]
+Zum installieren gibt es das Konsolenwerkzeug
+\texttt{cabal}\footnote{\url{http://www.haskell.org/cabal/download.html}} für
+Windows und Unix Systeme.
+Durch ausführen von
+\begin{lstlisting}[language=bash 
+                  ,numbers=none
+                  ,backgroundcolor=\color{lightgray}]
 cabal update
 \end{lstlisting}
 holt sich dieses, aktuelle Paketlisten von
 \url{https://hackage.haskell.org/}. Danach kann man mittels
-\begin{lstlisting}[language=bash ,numbers=none ,backgroundcolor=\color{lightgray}]
+\begin{lstlisting}[language=bash
+                  ,numbers=none
+                  ,backgroundcolor=\color{lightgray}]
 cabal install PAKETNAME
 \end{lstlisting}
 Pakete aus der umfangreichem Bibliothek installieren.
