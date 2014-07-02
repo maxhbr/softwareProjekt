@@ -1,15 +1,15 @@
-Gute Bücher zum Einstieg in Haskell sind beispielsweiße \cite{Hutton} und
-\cite{lyahfgg}. Basierend auf \cite{Hutton} gibt es von Erik Meijer auch eine
-ausführliche Video Reihe, die leicht im Internet zu finden ist.
-
-Eine ausführliche Übersicht über Tutorials bietet die Seite
-\url{http://www.haskell.org/haskellwiki/Tutorials}.
+\begin{center}
+\includegraphics[width=0.3\textwidth]{haskell.png}
+\end{center}
+\begin{center}
+\url{http://xkcd.com/1312/}
+\end{center}
 
 \section{Über die Programmiersprache}
 Die Einleitung in \cite{lyahfgg} sagt folgendes über Haskell.
 
 \begin{itemize}
-  \item 
+  \item
 Haskell ist eine \emph{rein funktionale} Programmiersprache.
 In einer \emph{imperativen} Programmiersprache gibt man dem Computer eine Folge
 von Aufgaben, welche dann ausgeführt werden.  Dazu gibt es Strukturen, die den
@@ -29,7 +29,7 @@ der Tat hat dies einige positive Konsequenzen. Beispielsweise liefert eine
 Funktion bei gleichen Eingaben, unabhängig von der Umgebung, immer den gleichen
 Rückgabe Wert. Diese Eigenschaft heißt \emph{Referentielle Transparenz}.
 
-  \item 
+  \item
 Haskell ist \emph{lazy}.
 Das bedeutet, dass Haskell Funktionen nicht auswertet, solange das Ergebnis
 nicht benötigt wird. Dies wird durch Referentielle Transparenz ermöglicht.
@@ -38,7 +38,7 @@ vermeiden.
 Es wird damit auch ermöglicht scheinbar unendliche Datenstrukturen zu
 verwenden, da nur Teile, also so weit wie nötig, evaluiert werden.
 
-  \item 
+  \item
 Haskell ist \emph{statisch Typisiert}.
 Das bedeutet, dass der Computer bereits zur Compilezeit weiß, welcher Teil eine
 Zahl ist und was eine Funktion ist, die aus einer Liste von Zahlen einen String
@@ -52,7 +52,7 @@ Code hat. Beispielsweise erkennt Haskell aus \texttt{a = 4 + 5} dass
 Damit ist es auch leichter, allgemeineren Code zu schreiben, der an vielen
 Stellen anwendbar ist.
 
-  \item 
+  \item
 Haskell ist \emph{elegant und präzise}.
 Da Haskell viele Konzepte höherer Programmiersprachen nutzt, sind in Haskell
 geschriebene Programme meist kürzer als ein vergleichbares imperatives. Und
@@ -64,6 +64,13 @@ zusammengetan hat, um eine Programmiersprache zu entwickeln, die ihren
 Ansprüchen genügt. Der \emph{Haskell Report}, welcher die erste stabile Version
 beschreibt, wurde 1999 publiziert (überarbeitet Version: \cite{haskell98}).
 Der aktuelle Standard wird beschrieben in \cite{haskell2010}.
+
+Gute Bücher zum Einstieg in Haskell sind beispielsweiße \cite{Hutton} und
+\cite{lyahfgg}. Basierend auf \cite{Hutton} gibt es von Erik Meijer auch eine
+ausführliche Video Reihe, die leicht im Internet zu finden ist.
+
+Eine ausführliche Übersicht über Tutorials bietet die Seite
+\url{http://www.haskell.org/haskellwiki/Tutorials}.
 
 \section{Ausführen von Haskell Programmen}
 
@@ -81,7 +88,27 @@ vor, parallel ausgeführt zu werden. Zusätzlich muss man beim ausführen dann
 noch die Parameter \texttt{-RTS -N4} mitgeben, wobei die $4$ die Anzahl der
 Prozessorkerne angibt, die genutzt werden sollen.
 
-\section{Testing: \texttt{hspec}}
+\section{Installieren von Haskell Paketen}
+Zum installieren gibt es das Konsolenwerkzeug \texttt{cabal}. Durch ausführen
+von 
+\begin{lstlisting}[language=bash
+                  ,numbers=none
+                  ,backgroundcolor=\color{lightgray}]
+cabal update
+\end{lstlisting}
+holt sich dieses, aktuelle Paketlisten von
+\url{https://hackage.haskell.org/}. Danach kann man mittels
+\begin{lstlisting}[language=bash
+                  ,numbers=none
+                  ,backgroundcolor=\color{lightgray}]
+cabal install PAKETNAME
+\end{lstlisting}
+Pakete aus der umfangreichem Bibliothek installieren.
+Dabei löst \texttt{cabal} selbstständig die Abhängigkeiten auf.
+
+\section{Entwicklung von Haskell-Code}
+
+\subsection{Testing: \texttt{hspec}}
 \begin{quote}
   Hspec is roughly based on the Ruby library RSpec. However, Hspec is just a
   framework for running HUnit and QuickCheck tests. Compared to other options,
@@ -91,9 +118,9 @@ Prozessorkerne angibt, die genutzt werden sollen.
 Weitere Quellen:
 \begin{itemize}
   \item \url{http://hspec.github.io/}
-\end{itemize}   
+\end{itemize}
 
-\section{Benchmarking: \texttt{criterion}}
+\subsection{Benchmarking: \texttt{criterion}}
 \begin{quote}
   This library provides a powerful but simple way to measure software
   performance. It provides both a framework for executing and analysing
@@ -102,7 +129,7 @@ Weitere Quellen:
   results.\footnote{\url{https://hackage.haskell.org/package/criterion}}
 \end{quote}
 
-\section{Zusammenfügen: \texttt{cabal}}
+\subsection{Zusammenfügen: \texttt{cabal}}
 \begin{quote}
   The Haskell Common Architecture for Building Applications and Libraries: a
   framework defining a common interface for authors to more easily build their
@@ -117,7 +144,7 @@ Weitere Quellen:
   \item \url{http://www.haskell.org/haskellwiki/How_to_write_a_Haskell_program}
 \end{itemize}
 
-\section{Dokumentation: \texttt{haddock}}
+\subsection{Dokumentation: \texttt{haddock}}
 \begin{quote}
   Haddock is a tool for automatically generating documentation from annotated
   Haskell source code.\footnote{\url{http://www.haskell.org/haddock/}}
