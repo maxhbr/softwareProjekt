@@ -1,0 +1,119 @@
+\section{Lineare Algebra}
+
+Grundlegende Funktionen der linearen Algebra -- wie man sie im weiteren Verlauf
+beispielsweise für den Berlekamp-Algorithmus brauchen wird -- haben wir in der
+Datei \url{Core/Matrix.hs} hinterlegt.
+
+Eine Matrix ist dabei der folgende Datentyp:
+
+\haskellinput{Core/Matrix}{data Matrix}
+
+Man hätte auch die Möglichkeit gehabt Matrizen als ħ[[a]]ħ (also als doppelte
+Liste) zu implementieren, jedoch haben Listen eine Zugriffszeite von $\cO(l)$ auf
+das $l$-te Element und die Abfrage der Länge dauert bei einer Liste der Länge
+$n$ $\cO(n)$. ħArraysħ schaffen beides in $\O(1)$, jedoch mit einer
+weit größeren Konstante (vgl. \url{}). 
+
+\subsection{Erzeugung von Matrizen und Basisoperationen}
+
+\paragraph{Erzeugung} Entweder erzeugt man eine Matrix direkt als
+ħArray (Int,Int) aħ oder durch die Verwendung von ħfromListsMħ.
+
+\haskellinput{Core/Matrix}{fromListsM}
+
+Für den Spezialfall des Vielfachen der Einheitsmatrix kann man auch folgende
+Funktion verwenden.
+
+\haskellinput{Core/Matrix}{genDiagM}
+
+\begin{beispiel}
+  Möchte man die Matrix $\begin{bmatrix} 2 & 0 \\ 0 & 2 \end{bmatrix} \in
+  \Z^{2\times 2}$
+  erzeugen, so gibt es die folgenden drei verschiedenen Varianten:
+  \begin{enumerate}
+    \item ħarray ((1,1),(2,2)) [((1,1),2::Int), ((1,2),2::Int), ((2,1),2::Int), ((2,2),2::Int)]ħ
+    \item ħgenDiagM (2::Int) 2ħ
+    \item ħfromListsM [[2::Int,0],[0,2]]ħ
+  \end{enumerate}
+\end{beispiel}
+
+\begin{bemerkung}
+  Es gilt anzumerken, dass der Konstruktor für ħArrayħ stets eine
+  \emph{vollständige} Liste erwartet. (Vergleiche auch die interne Funktion
+  ħgetAllIdxsExceptħ in ħgenDiagMħ.)
+\end{bemerkung}
+
+\paragraph{Basisoperationen} 
+Selbstredend möchte man eine Matrix auch wieder in Listenform zurückwandeln:
+
+\haskellinput{Core/Matrix}{toListsM}
+
+Die Dimension und Anzahl der Spalten bzw. Zeilen  einer Matrix lässt 
+sich durch die Arraydarstellung sehr leicht angeben.
+
+\haskellinput{Core/Matrix}{boundsM}
+\haskellinput{Core/Matrix}{getNumRowsM}
+\haskellinput{Core/Matrix}{getNumColsM}
+
+
+
+Ebenfalls sehr leicht ist ein Test, ob eine quadratische
+Matrix vorliegt.
+
+\haskellinput{Core/Matrix}{isQuadraticM}
+
+Ein Element einer Matrix an einer bestimmten Stelle findet man wie folgt.
+
+\haskellinput{Core/Matrix}{atM}
+
+Eine ganze Zeile bzw. Spalte bekommt man durch ħgetRowMħ bzw. ħgetColMħ.
+
+\haskellinput{Core/Matrix}{getRowM}
+\haskellinput{Core/Matrix}{getColM}
+
+\paragraph{Aneinanderfügen von Matrizen} 
+Wenn man zwei Matrizen horizontal bzw. vertikal aneinanderfügt, erhält man eine
+neue Matrix. Dies ist gerade beim Anwenden des Gaußschen Eliminationsverfahrens
+von großem Nutzen.
+
+%\haskellinput{Core/Matrix}{(<|>)}
+%\haskellinput{Core/Matrix}{(<->)}
+
+\paragraph{Untermatrizen} Untermatrizen erhält man wie folgt.
+
+\haskellinput{Core/Matrix}{subM}
+\haskellinput{Core/Matrix}{subArr}
+
+\paragraph{Vertauschen von Zeilen bzw. Spalten} Ebenfalls beim Gauß-Verfahren
+von Nöten ist das Vertauschen von Zeilen bzw. Spalten.
+
+\haskellinput{Core/Matrix}{swapRowsM}
+\haskellinput{Core/Matrix}{swapColsM}
+
+\haskellinput{Core/Matrix}{swapRowsArr}
+\haskellinput{Core/Matrix}{swapColsArr}
+
+\subsection{Zweiwertige Operationen auf Matrizen}
+
+\paragraph{Addition} Die Addition zweier Matrizen erklärt sich von selbst.
+
+\haskellinput{Core/Matrix}{addM}
+
+\paragraph{Multiplikation} Die Multiplikation wurde nach dem Standardverfahren
+implementiert.
+
+\haskellinput{Core/Matrix}{multM}
+
+\subsection{Lineare Algebra}
+
+\paragraph{Transponieren} 
+
+\haskellinput{Core/Matrix}{transposeM}
+
+\paragraph{Zeilenstufenform} 
+Um eine Matrix in Zeilenstufenform zu bringen, verwenden wir den allseits
+bekannten Algorithmus.
+
+\haskellinput{Core/Matrix}{echelonM}
+
+Nahezu selbsterklärend 

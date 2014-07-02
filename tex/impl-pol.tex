@@ -425,8 +425,12 @@ Multiplikationsalgorithmus.
 \haskellinput{Core/Polynomials/FFTTuple}{multx}
 
 \subsection{Division mit Rest mit Inversen $\bmod x^l$}
-Die Idee für eine schöne und zugleich schnelle Methode die 
-Division mit Rest für Polynome durchzuführen liefert folgende Proposition.
+Im Folgenden stellen wir eine Möglichkeit vor, die Division mit Rest zweier
+Polynome in genau der gleichen asymptotischen Laufzeit zu bewerkstelligen, wie
+die Multiplikation. Wir halten uns dabei eng an 
+\cite{divHensel} und \cite{divHensel2}.
+Die Idee für diese schöne und zugleich schnelle Methode liefert folgende 
+Proposition.
 
 \begin{prop}
   Sei $f(X) \in R[X]$ für einen Ring $R$. Sei $f(0) = 1$ und 

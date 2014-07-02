@@ -24,6 +24,9 @@ module GalFld.Core.Matrix
   , getAllM
   )
   where
+
+import Debug.Trace
+
 import Data.List
 import Data.Array
 import Data.Array.IArray (amap)
@@ -34,7 +37,8 @@ import GalFld.Core.ShowTex
 
 --------------------------------------------------------------------------------
 --  Data Definition
---
+
+
 -- Eine Matrix ist im inneren als ein zwei dimensionales Array dargestellt,
 -- wobei die erste Stelle die Zeile und dei zweite die Spalte darstellt
 data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a
@@ -42,13 +46,8 @@ data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a
 --------------------------------------------------------------------------------
 --  Basics
 
-{-# INLINE isQuadraticM #-}
-isQuadraticM :: Matrix a -> Bool
-sQuadraticM (Mdiag a) = True
-isQuadraticM (M m) = uncurry (==) $ snd $ bounds m
-
 {-# INLINE genDiagM #-}
--- |Erzeugt eine diagonale Matrix, welche auf der Diagonale einen
+-- |Erzeugt ein Vielfaches der Einheitsmatrix
 genDiagM :: Num a => a -> Int -> Matrix a
 genDiagM x n = M $ array ((1,1),(n,n)) $ fillList [((i,i),x) | i <- [1..n]] n n
   where fillList ls n m = ls ++ [(idx,0) | idx <- getAllIdxsExcept n m idxs]
@@ -111,6 +110,11 @@ getColM (M m) i = [m!(j,i) | j <- [1..k]]
 {-# INLINE boundsM #-}
 boundsM :: Matrix a -> (Int,Int)
 boundsM (M m) = snd $ bounds m
+
+{-# INLINE isQuadraticM #-}
+isQuadraticM :: Matrix a -> Bool
+isQuadraticM (Mdiag a) = True
+isQuadraticM (M m) = uncurry (==) $ snd $ bounds m
 
 --------------------------------------------------------------------------------
 --  Instanzen
@@ -218,7 +222,7 @@ instance (Num a, Binary a) => Binary (Matrix a) where
 -- Input:
 --      (k0,l0) : erste übernommene Spalte und Zeile
 --      (k1,l1) : letzte übernommene Spalte und Zeile
---      m       : eingabe Matrix
+--      m       : Eingabematrix
 subM :: Num a => (Int,Int) -> (Int,Int) -> Matrix a -> Matrix a
 subM (k0,l0) (k1,l1) (Mdiag x) = subM (k0,l0) (k1,l1) $ genDiagM x $ max k1 l1
 subM (k0,l0) (k1,l1) (M m)     = M $ subArr (k0,l0) (k1,l1) m
@@ -267,14 +271,14 @@ swapColsArr l0 l1 m = array ((1,1),(k,l))
               | otherwise = j
 
 {-# INLINE transposeM #-}
--- |Transponiere eine Matrix
+-- |Transponieren einer Matrix
 transposeM :: Matrix a -> Matrix a
 transposeM (Mdiag a) = Mdiag a
 transposeM (M m)     = M $ ixmap ((1,1),(l,k)) (\(x,y) -> (y,x)) m
   where !(k,l) = snd $ bounds m
 
 {-# INLINE detLapM #-}
--- |Berechne die Determinante ohne nutzen von Fractional a
+-- |Berechne die Determinante ohne Nutzen von Fractional a
 detLapM :: (Eq a, Num a) => Matrix a -> a
 detLapM (Mdiag 0) = 0
 detLapM (Mdiag 1) = 1
@@ -338,29 +342,34 @@ arrElim m | m!(1,1) == 0 = m
 
 -- |Berechnet die Zeilenstufenform einer Matrix
 {-# INLINE echelonM #-}
-echelonM :: (Eq a, Num a, Fractional a) => Matrix a -> Matrix a
+echelonM :: (Show a, Eq a, Num a, Fractional a) => Matrix a -> Matrix a
 echelonM (Mdiag n) = Mdiag n
 echelonM (M m)     = M $ echelonM' m
-  where echelonM' :: (Eq a, Num a, Fractional a) =>
+  where echelonM' :: (Show a, Eq a, Num a, Fractional a) =>
                     Array (Int,Int) a -> Array (Int,Int) a
         echelonM' m | k == 1       = arrElim m
                     | l == 1       = arrElim m
-                    | hasPivot    = echelonM' $ swapRowsArr 1 (minimum lst) m
-                    | noPivot     = echelonM'_noPivot m
-                    | otherwise   = echelonM'_Pivot m
+                    | hasPivot    = trace ("echelonM' (k,l)="++show (k,l)++" m=\n"++show (M m)++"\t-> hasPivot at "++show (minimum lst)) $ 
+                                    echelonM' $ swapRowsArr 1 (minimum lst) m
+                    | noPivot     = trace ("echelonM' (k,l)="++show (k,l)++" m=\n"++show (M m)++"\t-> noPivot") $ 
+                                    echelonM'_noPivot m
+                    | otherwise   = trace ("echelonM' (k,l)="++show (k,l)++" m=\n"++show (M m)++"\t->(1,1)/=0") $ 
+                                    echelonM'_Pivot m
           where !(k,l)    = snd $ bounds m
                 !lst      = [i | i <- [1..k], m!(i,1) /= 0]
                 !hasPivot = m!(1,1) == 0 && not (null lst)
                 !noPivot  = m!(1,1) == 0 && null lst
 
                 {-# INLINE echelonM'_Pivot #-}
-                echelonM'_Pivot m = m' // shifted
+                echelonM'_Pivot m = trace ("echeonM'_Pivot m'=\n"++show (M m')) $
+                                    m' // shifted
                   where !m' = arrElim m
                         !shifted = map (\((i,j),x) -> ((i+1,j+1),x)) $ assocs m''
                         !m''     = echelonM' $ subArr (2,2) (k,l) m'
 
                 {-# INLINE echelonM'_noPivot #-}
-                echelonM'_noPivot m = m // shifted
+                echelonM'_noPivot m = trace ("echelonM'_noPivot") $
+                                      m // shifted
                   where !m' = echelonM' $ subArr (1,2) (k,l) m
                         !shifted = map (\((i,j),x) -> ((i,j+1),x)) $ assocs m'
 
@@ -368,7 +377,7 @@ echelonM (M m)     = M $ echelonM' m
 --  kernelM gibt eine Matrix zurück, deren Spalten eine Basis des
 --  des Kerns sind
 {-# INLINE kernelM #-}
-kernelM :: (Eq a, Num a, Fractional a) => Matrix a -> Matrix a
+kernelM :: (Show a, Eq a, Num a, Fractional a) => Matrix a -> Matrix a
 kernelM (Mdiag m) = error "GalFld.Core.Matrix.kernelM: No kernel here"
 kernelM m     = M $ array ((1,1), (k,lzs))
                   [ ((i,j),b!(i,zs!!(j-1))) | i <- [1..k], j <- [1..lzs]]

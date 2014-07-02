@@ -50,10 +50,10 @@ benchMult gen e desc = [ benchMult' gen p
             bench ("multKar @ "++show n) $ nf (multBench multPK) list]
             {-bench ("multFFT @ "++show n) $ nf (multBench ssP) list ]-}
 
---multBench mulFunc list = zipWith mulFunc (take n list) (drop n list)
---  where n = length list `quot` 2
+multBench mulFunc list = zipWith mulFunc (take n list) (drop n list)
+ where n = length list `quot` 2
 
-multBench = pfold
+{-multBench = pfold-}
 
 pfold :: (a -> a -> a) -> [a] -> a
 pfold _ [x] = x
