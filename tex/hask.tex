@@ -1,5 +1,5 @@
 \begin{center}
-\includegraphics[width=0.3\textwidth]{haskell.png}
+\includegraphics[width=0.3\textwidth]{haskell-1312.png}
 \end{center}
 \begin{center}
 \url{http://xkcd.com/1312/}
@@ -69,8 +69,15 @@ Gute Bücher zum Einstieg in Haskell sind beispielsweiße \cite{Hutton} und
 \cite{lyahfgg}. Basierend auf \cite{Hutton} gibt es von Erik Meijer auch eine
 ausführliche Video Reihe, die leicht im Internet zu finden ist.
 
+\iffalse
+Es ist auch die Seite \url{http://en.wikibooks.org/wiki/Haskell} sehr
+empfehlenswert.
+\fi
+
 Eine ausführliche Übersicht über Tutorials bietet die Seite
 \url{http://www.haskell.org/haskellwiki/Tutorials}.
+
+Eine Liste an Büchern bietet \url{http://www.haskell.org/haskellwiki/Books}.
 
 \section{Ausführen von Haskell Programmen}
 
@@ -91,16 +98,12 @@ Prozessorkerne angibt, die genutzt werden sollen.
 \section{Installieren von Haskell Paketen}
 Zum installieren gibt es das Konsolenwerkzeug \texttt{cabal}. Durch ausführen
 von 
-\begin{lstlisting}[language=bash
-                  ,numbers=none
-                  ,backgroundcolor=\color{lightgray}]
+\begin{lstlisting}[language=bash ,numbers=none ,backgroundcolor=\color{lightgray}]
 cabal update
 \end{lstlisting}
 holt sich dieses, aktuelle Paketlisten von
 \url{https://hackage.haskell.org/}. Danach kann man mittels
-\begin{lstlisting}[language=bash
-                  ,numbers=none
-                  ,backgroundcolor=\color{lightgray}]
+\begin{lstlisting}[language=bash ,numbers=none ,backgroundcolor=\color{lightgray}]
 cabal install PAKETNAME
 \end{lstlisting}
 Pakete aus der umfangreichem Bibliothek installieren.
