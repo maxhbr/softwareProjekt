@@ -52,8 +52,27 @@ Damit diese Invariante stets sichergestellt ist, existiert die Funktion
 kann:
 \haskellinput{Core/Polynomials}{cleanP}
 
+\subsection{Instanzen}
+Es wurden die offensichtlichen Instanzen implementiert, d.h.
+ħEqħ und ħNumħ. Zudem wurden zu Anzeige von Polynomen ħShowħ und ħShowTexħ, zur
+binären Speicherung ħBinaryħ und für eine Auswertung trotz Lazyness ħNFDataħ
+implementiert.
 
-\subsubsection{Polynome erstellen}
+Alle auftauchenden Funktionen werden im weiteren Verlauf näher erläutert.
+
+\paragraph{Eq}\makebox{} 
+\haskellinput{Core/Polynomials}{instance .*?=> Eq}
+
+\paragraph{Num}\makebox{}  
+\haskellinput{Core/Polynomials}{instance .*?=> Num}
+    
+\paragraph{Show}\makebox{}  
+\haskellinput{Core/Polynomials}{instance .*?=> Show}
+
+\paragraph{ShowTex}\makebox{}  
+\haskellinput{Core/Polynomials}{instance .*?=> ShowTex}
+
+\subsection{Polynome erstellen}
 \paragraph{Allgemein}
 Diese Einschränkung erfordert auch, dass der Konstruktor des Polynomdatentyps
 nicht öffentlich gemacht wird und wir benötigen separate Funktionen, um

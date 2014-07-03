@@ -95,7 +95,6 @@ list2TupleSave ms = list2Tuple' ms 0
 
 
 instance (Eq a, Num a) => Eq (Polynom a) where
-  {-f == g = unP (aggP f) == unP (aggP g)-}
   f == g = eqP f g
 
 {-# INLINE eqP #-}

@@ -123,6 +123,10 @@
 %\newlength{\parskipsave}
 %\newcounter{mycount}
 \newcommand{\haskellinput}[2]{
+  \typeout{^^JThis is Haskellinput ------------------------ look for^^J
+    /usr/bin/awk 'BEGIN {RS="\string\n\string\n";} /.*?^#2 /'
+    ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex
+    ^^J------------------------------}
   \immediate\write18{/usr/bin/awk 'BEGIN {RS="\string\n\string\n";} /.*?^#2 /'
     ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex}
   \immediate\write18{/usr/bin/grep -n -Ff /tmp/temp.tex
