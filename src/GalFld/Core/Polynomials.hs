@@ -243,16 +243,16 @@ multPK f g = PMS h True
 {-# INLINE multPMKaratsuba #-}
 multPMKaratsuba :: (Show a, Num a, Eq a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 multPMKaratsuba f g  = multPMK' n f g
-  where n  = (next2Pot (max df dg)) `quot` 2
-        df = if null f then 0 else (fst $ head f)+1
-        dg = if null g then 0 else (fst $ head g)+1
+  where n  = next2Pot (max df dg) `quot` 2
+        df = if null f then 0 else fst (head f) + 1
+        dg = if null g then 0 else fst (head g)+ 1
 
 -- Der eigentliche Karatsuba
 multPMK' :: (Show a, Num a, Eq a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 multPMK' _ _ [] = []
 multPMK' _ [] _ = []
-multPMK' _ [(i,x)] g = map (\(j,y) -> (i+j,x*y)) g
-multPMK' _ f [(i,x)] = map (\(j,y) -> (i+j,x*y)) f
+multPMK' _ [(i,x)] g = map ((+) i A.*** (*) x) g
+multPMK' _ f [(i,x)] = map ((+) i A.*** (*) x) f
 multPMK' 1 [(i1,x1),(i2,x2)] [(j1,y1),(j2,y2)]
       = [(2,p1), (1,p3-p1-p2), (0,p2)]
   where !p1 = x1*y1
@@ -282,7 +282,7 @@ multPMK' n f g = addPM e1 $ addPM e2 e3
         {-# INLINE e1 #-}
         e1 = map (A.first (+(2*n))) p1
         {-# INLINE e2 #-}
-        e2 = map (A.first (+n)) $ subtrPM p3 $ (addPM p1 p2)
+        e2 = map (A.first (+n)) $ subtrPM p3 (addPM p1 p2)
         {-# INLINE e3 #-}
         e3 = p2
 
@@ -339,7 +339,7 @@ instance (Num a, Binary a) => Binary (Polynom a) where
                   return $ PMS x False
 
 instance (Eq a, Num a, NFData a) => NFData (Polynom a) where
-  rnf = rnf . (map fst) . p2Tup
+  rnf = rnf . map fst . p2Tup
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen
@@ -472,7 +472,7 @@ invModMonom h k  | isNullP h  = nullP
                         --  ++"\n\t=> a'="++show (pTup a')++" b="++show (pTup b)) $
                         invModMonom' b lnew
           where -- g_i+1 = (2*g_i - h*g_i^2) mod x^(2^i)
-                b = (map (A.second negate) a') ++ a
+                b = map (A.second negate) a' ++ a
                 -- a' = h*g_i^2
                 a' = multPMInter lnew l hs $ multPMInter lnew 0 a a
                 -- nächster Schritt
@@ -585,6 +585,6 @@ getAllMonicPs es is = map (`PMS` True) $ concat [allMonics i | i <- is]
   where allMonics 0 = [[(0,1)]]
         allMonics i = [(i,1)] : [(i,1):rs | rs <- ess (i-1)]
         ess i       | i == 0     = [[(0,y)] | y <- swpes]
-                    | otherwise = [[(i,y)] | y <- swpes] ++ (ess (i-1)) ++
+                    | otherwise = [[(i,y)] | y <- swpes] ++ ess (i-1) ++
                               [(i,y):ys | y <- swpes, ys <- ess (i-1)]
-        swpes       = (filter (/= 0)) es
+        swpes       = filter (/= 0) es

@@ -7,7 +7,7 @@ import GalFld.Core.Polynomials
 import GalFld.Core.PrimeFields
 
 getConway :: (Numeral n) => Mod n -> Int -> Polynom (Mod n)
-getConway a n = head $ [pList $ map MkMod f | (p',n',f) <- conways, p' == p, n' == n]
+getConway a n = head [pList $ map MkMod f | (p',n',f) <- conways, p' == p, n' == n]
   where p = modulus a
 
 conways = [

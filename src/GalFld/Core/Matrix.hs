@@ -286,7 +286,7 @@ detLapM (Mdiag _) =
   error "GalFld.Core.Matrix.detLapM: Not enougth information given"
 detLapM m | isQuadraticM m = detLapM' $ unM m
           | otherwise      = 0
-{-# INLINE detLapM'#-}
+{-# INLINE detLapM' #-}
 detLapM' :: (Eq a, Num a) => Array (Int, Int) a -> a
 detLapM' m | b == (1,1) = m!(1,1)
            | otherwise =

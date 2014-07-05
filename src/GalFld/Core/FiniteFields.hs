@@ -48,8 +48,8 @@ listFFElem m = map (`FFElem` m)
 
 instance (Show a, Num a, Eq a, Fractional a) => Eq (FFElem a) where
   (FFKonst x)  == (FFKonst y)  = x==y
-  (FFElem f p) == (FFKonst y)  = isNullP $ f-(pKonst y)
-  (FFKonst x)  == (FFElem g p) = isNullP $ g-(pKonst x)
+  (FFElem f p) == (FFKonst y)  = isNullP $ f - pKonst y
+  (FFKonst x)  == (FFElem g p) = isNullP $ g - pKonst x
   (FFElem f p) == (FFElem g q) | p==q       = isNullP $ f-g
                               | otherwise = error "Not the same mod"
 
@@ -71,15 +71,15 @@ instance (Show a, Num a, Eq a, Fractional a) => Num (FFElem a) where
 
   {-# INLINE (+) #-}
   (FFKonst x)  + (FFKonst y)              = FFKonst (x+y)
-  (FFElem f p) + (FFKonst x)              = FFElem (f+(pKonst x)) p
-  (FFKonst x)  + (FFElem f p)             = FFElem (f+(pKonst x)) p
+  (FFElem f p) + (FFKonst x)              = FFElem (f + pKonst x) p
+  (FFKonst x)  + (FFElem f p)             = FFElem (f + pKonst x) p
   (FFElem f p) + (FFElem g q) | p==q       = aggF $ FFElem (f+g) p
                               | otherwise = error "Not the same mod"
 
   {-# INLINE (*) #-}
   (FFKonst x)  * (FFKonst y)              = FFKonst (x*y)
-  (FFElem f p) * (FFKonst x)              = FFElem (f*(pKonst x)) p
-  (FFKonst x)  * (FFElem f p)             = FFElem (f*(pKonst x)) p
+  (FFElem f p) * (FFKonst x)              = FFElem (f * pKonst x) p
+  (FFKonst x)  * (FFElem f p)             = FFElem (f * pKonst x) p
   (FFElem f p) * (FFElem g q) | p==q       = aggF $ FFElem (f*g) p
                               | otherwise = error "Not the same mod"
 

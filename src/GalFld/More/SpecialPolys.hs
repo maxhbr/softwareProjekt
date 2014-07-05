@@ -37,7 +37,7 @@ piPoly f
         -- Faktorisierung von f
         facs = factorP f
         -- Start der Rekursion mit P_(f1)
-        pFst = (assozPoly $ snd $ head facs) @/ (pTupUnsave [(1,1)])
+        pFst = assozPoly (snd $ head facs) @/ pTupUnsave [(1,1)]
         -- Definition von odot
         odot f g = evalPInP f $ assozPoly g
         -- Test auf quadratfrei
@@ -60,4 +60,4 @@ evalPInP f g = evalP' g $ p2Tup f
 evalP' g []   = 0
 evalP' g fs   = snd $ foldl' (\(i,h) (j,y) -> (j,h*g^(i-j)+y)) 
                                                          (head fs') (tail fs') 
-  where fs' = map (A.second (pKonst)) fs
+  where fs' = map (A.second pKonst) fs

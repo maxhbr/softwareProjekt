@@ -42,9 +42,9 @@ fft w addF subF zero i n fs = --trace ("fft: n="++show n++" m="++show m++" fs="+
              intersperseL ls' rs'
   where !i'  = 2*i
         !ls' = fft w addF subF zero i' m ls
-        !ls  = take m $ zipWith' (addF) zero fs fss
+        !ls  = take m $ zipWith' addF zero fs fss
         !rs' = fft w addF subF zero i' m rs
-        !rs  = take m $ zipWith (w) [i | i<-[0..]] $ zipWith' (subF) zero fs fss
+        !rs  = take m $ zipWith w [0..] $ zipWith' (subF) zero fs fss
         !fss = drop m fs
         !m   = n `quot` 2
 

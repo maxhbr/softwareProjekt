@@ -26,7 +26,7 @@ primFactors n = let divisors = dropWhile ((/= 0) . mod n)
 
 
 isPrime :: Int -> Bool
-isPrime n = 1 == (length $ primFactors n)
+isPrime n = 1 == length (primFactors n)
 
 -- |Teiler von n
 divisors :: Int -> [Int]

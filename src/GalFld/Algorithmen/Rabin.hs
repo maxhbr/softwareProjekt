@@ -73,7 +73,7 @@ rabin f = rabin' f ns
         rabin' f (n:ns) | g /= pKonst 1  = False
                         | otherwise = rabin' f ns
           where g  = --trace ("rabin: ggTP for f="++show f++" h'-pX="++show (p2Tup (h'-pX))) $ 
-                      (ggTP f (h'-pX))
+                      ggTP f (h'-pX)
                 h' = --trace ("x^"++show q++"^"++show n++" mod f = h'="++show (modMonom q n f )) $ 
                       modMonom q n f
 
@@ -95,16 +95,16 @@ factor n = let divisors = dropWhile ((/= 0) . mod n) [2 .. ceiling $ sqrt $ from
 --   x^(q^d) mod f
 modMonom :: (Show a, Num a, Eq a, Fractional a) => 
                                                 Int -> Int -> Polynom a -> Polynom a
-modMonom q d f  = modMonom' n f
-  where n  = (toInteger q)^(toInteger d) 
+modMonom q d  = modMonom' n
+  where n  = toInteger q ^ toInteger d 
         modMonom' n f 
-               | n < (toInteger df)  
+               | n < toInteger df
                            = --trace ("modMonom n="++show n++" n<df") $
                             pTupUnsave [(fromInteger n,1)]
                | even n    = --trace ("modMonom n="++show n++" n ger") $
                               g `modByP` f
                | otherwise = --trace ("modMonom n="++show n++" n unger") $
-                            (multMonomP 1 g) `modByP` f
+                             multMonomP 1 g `modByP` f
           where df = uDegP f
                 m  = n `quot` 2
                 g  = h*h
