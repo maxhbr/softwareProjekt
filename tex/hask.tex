@@ -66,8 +66,11 @@ beschreibt, wurde 1999 publiziert (überarbeitet Version: \cite{haskell98}).
 Der aktuelle Standard wird beschrieben in \cite{haskell2010}.
 
 Gute Bücher zum Einstieg in Haskell sind beispielsweiße \cite{Hutton} und
-\cite{lyahfgg}. Basierend auf \cite{Hutton} gibt es von Erik Meijer auch eine
-ausführliche Video Reihe, die leicht im Internet zu finden ist.
+\cite{lyahfgg}.
+Basierend auf \cite{Hutton} gibt es von Erik Meijer auch eine ausführliche
+Video Reihe, die leicht im Internet zu finden ist.
+Zum Buch \cite{lyahfgg} gibt es ebenfalls im Internet eine vollständige HTML
+Variante\footnote{\url{http://learnyouahaskell.com/}}.
 
 \iffalse
 Es ist auch die Seite \url{http://en.wikibooks.org/wiki/Haskell} sehr
@@ -116,6 +119,9 @@ Pakete aus der umfangreichem Bibliothek installieren.
 Dabei löst \texttt{cabal} selbstständig die Abhängigkeiten auf.
 
 \section{Entwicklung von Haskell-Code}
+Für Haskell gibt es eine umfangreiche Auswahl an Programmen, die einem bei der
+Entwicklung von Haskell Bibliotheken und Programmen helfen. Hier sollen die
+erwähnt werden, die für dieses Projekt genutzt wurden.
 
 \subsection{Testing: \texttt{hspec}}
 \begin{quote}
@@ -124,10 +130,43 @@ Dabei löst \texttt{cabal} selbstständig die Abhängigkeiten auf.
   it provides a much nicer syntax that makes tests very easy to
   read.\footnote{\url{https://hackage.haskell.org/package/hspec}}
 \end{quote}
-Weitere Quellen:
-\begin{itemize}
-  \item \url{http://hspec.github.io/}
-\end{itemize}
+Hspec ermöglicht es einfach tests zu schreiben, deren Quellcode leicht
+verständlich ist und eine konkrete Aussage darüber trifft, was die getestete
+Funktion tuen sollte.
+
+Ein einfaches und selbsterklärendes
+Beispiel\footnote{\url{http://hspec.github.io/}} ist
+\begin{hcode}
+-- Datei Spec.hs
+import Test.Hspec
+import Test.QuickCheck
+import Control.Exception (evaluate)
+
+main :: IO ()
+main = hspec $ do
+  describe "Prelude.head" $ do
+    it "returns the first element of a list" $ do
+      head [23 ..] `shouldBe` (23 :: Int)
+
+    it "returns the first element of an *arbitrary* list" $
+      property $ \x xs -> head (x:xs) == (x :: Int)
+
+    it "throws an exception if used with an empty list" $ do
+      evaluate (head []) `shouldThrow` anyException
+\end{hcode}
+Ein Ausführen, durch beispielsweise \texttt{runhaskell Spec.hs},liefert die folgende
+Konsolenausgabe
+\begin{lstlisting}[language=bash 
+                  ,numbers=none
+                  ,backgroundcolor=\color{lightgray}]
+Prelude.head
+  - returns the first element of a list
+  - returns the first element of an *arbitrary* list
+  - throws an exception if used with an empty list
+
+Finished in 0.0028 seconds
+3 examples, 0 failures
+\end{lstlisting}
 
 \subsection{Benchmarking: \texttt{criterion}}
 \begin{quote}
@@ -158,3 +197,36 @@ Weitere Quellen:
   Haddock is a tool for automatically generating documentation from annotated
   Haskell source code.\footnote{\url{http://www.haskell.org/haddock/}}
 \end{quote}
+
+\section{Pragmas} %TODO: oder Paradigmen?
+Pragmas\footnote{\url{https://www.haskell.org/ghc/docs/7.0.4/html/users_guide/pragmas.html}}
+bieten in Haskell die Möglichkeit, für den Compiler bestimmte Commandos in den
+Quellcode zu integrieren. Diese beeinflussen meist nicht die Bedeutung des
+Codes sondern haben eher Einfluss auf Effizienz des generierten Programms. Auch
+können damit Haskell Erweiterungen aktiviert werden.
+
+Ein (Sprach) Pragma im Code ist berandet durch ħ{-# ... #-}ħ und ein Beispiel
+dafür wäre
+\begin{hcode}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE TemplateHaskell #-}
+\end{hcode}
+Dadurch werden die (Sprach-) Erweiterungen \texttt{CPP} und
+\texttt{TemplateHaskell} aktiviert. Die erste Erweiterung ermöglicht es durch
+die Befehle \texttt{\#if 1} bzw. \texttt{\#if 0}, \texttt{\#else} und
+\texttt{\#endif} analog zu \texttt{\slash{}iftrue} und
+\texttt{\slash{}iffalse} im \LaTeX{} mehrere Zeilen im Quellcode zu
+deaktivieren bzw. schnell zwischen alternativen Implementierungen umzuschalten.
+
+Die \texttt{TemplateHaskell} ermöglicht es, zusammen mit \texttt{QuasiQuotes}
+Haskell Funktionen bereits zur Compilezeit auszuführen. Damit lässt sich
+dynamisch Code erzeugen oder man kann auch Rechenaufgaben in die Compilezeit
+verlagern.
+
+Es gibt noch diverse andere Arten von Pragmas, die beispielsweise:
+\begin{itemize}
+  \item \texttt{OPTIONS\_GHC} Pragmas bieten eine Möglichkeit, dem Compiler
+  direkt Compileparameter zu übergeben und
+  \item \texttt{INLINE} Pragmas, welche zur Steigerung der Performance sehr
+  extensiv genutzt wurden.
+\end{itemize}
