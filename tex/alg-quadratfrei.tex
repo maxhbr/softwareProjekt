@@ -10,12 +10,13 @@ Als Referenz dieses Abschnitts sei
 8.3]{geddes:algorithms} genannt.
 
 
-\begin{definition}[quadratfrei]
-  Sei $f(X) \in k[X]$. Dann heißt $f(X)$ \emph{quadratfrei},
-  falls für seine vollständige Faktorisierung
-  \[ f(X) = \prod_{i=1}^d f_i(X)^{\nu_i}\,,\]
-  $f_i(X)$ irreduzibel und paarweise verschieden, gilt:
-  \[ \nu_i = 1 \ \forall i=1,\ldots,d\,.\]
+\begin{definition}[quadratfrei, quadratfreier Teil]
+  Seien $f(X) \in k[X]$ und seine vollständige Faktorisierung durch
+  \[ f(X) = \prod_{i=1}^d f_i(X)^{\nu_i}\]
+  gegeben. Der \emph{quadratfreie Teil von $f(X)$} ist
+  \[ \nu(f(X)) = \prod_{i=1}^d f_i(X) \,.\]
+  Ferner heißt $f(X)$ \emph{quadratfrei}, falls
+  \[\nu(f(X)) = f(X)\,.\]
 \end{definition}
 
 \begin{definition}[quadratfreie Faktorisierung]
@@ -46,17 +47,23 @@ dies nicht so einfach, wie folgendes Beispiel zeigt:
 Körpern}
 Einen Algorithmus zur quadratfreien Faktorisierung über Körpern der
 Charakteristik $0$ findet man beispielsweise in \autocite[Figure 9.1]{cohen:algebra}
-oder \autocite[Algorithm 8.2]{geddes:algorithms}.
+oder \autocite[Algorithm 8.1]{geddes:algorithms}.
 
 Für den passenden Algorithmus über endlichen Körpern halten wir uns an
 \autocite[Section 8.3]{geddes:algorithms}. Dazu starten wir mit der
 wesentlichen Aussage, die gerade in dem Fall, dass die Ableitung eines Polynoms
-$0$ ist, die entscheidende Information liefert.
+$0$ ist, die entscheidende Information liefert. Doch dies gilt nicht für
+beliebige Körper!
 
-Im Folgenden sei $\F$ ein Körper der Charakteristik $p$ für $p$ eine Primzahl.
+\begin{definition}[perfekter Körper]
+  Ein Körper $\F$ heißt \emph{perfekt}, falls $\charak \F = p$ für eine
+  Primzahl $p$ und der Frobenius $\sigma: \F \to \F,\ x \mapsto x^p$ ein
+  Automorphismus ist.
+\end{definition}
 
-\begin{prop}
-  Sei $f(X) \in \F[X]$. Ist $f'(X) = 0$, so existiert ein $b(X) \in \F[X]$ mit
+\begin{prop}\label{prop:sfree1}
+  Seien $\F$ ein perfekter Körper und $f(X) \in \F[X]$. 
+  Ist $f'(X) = 0$, so existiert ein $b(X) \in \F[X]$ mit
   \[ f(X) = (b(X))^p\,.\]
 \end{prop}
 
@@ -67,12 +74,18 @@ Im Folgenden sei $\F$ ein Körper der Charakteristik $p$ für $p$ eine Primzahl.
   \[ f(X) = a_{pk} X^{pk} + \ldots + a_p X^p + b_0\,.\]
   Definiere nun 
   \[ b(X) = b_k X^k + \ldots + b_1 X + b_0 \quad\text{mit}\quad
-    b_i = a_{pi}^{\tfrac 1 p}\ i=0,\ldots,k\,.\]
+    b_i = a_{pi}^{\frac 1 p}\ i=0,\ldots,k\,.\]
   Da wir wissen, dass der Frobenius $\F \to \F, x \mapsto x^p$ ein
-  Automorphismus auf $\F$ ist, ist $(.)^{\tfrac 1 p}$ ein wohldefinierter
+  Automorphismus auf $\F$ ist, ist $(.)^{\frac 1 p}$ ein wohldefinierter
   Ausdruck und es gilt 
   \[ f(X) = b(X)^p\,.\]
 \end{proof}
+
+\begin{beispiel}
+  Sei $F = \F_p(z)$ für $z\notin \F_p$. Dann gilt für $f(X) = X^p-z \in F[X]$,
+  dass $f'(X) = 0$, aber $f(X)$ ist über $F$ irreduzibel. Offenbar besitzt $z$
+  kein Urbild unter dem Frobenius; mithin ist $F$ nicht perfekt.
+\end{beispiel}
 
 
 Damit können wir nun einen Algorithmus zur quadratfreien Faktorisierung über
@@ -81,14 +94,70 @@ endlichen Körpern formulieren.
 
 \begin{pseudocode}{Quadratfreie Faktorisierung über endlichen Körpern}%
  {alg:sfree}
-Input:  $f(X) \in \F_q[X]$ monisch, $q=p^m$ eine Primzahlpotenz.
-Output: $f(X) = \prod_{i=1}^d r_i(X)^d$
+Input:  $f(X) \in \F_q[X]$ monisch, $q=p^n$ eine Primzahlpotenz.
+Output: $f(X) = r(X) = \prod_{i=1}^m r_i(X)^i$ quadratfreie Faktorisierung
 Algorithmus SFF($f(X)$):
- 1. Setze $i:=1$, $r(X) := 1$, $b(X) := f'(X)$.
- 2. if $b(X) \neq 0$ then
-    $c(X) := \ggT(f(X),b(X))$.
-    $w(X) := f(X) / 
+$i:=1$, $r(X) := 1$, $b(X) := f'(X)$.
+if $b(X) \neq 0$ then		(1)
+  $c(X) := \ggT(f(X),b(X))$
+  $w(X) := f(X) / c(X)$
+  while $w(X) \neq 1$ do		(1.1)
+    $y(X) := \ggT(w(X),c(X))$, $z(X) := w(X) / y(X)$
+    $r(X) := r(X)\cdot z(X)^i$, $i := i+1$
+    $w(X) := y(X)$, $c(X) := c(X) / y(X)$
+  endwhile
+  if $c(X) \neq 1$ then		(1.2)
+    $c(X) := c(X)^{\frac 1 p}$
+    $r(X) := r(X) \cdot ($SFF($c(X)$)$)^p$
+  endif
+else		(2)
+  $f(X) := f(X)^{\frac 1 p}$
+  $r(X) := ($SFF($f(X)$)$)^p$
+endif
 \end{pseudocode}
 
 
-
+\begin{thm}
+  \autoref{alg:sfree} berechnet die quadratfreie Faktorisierung für Polynome
+  über endlichen Körpern (sogar über perfekten Körpern).
+\end{thm}
+\begin{proof}
+  Sei $f(X)$ gegeben durch seine vollständige Faktorisierung in irreduzible
+  Faktoren 
+  \[ f(X) = \prod_{i=1}^d f_i(X)^{\nu_i}\]
+  \begin{description}
+    \item[Schritt 2.] Beginnen wir mit dem kürzeren Fall.
+      Ist $b(X) = f'(X) = 0$, so existiert nach \thref{prop:sfree1} eine
+      $p$-te Wurzel des Polynoms. Auf diese lässt sich dann der Algorithmus
+      rekursiv anwenden.
+    \item[Schritt 1.] Kommen wir nun zu dem Fall, wo auch wirklich etwas zu tun
+      ist. Sei zunächst eine quadratfreie Faktorisierung von $f(X)$ gegeben,
+      d.h.
+      \[ f(X) = \prod_{i=1}^m a_i(X)^i \]
+      mit $a_i$ quadratfrei und paarweise teilerfremd.
+      Nun ist
+      \[ b(X) = f'(X) = \sum_{i=1}^m a_1(X) \cdot \ldots\cdot a_{i-1}(X)^{i-1}
+        \cdot i a_i(X)^{i-1} a_i'(X)\cdot a_{i+1}(X)^{i+1}\cdot\ldots\cdot
+        a_m(X)^m\]
+      und wir können folgern, 
+      \[ c(X) = \ggT(f(X),f'(X)) = \prod_{i\in A} a_i(X)^{i-1}\,,\]
+      wobei $A = \{i=1,\ldots,m:\ p\nmid i\}$. Es ist klar, dass diejenigen
+      $a_i$, deren Exponent $i$ ein Vielfaches der Charakteristik ist,
+      nicht mehr im $\ggT$ auftauchen. Damit haben wir
+      \[ w(X) = \frac{f(X)}{c(X)} = \prod_{i\in A} a_i(X) \]
+      ein Produkt der quadratfreien Faktoren in $A$ mit jeweils einfacher
+      Vielfachheit. Dieses können wir nun nutzen, um diese quadratfreien Faktoren
+      zu isolieren: Für $A = \{i_1,\ldots,i_k\}$ in aufsteigend sortierter
+      Reihenfolge haben wir
+      \begin{align*}
+        y(X) &= \ggT(w(X),c(X)) = \prod_{j=i_1}^{i_k} a_j(X)\,,\\
+        z(X) &= \frac{w(X)}{y(X)} = a_{i_1}(X)\,.
+      \end{align*}
+      Nun ist klar, dass man die weiteren Faktoren deren Exponenten in $A$
+      liegen durch iterative Anwendung dieser Idee erhält, wie man im 
+      Algorithmus erkennen kann. Letztlich bleibt nur die Frage, wie man an die
+      Faktoren kommt, deren Exponenten Vielfache der Charakteristik sind.
+      Dies ist aber auch offensichtlich, betrachtet man erneut
+      \thref{prop:sfree1} und die Umsetzung in Schritt 1.2. 
+  \end{description}
+\end{proof}
