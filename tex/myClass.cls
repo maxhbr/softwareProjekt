@@ -4,6 +4,9 @@
 
 \LoadClassWithOptions{scrbook}
 
+\usepackage[utf8]{luainputenc}
+\usepackage[T1]{fontenc}
+
 %%%% General
 \clubpenalty = 10000
 \widowpenalty = 10000
