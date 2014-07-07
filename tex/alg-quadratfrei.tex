@@ -1,0 +1,94 @@
+Über endlichen Körpern existieren Über endlichen Körpern existieren 
+verschiedene Ansätze, um ein Polynom zu faktorisieren. Diese sollen nun im
+Folgenden erläutert werden.
+
+\section{Quadratfreie Faktorisierung}
+Wir beginnen mit der Beschreibung eines Algorithmus zur quadratfreien 
+Faktorisierung. Dazu sei im Folgenden $k$ ein beliebiger Körper. 
+Als Referenz dieses Abschnitts sei 
+\autocite[Section 9]{cohan:algebra} und \autocite[Section
+8.3]{geddes:algorithms} genannt.
+
+
+\begin{definition}[quadratfrei]
+  Sei $f(X) \in k[X]$. Dann heißt $f(X)$ \emph{quadratfrei},
+  falls für seine vollständige Faktorisierung
+  \[ f(X) = \prod_{i=1}^d f_i(X)^{\nu_i}\,,\]
+  $f_i(X)$ irreduzibel und paarweise verschieden, gilt:
+  \[ \nu_i = 1 \ \forall i=1,\ldots,d\,.\]
+\end{definition}
+
+\begin{definition}[quadratfreie Faktorisierung]
+  Sei $f(X) \in k[X]$. Dann heißt
+  \[ f(X) = c \prod_{i=1}^m r_i(X)^i\]
+  \emph{quadratfreie Faktorisierung von $f(X)$}, falls
+  für alle $i=1,\ldots,m$ gilt, dass $r_i(X)$ monisch und quadratfrei ist und
+  für alle $i,j=1,\ldots,m$, $i\neq j$, stets $r_i(X)$ und $r_j(X)$ paarweise
+  teilerfremd sind.
+\end{definition}
+
+Bekanntlich ist für jedes nichttriviale Polynom $f(X)$ über einem Körper der
+Charakteristik Null $\ggT(f(X),f'(X)) \neq 0$, wobei $f'(X)$ die formale
+Ableitung von $f$ meint. Damit kann man folgern, dass $\ggT(f(X),f'(X)) = 1$
+genau dann, wenn $f(X)$ quadratfrei ist. (vgl. \autocites[Theorem
+9.4]{cohan:algebra}[Theorem 9.5]{cohan:algebra}) Über endlichen Körpern geht
+dies nicht so einfach, wie folgendes Beispiel zeigt:
+
+\begin{beispiel}
+  Sei $f(X) = X^3+1 \in \F_3[X]$. Dann ist 
+  \[ f'(X) = 3 X^2 = 0 \,. \]
+  Dennoch besitzt $f(X)$ eine quadratfreie Faktorisierung, da
+  \[ f(X) = (x+1)^3\,.\]
+\end{beispiel}
+
+
+\subsection{Algorithmus zur quadratfreien Faktorisierung über endlichen
+Körpern}
+Einen Algorithmus zur quadratfreien Faktorisierung über Körpern der
+Charakteristik $0$ findet man beispielsweise in \autocite[Figure 9.1]{cohen:algebra}
+oder \autocite[Algorithm 8.2]{geddes:algorithms}.
+
+Für den passenden Algorithmus über endlichen Körpern halten wir uns an
+\autocite[Section 8.3]{geddes:algorithms}. Dazu starten wir mit der
+wesentlichen Aussage, die gerade in dem Fall, dass die Ableitung eines Polynoms
+$0$ ist, die entscheidende Information liefert.
+
+Im Folgenden sei $\F$ ein Körper der Charakteristik $p$ für $p$ eine Primzahl.
+
+\begin{prop}
+  Sei $f(X) \in \F[X]$. Ist $f'(X) = 0$, so existiert ein $b(X) \in \F[X]$ mit
+  \[ f(X) = (b(X))^p\,.\]
+\end{prop}
+
+\begin{proof}
+  Sei $f$ gegeben als $f(X) = a_nX^n + \ldots + a_0$, so gilt offensichtlich
+  durch Betrachtung der Definition und Regeln der formalen Ableitung, dass
+  jede auftauchende Potenz von $X$ ein Vielfaches von $p$ sein muss. Also ist
+  \[ f(X) = a_{pk} X^{pk} + \ldots + a_p X^p + b_0\,.\]
+  Definiere nun 
+  \[ b(X) = b_k X^k + \ldots + b_1 X + b_0 \quad\text{mit}\quad
+    b_i = a_{pi}^{\tfrac 1 p}\ i=0,\ldots,k\,.\]
+  Da wir wissen, dass der Frobenius $\F \to \F, x \mapsto x^p$ ein
+  Automorphismus auf $\F$ ist, ist $(.)^{\tfrac 1 p}$ ein wohldefinierter
+  Ausdruck und es gilt 
+  \[ f(X) = b(X)^p\,.\]
+\end{proof}
+
+
+Damit können wir nun einen Algorithmus zur quadratfreien Faktorisierung über
+endlichen Körpern formulieren.
+
+
+\begin{pseudocode}{Quadratfreie Faktorisierung über endlichen Körpern}%
+ {alg:sfree}
+Input:  $f(X) \in \F_q[X]$ monisch, $q=p^m$ eine Primzahlpotenz.
+Output: $f(X) = \prod_{i=1}^d r_i(X)^d$
+Algorithmus SFF($f(X)$):
+ 1. Setze $i:=1$, $r(X) := 1$, $b(X) := f'(X)$.
+ 2. if $b(X) \neq 0$ then
+    $c(X) := \ggT(f(X),b(X))$.
+    $w(X) := f(X) / 
+\end{pseudocode}
+
+
+
