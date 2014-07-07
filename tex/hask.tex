@@ -227,6 +227,23 @@ Es gibt noch diverse andere Arten von Pragmas, die beispielsweise:
 \begin{itemize}
   \item \texttt{OPTIONS\_GHC} Pragmas bieten eine Möglichkeit, dem Compiler
   direkt Compileparameter zu übergeben und
-  \item \texttt{INLINE} Pragmas, welche zur Steigerung der Performance sehr
-  extensiv genutzt wurden.
+  \item ħINLINEħ Pragmas werden in der Form
+    ħ{-# INLINE funktionsname #-}ħ einer Funktion direkt vorangestellt und 
+    und geben dem Compiler die Anweisung, den Inhalt der Funktion anstelle des
+    Funktionsaufrufs bei einer Benutzung zu setzen. Wird innerhalb eines
+    Programms eine Funktion, nennen wir sie ħfooħ benutzt, so setzt der
+    Compiler an diese Stelle lediglich eine Referenz auf die Funktion ħfooħ,
+    deren eigentliche Definition an irgendeiner anderen Stelle gespeichert wird.
+    Das ħINLINEħ-Pragma fordert nun den Compiler auf, die gesamte Definition 
+    von ħfooħ statt einer Referenz zu setzen. Dies spart
+    bei der Ausführung -- gerade wenn die Funktion häufig mit wechselnden
+    Argumenten aufgerufen wird, wie
+    beispielsweise eine Addition -- Zeit, da das Programm die aktuelle Position
+    der Ausführung nicht verlassen muss. Dies geht jedoch auf Kosten einer gewissen
+    Lazyness. Nehmen wir an, ħfooħ hätte die Deklaration ħfoo :: a -> aħ und wir
+    würden in einem fiktiven Programm sehr oft ħfoo ħ$x$ mit dem selben Argument
+    $x$ aufrufen, so würde ohne ħINLINEħ Haskell lediglich \emph{einmal}
+    ħfoo ħ$x$ berechnen und die anderen Aufrufe durch das Ergebnis ersetzen.
+    Durch ħINLINEħ wird ħfooħ sofort durch seinen Inhalt ersetzt, wodurch 
+    \emph{alle} ħfoo ħ$x$ separat berechnet werden. 
 \end{itemize}
