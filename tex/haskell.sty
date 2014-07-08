@@ -4,6 +4,7 @@
 \definecolor{castanho_ulisses}{rgb}{0.71,0.33,0.14}
 \definecolor{preto_ulisses}{rgb}{0.41,0.20,0.04}
 \definecolor{green_ulises}{rgb}{0.2,0.75,0}
+\definecolor{pragmacol}{rgb}{241,168,194}
 
 \lstdefinelanguage{HaskellUlisses}
 {
@@ -13,6 +14,8 @@
   sensitive=true,
   morecomment=[l][\color{gray_ulisses}\scriptsize]{--},
   morecomment=[s][\color{gray_ulisses}\scriptsize]{\{-}{-\}},
+  morecomment=[s][\color{preto_ulisses}\scriptsize]{\{-\#}{\#-\}},
+  morecomment=[l][\color{green_ulises}\scriptsize]{\#},
   morestring=[b]",
   stringstyle=\color{red},
   showstringspaces=false,

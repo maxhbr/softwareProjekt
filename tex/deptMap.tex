@@ -8,13 +8,43 @@ Struktureller Aufbau des Projektes.
     rectangle, inner sep=5pt, inner ysep=5pt, text width=5cm]
 \tikzstyle{myNode5} = [draw=black, fill=black!5,
     rectangle, inner sep=5pt, inner ysep=5pt, text width=3cm]
-\tikzstyle{myNode0} = [draw=white, fill=white,
-    rectangle, inner sep=5pt, inner ysep=5pt]
 
 \tikzstyle{folderline} = [very thick, dashed]
 
+\usetikzlibrary{fit,positioning}
+\pgfdeclarelayer{l1}
+\pgfdeclarelayer{l2}
+\pgfdeclarelayer{l3}
+\pgfsetlayers{l1,l2,l3,main}
+
+\definecolor{col}{HTML}{CBF7FF}
+\colorlet{col1}{col}
+\colorlet{col2}{col!70}
+\colorlet{col3}{col!30}
+\colorlet{col4}{col!10}
+
+
+\tikzstyle{tt} = [font=\ttfamily, left, inner sep=5pt]
+\tikzstyle{sub} = [below right=5pt and 50pt of #1.south west, 
+                   anchor=north west]
+\tikzstyle{des} = [below=2pt of #1.south west, anchor=north west]
+
+\tikzstyle{l4} = [fill=col4, draw=col4!50!black, inner sep=5pt]
+\tikzstyle{l3} = [fill=col3, draw=col3!50!black, inner sep=5pt]
+\tikzstyle{l2} = [fill=col2, draw=col2!30!black, inner sep=5pt]
+\tikzstyle{l1} = [fill=col1, draw=col1!30!black, inner sep=5pt]
+
+\newcommand{\surround}[3]{
+  \begin{pgfonlayer}{l#1}
+  \node[l#1,fit=(#2) #3, xshift=5pt, yshift=-5pt] (f#2) {};
+  \draw[l#1] (#2.south-|f#2.west) -- (#2.south-|f#2.east);
+  \end{pgfonlayer}
+}
+
 \begin{center}
 \begin{tikzpicture}
+
+\iffalse
 
 \draw[myNode20] (-2.4,1.4) rectangle (8.4,-11.5);
 \draw[myNode15] (-2,0.4) rectangle (8,-8.4);
@@ -42,5 +72,40 @@ Struktureller Aufbau des Projektes.
 \node[text width=3cm] (More) at (0,-12) [] {\texttt{More.hs}};
   \node[myNode10] (NumberTheory) at (5,-12) [] {\texttt{NumberTheory.hs}};
   \node[myNode10] (SpecialPolys) at (5,-13) [] {\texttt{SpecialPolys.hs}};
+
+\fi
+
+
+\node[tt] (1) {.GalFld};
+\node[tt, sub=1] (1-1) {.Algorithmen};
+\node[l3,tt, sub=1-1] (1-1-1) {.Berlekamp};
+\node[l3,tt, des=1-1-1] (1-1-2) {.Rabin};
+\node[l3,tt, des=1-1-2] (1-1-3) {.SFreeFactorization};
+\surround{2}{1-1}{(1-1-1) (1-1-2) (1-1-3)}
+
+\node[tt, des=f1-1] (1-2) {.Core};
+\node[l3,tt, sub=1-2] (1-2-1) {.Factorization};
+\node[l3,tt, des=1-2-1] (1-2-2) {.FiniteField};
+\node[l3,tt, des=1-2-2] (1-2-3) {.Finitefields};
+\node[l3,tt, des=1-2-3] (1-2-4) {.Matrix};
+\node[tt, des=1-2-4] (1-2-5) {.Polynomials};
+
+\node[l4,tt, sub=1-2-5] (1-2-5-1) {.Conway};
+\node[l4,tt, des=1-2-5-1] (1-2-5-2) {.FFTTuple};
+\surround{3}{1-2-5}{(1-2-5-1) (1-2-5-2)}
+
+\node[l3,tt, des=f1-2-5] (1-2-6) {.PrimeFields};
+\node[l3,tt, des=1-2-6] (1-2-7) {.ShowTex};
+
+\surround{2}{1-2}{(1-2-1) (f1-2-5) (1-2-7)}
+
+\node[tt, des=f1-2] (1-3) {.More};
+\node[l3,tt, sub=1-3] (1-3-1) {.NumberTheory};
+\node[l3,tt, des=1-3-1] (1-3-2) {.SpecialPolys};
+
+\surround{2}{1-3}{(1-3-1) (1-3-2)}
+
+\surround{1}{1}{(f1-1) (f1-2) (f1-3)}
+
 \end{tikzpicture}
 \end{center}
