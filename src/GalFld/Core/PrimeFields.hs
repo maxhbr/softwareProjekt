@@ -11,6 +11,7 @@
 -- Dieser braucht eine passende Instanz Numeral und eine Instanz Show
 --      instance Numeral Numeral7 where {numValue x = 7}
 --      instance Show Numeral7 where {show = show}
+--      instance NFData Numeral7
 -- Damik kann man nun den Primkörper definieren
 --      type F7 = Mod Numeral7
 -- Also zusammengefasst:
@@ -18,11 +19,13 @@
 data Numeral7
 instance Numeral Numeral7 where {numValue x = 7}
 instance Show Numeral7 where {show = show}
+instance NFData Numeral7
 type F7 = Mod Numeral7
  -}
 --
 -- Altertiv und mit nur einer Zeile mit TemplateHaskell:
 -- Dazu muss die Erweiterung TH durch die folgende Zeile Aktiviert werden:
+--      {-# LANGUAGE QuasiQuotes #-}
 --      {-# LANGUAGE TemplateHaskell #-}
 -- Im Code kann man nun durch
 {-
@@ -180,7 +183,7 @@ genPrimeField p pfName = do
 data MName; \
 instance Numeral MName where {numValue _ = MValue} ; \
 instance Show MName where {show = show} ; \
-instance NFData MName where {rnf _ = ()} ; \
+instance NFData MName ; \
 type PFName = Mod MName
 
 PFInstance(Numeral2,2,F2)

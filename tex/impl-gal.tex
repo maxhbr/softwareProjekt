@@ -1,6 +1,68 @@
 \section{Endliche Körper}
 \subsection{Primkörper}
+Die Primkörper werden in dem Modul \texttt{Projekt.Core.PrimeFields}
+spezifiziert. Diese werden implementiert als ħIntħ Werte, die durch den Wrapper
+ħModħ noch Zusätzlich information enthalten, in welchem Primekörper sich das
+Element befindet.
 
+Da wir uns die Charakteristik zu einem solchem Körper auf Typenebene speichern
+wollen, führen wir dazu zunächst eine neue Klasse von Datentypen mit dem Namen
+ħNumeralħ ein, welche als einzige Funktion 
+ħnumValue :: a -> Intħ besitzen.
+Diese Funktion soll konstant die Charakteristik wiedergeben.
+
+Nun können wir durch
+\haskellinput{Core/PrimeFields}{newtype Mod}
+Primkörper definieren, wobei für den Parameter \texttt{n} ein
+Datentyp von der Klasse \texttt{Numeral} eingesetzt werden soll.
+
+Um zu einem Element im Primkörper einen Repräsentanten in $\Z$ zu bekommen gibt
+es die Funktion
+\haskellinput{Core/PrimeFields}{unMod}
+Einen Repräsentanten, der nichtnegativ aber kleiner als die Charakteristik ist,
+bekommt man durch
+\haskellinput{Core/PrimeFields}{getRepr}
+
+Die Instanzen von ħShowħ und ħShowTexħ ermöglicht es, Elemente von Primkörpern
+als String oder als Rohes Tex darzustellen.
+\haskellinput{Core/PrimeFields}{instance .*?=> Show}
+\haskellinput{Core/PrimeFields}{instance .*?=> ShowTex}
+
+Da es sich hier um einen Nichtfreien Datentyp handelt, brauchen wir noch ein
+Extensionalitätsaxiom, das beschreibt, wann zwei Elemente gleich sein sollen:
+\haskellinput{Core/PrimeFields}{instance .*?=> Eq}
+
+Außerdem wollen wir damit rechnen können und das ganze ist dann auch ein
+Endlicher Körper:
+\haskellinput{Core/PrimeFields}{instance .*?=> Num}
+\haskellinput{Core/PrimeFields}{instance .*?=> FiniteField}
+\haskellinput{Core/PrimeFields}{modulus}
+
+Zum bequemen invertieren haben wir auch noch eine Instanz ħFractionalħ
+\haskellinput{Core/PrimeFields}{instance .*?=> Fractional}
+
+Weiterhin haben wir noch die folgenden Instanzen:
+\haskellinput{Core/PrimeFields}{instance .*?=> Binary}
+\haskellinput{Core/PrimeFields}{instance .*?=> NFData}
+
+\subsubsection{Erzeugen von Primkörpern}
+Möchte man nun einen Primkörper von beliebiger Charakteristik in einem Haskell
+Programm, bietet sich die ħTemplateHaskellħ Funktion ħgenPrimeFieldħ an. Diese
+übernimmt das Erzeugen von diversen Instanzen, die nötig sind.
+\haskellinput{Core/PrimeFields}{genPrimeField}
+
+Da es sich hierbei um eine Funktion handelt, die per ħTemplateHaskellħ zur
+Compilezeit ausgeführt wird, sind zum nutzen zunächst zwei Pragmas nötig:
+\begin{hcode}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
+\end{hcode}
+Dann kann man sich einen Primkörper der Charakteristik $7$ mit Namen
+\texttt{PF} durch die Ziele
+\begin{hcode}
+$(genPrimeField 7 "PF")
+\end{hcode}
+erzeugt werden.
 
 \subsection{Erweiterungskörper}
 
