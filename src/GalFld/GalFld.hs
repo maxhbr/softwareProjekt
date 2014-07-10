@@ -1,6 +1,7 @@
 module GalFld.GalFld
   ( module X
    , factorP
+   , factorP2
    , extendFFBy
   ) where
 import GalFld.Core as X
@@ -19,3 +20,6 @@ extendFFBy d e = FFElem (pList[0,onefy]) $ findIrred $ getAllMonicPs (elems e) [
 -- Berlekamp
 factorP :: (Show a, Num a, Fractional a, FiniteField a) => Polynom a -> [(Int,Polynom a)]
 factorP = aggFact . appBerlekamp . appSff . obviousFactor
+
+factorP2 :: (Show a, Num a, Fractional a, FiniteField a) => Polynom a -> [(Int,Polynom a)]
+factorP2 = aggFact . appBerlekamp2 . appSff . obviousFactor

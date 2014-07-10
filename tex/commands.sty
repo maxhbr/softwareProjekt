@@ -32,7 +32,7 @@
 
 % {{{ cal
 %\def\cA{\ensuremath \mathcal{A}}
-%\def\cB{\ensuremath \mathcal{B}}
+\def\cB{\ensuremath \mathcal{B}}
 \def\cC{\ensuremath \mathcal{C}}
 \def\cD{\ensuremath \mathcal{D}}
 \def\cE{\ensuremath \mathcal{E}}
@@ -138,4 +138,7 @@
 \makebox[0pt]{\fbox{\scriptsize#2}}\\[-2pt]\text{\small$\downarrow$}\\[-3pt]%
 {\displaystyle#1}\end{array}}
 
+\newcommand{\funcdef}[1]{%
+  \begin{array}[t]{>{\displaystyle}r>{\displaystyle}c>{\displaystyle}l}%
+  #1\end{array}}
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:

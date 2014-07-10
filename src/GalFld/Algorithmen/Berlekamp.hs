@@ -11,11 +11,12 @@
 --
 --------------------------------------------------------------------------------
 module GalFld.Algorithmen.Berlekamp
-  ( berlekamp, appBerlekamp, sffAndBerlekamp
+  ( appBerlekamp, sffAndBerlekamp
   , findIrred, findIrreds, findTrivialsB
   -- Algorithmus
   , berlekampBasis
   , berlekampFactor
+  , berlekampFactor2, appBerlekamp2
   )where
 
 import Debug.Trace
@@ -32,11 +33,11 @@ import GalFld.Algorithmen.SFreeFactorization
 --------------------------------------------------------------------------------
 --  Wrapper
 
-berlekamp :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
-berlekamp = appFact berlekampFactor . obviousFactor
-
 appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
-appBerlekamp = appFact berlekamp
+appBerlekamp = appFact berlekampFactor
+
+appBerlekamp2 :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appBerlekamp2 = appFact berlekampFactor2
 
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 -- Benutzt wird dazu die Quadratfreie Faktorisierung mit anschließendem
@@ -91,7 +92,8 @@ findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp (findTrivialsSff ps)
 --  aufspannen bzgl der kanonischen Basis { 1, x, x², x³, ... }
 berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a)
                                                        => Polynom a -> Matrix a
-berlekampBasis f = transposeM $ kernelM $ transposeM $!
+berlekampBasis f = --trace ("mods = \n"++show (fromListsM [red i | i <- [0..(n-1)]])) $
+    transposeM $ kernelM $ transposeM $!
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n
   where !n     = fromJust $ degP f
         !q     = elemCount a
@@ -102,46 +104,9 @@ berlekampBasis f = transposeM $ kernelM $ transposeM $!
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
-berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
+berlekampFactor2 :: (Show a, Fractional a, Num a, FiniteField a)
                                               => Polynom a -> [(Int,Polynom a)]
-#if 0
-berlekampFactor f
-    | length triv == 1 = berleFac
-    | length triv == 2 = head triv : berleFac
-    | otherwise       = error "obviousFactor malefunction"
-  where triv     = obviousFactor f
-        berleFac = doBerlekamp $ snd $ last triv
-
-doBerlekamp :: (Show a, Fractional a, Num a, FiniteField a)
-                                              => Polynom a -> [(Int,Polynom a)]
-doBerlekamp f = berlekampFactor' f m
-  where m = berlekampBasis f
-        berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)
-                                      => Polynom a -> Matrix a -> [(Int,Polynom a)]
-        berlekampFactor' f m | uDegP f <= 1       = --trace ("berlekamp f="++show f++" deg f <= 1") $
-                                                    [(1,f)]
-                             | getNumRowsM m == 1 = --trace ("berlekamp f="++show f++" triv m="++show m) $
-                                                    [(1,f)]
-                             | otherwise         = --trace ("berlekamp f="++show f++" m=\n"++show m)
-                              berlekampFactor' g n ++ berlekampFactor' g' n'
-          where g  = --trace ("list="++show [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
-                     --        , x /= 1])$
-                     head [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
-                             , x /= 1]
-                g' = --trace ("f= "++show f) $
-                     f @/ g
-                h  = pList $ getRowM m 2
-                n  = newKer m g
-                n' = newKer m g'
-                newKer m g  = fromListsM $ take r m'
-                  where (k,l) = boundsM m
-                        m'    = toListsM $ echelonM $ fromListsM
-                              [takeFill 0 l $ p2List $ modByP (pList (getRowM m i)) g
-                                   | i <- [1..k]]
-                        r     = k-1- fromMaybe (-1) (findIndex (all (==0))
-                                                        $ reverse m')
-#else
-berlekampFactor f | isNullP f   = []
+berlekampFactor2 f | isNullP f   = []
                   | uDegP f < 2 = [(1,f)]
                   | otherwise   = berlekampFactor' f m
   where !m = berlekampBasis f
@@ -153,13 +118,12 @@ berlekampFactor f | isNullP f   = []
                              | otherwise         = --trace ("berlekamp f="++show f++" m=\n"++show m)
                               berlekampFactor' g n ++ berlekampFactor' g' n'
           where {-# INLINE g #-}
-                g  = --trace ("list="++show [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
+                g  = --trace ("list="++show [(x,s) | (x,s) <- [(ggTP f (h - pKonst s), s) | s <- elems (getReprP f)]
                      --        , x /= 1])$
                      head [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
                              , x /= 1]
                 {-# INLINE g' #-}
-                g' = --trace ("f= "++show f) $ 
-                     f @/ g
+                g' = f @/ g
                 {-# INLINE h #-}
                 h  = pList $ getRowM m 2
                 {-# INLINE n #-}
@@ -175,7 +139,41 @@ berlekampFactor f | isNullP f   = []
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
 
-#endif
+-- |Faktorisiert ein Polynom f über einem endlichen Körper
+--  Voraussetzungen: f ist quadratfrei
+--  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
+berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
+                                              => Polynom a -> [(Int,Polynom a)]
+berlekampFactor f | isNullP f   = []
+                  | uDegP f < 2 = [(1,f)]
+                  | otherwise   = berlekampFactor' f m
+  where !m = berlekampBasis f
+        {-# INLINE berlekampFactor' #-}
+        berlekampFactor' :: (Show a, Num a, Fractional a, FiniteField a)
+                                      => Polynom a -> Matrix a -> [(Int,Polynom a)]
+        berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
+                             | getNumRowsM m == 1 = [(1,f)]
+                             | otherwise         = --trace ("berlekamp f="++show f++" m=\n"++show m)
+                              concat [berlekampFactor' g (newKer m g) | g <- gs]
+          where {-# INLINE gs #-}
+                gs  = --trace ("list="++show [(x,s) | (x,s) <- [(ggTP f (h - pKonst s), s) | s <- elems (getReprP f)]
+                      --       , x /= 1])$
+                     [x | x <- [ggTP f (h - pKonst s) | s <- elems (getReprP f)]
+                             , x /= 1]
+                {-# INLINE h #-}
+                h  = pList $ getRowM m 2
+                {-# INLINE newKer #-}
+                newKer m g  = --trace ("m mod g="++show g++" =\n"++show (fromListsM
+                              --[takeFill 0 l $ p2List $ modByP (pList (getRowM m i)) g
+                              --     | i <- [1..k]]       ))$
+                  fromListsM $! take r m'
+                  where !(k,l) = boundsM m
+                        !m'    = toListsM $ echelonM $ fromListsM
+                              [takeFill 0 l $ p2List $ modByP (pList (getRowM m i)) g
+                                   | i <- [1..k]]
+                        !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
+                                                        $ reverse m')
+
 
 {-# INLINE takeFill #-}
 takeFill :: Num a => a -> Int -> [a] -> [a]
