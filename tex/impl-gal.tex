@@ -62,8 +62,55 @@ Dann kann man sich einen Primkörper der Charakteristik $7$ mit Namen
 \begin{hcode}
 $(genPrimeField 7 "PF")
 \end{hcode}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 erzeugt werden.
 
 \subsection{Erweiterungskörper}
+Um Erweiterungskörper darzustellen verwenden wir Polynome, welche modulo einem
+Minimalpolynom gelesen werden sollen. Das ganze codieren wir in dem Datentypen
+\texttt{FFElem}.
+\haskellinput{Core/FiniteFields}{data FFElem}
+Natürlich haben wir die kanonische inclusion des Grundkörpers die durch
+\texttt{FFKonst} realisiert ist.
+
+Durch dieses Konzept kann man einfach in Erweiterungen von Erweiterungen
+rechnen.
+Startet man mit einem Primkörper, beisielsweise dem $\F_2$. Dann haben wir
+darin das Element $1$:
+\begin{hcode}
+f2 = 1::F2
+\end{hcode}
+Durch das Minimalpolynom $x^2+x+1$ erzeugen wir uns eine Grad $2$ Erweiterung.
+\begin{hcode}
+e2f2Mipo = pList [1::F2,1,1] -- x²+x+1
+e2f2 = FFElem (pList [0,1::F2]) e2f2Mipo
+\end{hcode}
+Durch eine weitere Grad $2$ Erweiterung erhalten wir das folgende:
+\begin{hcode}
+e2e2f2Mipo = pList [e2f2,one,one] -- x²+x+e2f2
+e2e2f2 = FFElem (pList [0,e2f2]) e2e2f2Mipo
+\end{hcode}
+Alternativ kann man auch durch eine Grad $4$ Erweiterung über $\F_2$ den
+gleichen Körper erhalten:
+\begin{hcode}
+e4f2Mipo = pList [1::F2,1::F2,0,0,1::F2] -- x⁴+x²+1
+e4f2 = FFElem (pList [0,1::F2]) e4f2Mipo
+\end{hcode}
+
+Zu einem Polynom bekommen wir die Charakteristik durch die folgende Funktion.
+\haskellinput{Core/FiniteFields}{charOfP}
+Auch kann man die $p$-te Wurzel eines Polynomes ziehen mittels der Funktion
+\haskellinput{Core/FiniteFields}{charRootP}
+
+Instanzen haben wir für \texttt{Eq}, \texttt{Show} und \texttt{ShowTex}.
+%\haskellinput{Core/FiniteFields}{instance .*?=> Eq}
+%\haskellinput{Core/FiniteFields}{instance .*?=> Show}
+%\haskellinput{Core/FiniteFields}{instance .*?=> ShowTex}
+Zum rechnen haben wir \texttt{Num} und \texttt{Fractional}.
+%\haskellinput{Core/FiniteFields}{instance .*?=> Num}
+%\haskellinput{Core/FiniteFields}{instance .*?=> Fractional}
+Dazu haben wir noch \texttt{NFData} und \texttt{Binary}.
+%\haskellinput{Core/FiniteFields}{instance .*?=> NFData}
+%\haskellinput{Core/FiniteFields}{instance .*?=> Binary}
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:

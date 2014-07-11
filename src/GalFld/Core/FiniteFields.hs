@@ -68,25 +68,21 @@ instance (ShowTex a, Num a, Eq a) => ShowTex (FFElem a) where
 
 instance (Show a, Num a, Eq a, Fractional a) => Num (FFElem a) where
   fromInteger i                           = FFKonst (fromInteger i)
-
   {-# INLINE (+) #-}
   (FFKonst x)  + (FFKonst y)              = FFKonst (x+y)
   (FFElem f p) + (FFKonst x)              = FFElem (f + pKonst x) p
   (FFKonst x)  + (FFElem f p)             = FFElem (f + pKonst x) p
   (FFElem f p) + (FFElem g q) | p==q       = aggF $ FFElem (f+g) p
                               | otherwise = error "Not the same mod"
-
   {-# INLINE (*) #-}
   (FFKonst x)  * (FFKonst y)              = FFKonst (x*y)
   (FFElem f p) * (FFKonst x)              = FFElem (f * pKonst x) p
   (FFKonst x)  * (FFElem f p)             = FFElem (f * pKonst x) p
   (FFElem f p) * (FFElem g q) | p==q       = aggF $ FFElem (f*g) p
                               | otherwise = error "Not the same mod"
-
   {-# INLINE negate #-}
   negate (FFKonst x)                      = FFKonst (negate x)
   negate (FFElem f p)                     = FFElem (negate f) p
-
   abs _    = error "Prelude.Num.abs: inappropriate abstraction"
   signum _ = error "Prelude.Num.signum: inappropriate abstraction"
 
