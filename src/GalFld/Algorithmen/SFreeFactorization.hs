@@ -21,12 +21,14 @@ import Debug.Trace
 sff :: (Show a, FiniteField a, Num a, Fractional a) => Polynom a -> [(Int,Polynom a)]
 sff = appFact sffFactor . obviousFactor
 
-appSff :: (Show a, FiniteField a, Num a, Fractional a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
+appSff :: (Show a, FiniteField a, Num a, Fractional a) => 
+                                        [(Int,Polynom a)] -> [(Int,Polynom a)]
 appSff = appFact sff
 
 -- |Gibt alle Faktorisierungen zurück, welche nach SFF noch trivial sind
 -- Wendet zuvor die offensichtliche Faktorisierung an
-findTrivialsSff :: (Show a, Fractional a, Num a, FiniteField a) => [Polynom a] -> [[(Int,Polynom a)]]
+findTrivialsSff :: (Show a, Fractional a, Num a, FiniteField a) => 
+                                            [Polynom a] -> [[(Int,Polynom a)]]
 findTrivialsSff ps = [fs | fs <- parMap rpar appSff
                          --(findTrivialsOb ps) -- Suche nur 0 als Ns
                          (findTrivialsNs ps) -- Suche alle Ns

@@ -57,10 +57,11 @@ findIrredsRabin ff@(f:fs) = findIrreds' ff
 --      if g = 0, then return "f is irreducible", 
 --          else return "f is reducible"
 --  end.
---  aus http://en.wikipedia.org/wiki/Factorization_of_polynomials_over_
+--  vgl http://en.wikipedia.org/wiki/Factorization_of_polynomials_over_
 --      finite_fields#Irreducible_polynomials
 rabin :: (Show a, FiniteField a, Num a, Fractional a, Eq a) => Polynom a -> Bool
-rabin f = rabin' f ns
+rabin f | isNullP f = False
+        | otherwise = rabin' f ns
   where ns = map (\p -> d `quot` p) $ nub $ factor d
         d  = uDegP f
         q  = elemCount $ getReprP f
@@ -72,10 +73,8 @@ rabin f = rabin' f ns
         -- eigentlicher Rabin für x^(q^n_j) - x mit n_j = n / p_j
         rabin' f (n:ns) | g /= pKonst 1  = False
                         | otherwise = rabin' f ns
-          where g  = --trace ("rabin: ggTP for f="++show f++" h'-pX="++show (p2Tup (h'-pX))) $ 
-                      ggTP f (h'-pX)
-                h' = --trace ("x^"++show q++"^"++show n++" mod f = h'="++show (modMonom q n f )) $ 
-                      modMonom q n f
+          where g  = ggTP f (h'-pX)
+                h' = modMonom q n f
 
 -------------------------------------------------------------------------------
 -- Helper
@@ -99,12 +98,9 @@ modMonom q d  = modMonom' n
   where n  = toInteger q ^ toInteger d 
         modMonom' n f 
                | n < toInteger df
-                           = --trace ("modMonom n="++show n++" n<df") $
-                            pTupUnsave [(fromInteger n,1)]
-               | even n    = --trace ("modMonom n="++show n++" n ger") $
-                              g `modByP` f
-               | otherwise = --trace ("modMonom n="++show n++" n unger") $
-                             multMonomP 1 g `modByP` f
+                           = pTupUnsave [(fromInteger n,1)]
+               | even n    = g `modByP` f
+               | otherwise = multMonomP 1 g `modByP` f
           where df = uDegP f
                 m  = n `quot` 2
                 g  = h*h

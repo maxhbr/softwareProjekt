@@ -54,17 +54,18 @@ appFact alg = withStrategy (parList rpar) . concatMap
                       | uDegP f <= 1 = [(i,f)]
                       | otherwise   = potFact i (alg f)
 
--- |Fasst in einer Faktoriesierung gleiche Funktionen Zusammen
+-- |Fasst in einer Faktoriesierung gleiche Terme Zusammen
 aggFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], 
                                                                 f /= pKonst 1]
 
 -- |Sagt, ob die gegebene Faktoriesierung trivial ist, also aus nur einem
--- Echten Faktor vom Grad 1 besteht
-isTrivialFact :: [(Int,a)] -> Bool
+-- echten Faktor besteht
+isTrivialFact :: (Num a, Eq a) => [(Int,Polynom a)] -> Bool
 isTrivialFact [] = error "A unit has no welldefined factorization"
 isTrivialFact [(1,_)] = True
-isTrivialFact ms = sum (map fst ms) == 1
+isTrivialFact ms = sum (map fst ms') == 1
+  where ms' = filter (\(_,f) -> f/=1) ms
 
 -- |Gibt alle Faktorisierungen zurück, welche nach der offensichtlichen
 -- Faktoriesierung noch trivial sind
@@ -96,9 +97,7 @@ obviousFactor f | isNullP f     = [(1,nullP)]
         factorX | g == 1     = [(d,pTupUnsave [(1,1)])]
                 | otherwise = [(d,pTupUnsave [(1,1)]), (1,g)]
           where d = fst $ last fs
-                g = --trace ("ob f="++show f++" -> d="++show d++" fs="++show fs
-                    -- ++" mapped="++show(map (A.first (\x -> x- d)) fs ))$
-                    pTupUnsave $ map (A.first (\x -> x-d)) fs
+                g = pTupUnsave $ map (A.first (\x -> x-d)) fs
 
 appObFact :: (Show a, Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
 appObFact = appFact obviousFactor

@@ -1,0 +1,67 @@
+\section{Faktorisierung von Polynomen über endlichen Körpern}
+\texttt{GalFld/Core/Factorization.hs}\\
+\texttt{GalFld/Algorithmen/Berlekamp.hs}\\
+\texttt{GalFld/Algorithmen/Rabin.hs}
+
+
+\paragraph{Faktorisierungsalgorithmen} Grundsätzlich sind alle Algorithmen, die
+in \autoref{chap:algs} beschrieben und der konkreten Faktorisierung von
+Polynomen dienen, als ħPolynom a -> [(Int, Polynom a)]ħ beschrieben. Das
+bedeutet, dass eine \emph{Faktorisierung} stets als Liste von Tupeln zu
+verstehen ist, wobei der erste Eintrag die Multiplizität des zweiten Eintrags,
+dem konkreten Faktor, angibt.
+
+
+\subsection{Triviale Faktoren} Kann man aus einem Polynom $f(X)$ 
+den trivialen Faktor $X$ ausklammern so leistet dies die Funktion
+ħobviousFactorħ.
+
+\haskellinput{Core/Factorization}{obviousFactor}
+
+Um Polynome, die keinen trivialen Faktor besitzen trotzdem als Faktorisierung
+zurückgegeben zu können, haben wir ħtoFactħ implementiert.
+
+\haskellinput{Core/Factorization}{toFact}
+
+
+\subsection{Funktionen rund um Faktorisierungen}
+
+\paragraph{Anwenden von Faktorisierungen} 
+Es ist klar, dass man verschiedene Algorithmen kombinieren will, die teilweise
+Faktorisierungen herstellen (vgl. z.B. quadratfrei Faktorisierung mit
+anschließendem Berlekamp). Dazu braucht man Funktionen die einen
+Faktorisierungsalgorithmus (also eine Funktion 
+ħPolynom a -> [(Int,Polynom a)]ħ) auf eine bereits vorhandene 
+Faktorisierung anwenden und anschließend das
+Ergebnis zusammenfassen. Dazu gibt es den nachstehen Wrapper ħappFactħ.
+
+\haskellinput{Core/Factorization}{appFact}
+
+ħpotFactħ fasst dabei die entstehenden Mehrfachpotenzen der Faktoren zusammen.
+
+\haskellinput{Core/Factorization}{potFact}
+
+Es gilt zu bemerken, dass ħappFactħ parallelisiert ausgeführt wird, sofern die
+Multicore-Unterstützung aktiviert wurde.
+
+Man will jedoch als Anwender nicht immer ħappFactħ auf einen Algorithmus
+anwenden. Daher gibt es für jeden Faktorisierungsalgorithmus eine Funktion 
+ħappħ$A$ wobei $A$ für den jeweiligen konkreten Algorithmus steht.
+
+
+\haskellinput{Core/Factorization}{appObFact}
+\haskellinput{Algorithmen/SFreeFactorization}{appSff}
+\haskellinput{Algorithmen/Berlekamp}{appBerlekamp}
+\haskellinput{Algorithmen/Berlekamp}{appBerlekamp2}
+
+Wie bereits erwähnt wird auf die konkreten Algorihmen erst in
+\autoref{chap:algs} eingegangen.
+
+\paragraph{Zusammenfassen von Faktorisierungen} Es ist sicherlich leicht
+vorstellbar, dass durch Anwendung von ħappħ$A$ verschiedene Tupel entstehen,
+deren eigentlicher Faktor jedoch der gleiche ist. Da diese erstmal nicht
+erkannt werden, gibt es ħaggFactħ, um am Ende in einer Faktorisierung nur
+paarweise verschiedene Faktoren zu haben.
+
+\haskellinput{Core/Factorization}{aggFact}
+

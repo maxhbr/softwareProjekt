@@ -1,8 +1,6 @@
 module Main
   where
 import Control.Arrow as A
-import GalFld.GalFld
-import GalFld.More.SpecialPolys
 
 import System.Random
 import Criterion.Main
@@ -14,7 +12,9 @@ import Data.List
 import Debug.Trace
 import Data.Maybe
 
-import GalFld.Core.Polynomials.FFTTuple
+import GalFld.GalFld
+import GalFld.More.SpecialPolys
+{-import GalFld.Core.Polynomials.FFTTuple-}
 {-import GalFld.Core.Polynomials.Conway-}
 
 
@@ -44,13 +44,13 @@ findFstNonZero xs
 
 samples = 30::Int
 
-benchBerle gen e desc = [ benchBerle' gen p
-  | p <- map ((\ n -> (n, getRndPol gen n e samples)) . (2 ^)) [1..3] ]
-  where benchBerle' gen (n,list) = bgroup ("berleBench "++desc++" @ "++show n)
-          [ bench ("Berlekamp @ "++show n) $ nf (berleBench factorP) list,
-            bench ("Berlekamp2 @ "++show n) $ nf (berleBench factorP2) list]
+benchVs gen e desc n = [ benchVs' gen p
+  | p <- map ((\ n -> (n, getRndPol gen n e samples)) . (2 ^)) [1..n] ]
+  where benchVs' gen (n,list) = bgroup ("rabinVsBerleBench "++desc++" @ "++show n)
+          [ bench ("Berlekamp @ "++show n) $ nf (vsBench (isTrivialFact.factorP)) list,
+            bench ("Rabin @ "++show n) $ nf (vsBench rabin) list]
 
-berleBench berleFunc list = map berleFunc list
+vsBench irredFunc list = map irredFunc list
 
 -------------------------------------------------------------------------------
 myConfig = defaultConfig {
@@ -60,6 +60,6 @@ main :: IO ()
 main = do
   gen <- getStdGen
   defaultMainWith myConfig (return ()) $
-    {-benchBerle gen (1::F5) "F5"-}
-    benchBerle gen (FFElem (pList [0,1::F5]) (pList [3,3,0,1])) "F5^3"
+    {-benchVs gen (1::F5) "F5" 6-}
+    benchVs gen (FFElem (pList [0,1::F5]) (pList [3,3,0,1])) "F5^3" 3
     {-benchDiv gen (FFElem (pList [0,1::F5]) (pList [2,1,4,2,3,3,0,0,0,0,1])) "F5^10"-}

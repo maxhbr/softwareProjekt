@@ -1,4 +1,5 @@
 \section{Der Algorithmus von Berlekamp}
+\label{sec:berlekamp}
 Sei im Folgenden $\F_q$ ein endlicher Körper von Charakteristik $p$ und
 $f(X) \in \F_q[X]$ monisch. Ziel dieses Abschnittes ist ein Algorithmus, der eine
 vollständige Faktorisierung von $f(X)$ über $\F_q$ angibt.
@@ -208,4 +209,15 @@ eben jenem $\ggT$ und seinem Kofaktor in $f(X)$ zu enden.
 \subsubsection{Ein kleiner Vergleich}
 
 Es hat sich herausgestellt, dass beide Varianten nahzu identische Laufzeiten
-haben. Die folgenden Grafiken zeigen das Ergebnis.
+haben. Bei einem kleinen Vergleich von je 30 Polynomen eines Grades
+stellt sich heraus, dass letztere Variante in kleinen Graden schneller ist,
+wohingegen die erste Variante in höheren Graden effizienter arbeitet.
+\autoref{fig:berlekamp} fasst die Ergebnisse zusammen.
+
+\begin{figure}
+  \caption{Vergleich der Berlekamp-Varianten über $\F_5$ und $\F_{5^3}$}
+  \label{fig:berlekamp}
+  \centering
+  \includegraphics[width=0.7\textwidth,angle=-90]{plots/benchBerle_F5.pdf}
+  \includegraphics[width=0.7\textwidth,angle=-90]{plots/benchBerle_F53.pdf}
+\end{figure}
