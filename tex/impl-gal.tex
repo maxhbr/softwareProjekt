@@ -85,6 +85,8 @@ Durch das Minimalpolynom $x^2+x+1$ erzeugen wir uns eine Grad $2$ Erweiterung.
 e2f2Mipo = pList [1::F2,1,1] -- x²+x+1
 e2f2 = FFElem (pList [0,1::F2]) e2f2Mipo
 \end{hcode}
+Hier ist \texttt{e2f2} ein erzeugendes Element in dem Erzeugtem Körper. Also
+reicht dieses uns, um alle Körperelemente zu bekommen.
 Durch eine weitere Grad $2$ Erweiterung erhalten wir das folgende:
 \begin{hcode}
 e2e2f2Mipo = pList [e2f2,one,one] -- x²+x+e2f2
@@ -97,9 +99,109 @@ e4f2Mipo = pList [1::F2,1::F2,0,0,1::F2] -- x⁴+x²+1
 e4f2 = FFElem (pList [0,1::F2]) e4f2Mipo
 \end{hcode}
 
+Öffnet man \texttt{GalFld.Sandbox.FFSandbox} mit \texttt{GHCI} startet der
+Interpreter und man befindet sich in einer Umgebung, in der die Körper bereits
+Erzeugt wurden. Nachdem wir also bereits das element \texttt{e2e2f2} haben,
+können wir uns dieses anzeigen lassen, indem wir einfach nur \texttt{e2e2f2} in
+die Konsole eintippen und bestätigen. Damit erhalten wir
+\begin{lstlisting}[language=bash
+                  ,numbers=none
+                  ,backgroundcolor=\color{lightgray}]
+((1₂·X mod 1₂·X²+1₂·X+1₂)·X mod (1₂ mod ...)·X²+(1₂ mod ...)·X+(1₂·X mod 1₂·X²+1₂·X+1₂))
+\end{lstlisting}
+Ein Element in einer Körpererweiterung wird beisielsweise dargestellt als
+\begin{itemize}
+  \item \texttt{(1₂·X mod 1₂·X²+1₂·X+1₂)}, welches die Äquivalenzklasse von $x$
+  in $\F_2[x]/(x^2+x+1)$ bezeichnet. Die \LaTeX{} Darstellung dazu ist 
+  $\left(
+      \underline{
+        1_{2}
+        \cdot{}X
+      }_{
+        mod~1_{2} \cdot{}X^{2}+1_{2}\cdot{}X+1_{2}
+      }
+    \right)$.
+  \item \texttt{(1₂ mod ...)} bedeutet, dass noch nicht klar ist, modulo
+  welchem Polynom dieses Element gelesen wird. Es ist also die
+  $1\in\F_2[x]/(g(x))$
+  wobei $g(x)$ erst wärend der Berechnung inferiert werden muss.
+  Dies ist nötig, um die Inklusion des Grundkörpers zu realisieren.
+\end{itemize}
+Dadurch, dass wir eine \texttt{ShowTex} Instanz haben, können wir aus
+\texttt{e2e2f2} auch eine \LaTeX{} Darstellung erzeugen:
+\[
+\left(
+  \underline{
+    \left(
+      \underline{
+        1_{2}
+        \cdot{}X
+      }_{
+        mod~1_{2} \cdot{}X^{2}+1_{2}\cdot{}X+1_{2}
+      }
+    \right)\cdot{}X
+  }_{
+    mod~1_{2}\cdot{}X^{2}+1_{2}\cdot{}X+\left(
+      \underline{
+        1_{2}\cdot{}X
+      }_{
+        mod~1_{2}\cdot{}X^{2}+1_{2}\cdot{}X+1_{2}
+      }
+    \right)
+  }
+\right)
+\]
+Ersetzen wir \texttt{(1₂·X mod 1₂·X²+1₂·X+1₂)} mit \texttt{Y} dann kann
+\texttt{e2e2f2} auch geschrieben werden als:
+\begin{lstlisting}[language=bash
+                  ,numbers=none
+                  ,backgroundcolor=\color{lightgray}]
+(Y·X mod (1₂ mod ...)·X²+(1₂ mod ...)·X+Y)
+\end{lstlisting}
+Dieses Element ist also die Äquivalenzklasse von $yx$ in
+$\F_2[y,x]/(y^2+y+1,x^2+x+y)$.
+
+Nun können wir auch Berechnungen machen und erhalten beisielsweise für
+\texttt{e2e2f2 + e2e2f2 * e2e2f2} das folgende.
+\begin{lstlisting}[language=bash
+                  ,numbers=none
+                  ,backgroundcolor=\color{lightgray}]
+((1₂ mod 1₂·X²+1₂·X+1₂)·X+(1₂ mod 1₂·X²+1₂·X+1₂) mod (1₂ mod ...)·X²+(1₂ mod ...)·X+(1₂·X mod 1₂·X²+1₂·X+1₂))
+\end{lstlisting}
+Was in der \LaTeX{} Darstellung dem folgendem entspricht:
+\[
+\left(
+  \underline{
+    \left(
+      \underline{
+        1_{2}
+      }_{
+        mod~1_{2}\cdot{}X^{2}+1_{2}\cdot{}X+1_{2}
+      }
+    \right)
+    \cdot{}X+\left(
+      \underline{
+        -1_{2}
+      }_{
+        mod~1_{2}\cdot{}X^{2}+1_{2}\cdot{}X+1_{2}
+      }
+    \right)
+  }_{
+    mod~1_{2}\cdot{}X^{2}+1_{2}\cdot{}X+\left(
+      \underline{
+        1_{2}\cdot{}X
+      }_{
+        mod~1_{2}\cdot{}X^{2}+1_{2}\cdot{}X+1_{2}
+      }
+    \right)
+  }
+  \right)
+\]
+
+\subsubsection{Funktionen auf Körpererweiterungen}
 Zu einem Polynom bekommen wir die Charakteristik durch die folgende Funktion.
 \haskellinput{Core/FiniteFields}{charOfP}
-Auch kann man die $p$-te Wurzel eines Polynomes ziehen mittels der Funktion
+Auch kann man die $p$-te Wurzel eines Polynomes ziehen mittels der Funktion:
 \haskellinput{Core/FiniteFields}{charRootP}
 
 Instanzen haben wir für \texttt{Eq}, \texttt{Show} und \texttt{ShowTex}.
