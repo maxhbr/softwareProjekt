@@ -42,7 +42,7 @@ verwenden, da nur Teile, also so weit wie nötig, evaluiert werden.
 Haskell ist \emph{statisch Typisiert}.
 Das bedeutet, dass der Computer bereits zur Compilezeit weiß, welcher Teil eine
 Zahl ist und was eine Funktion ist, die aus einer Liste von Zahlen einen String
-macht, usw. Das bedeutet, dass viele Fehler bereits wärend des Compilierens
+macht, usw. Das bedeutet, dass viele Fehler bereits während des Compilierens
 erkannt werden können.
 
 Zusätzlich ist Haskell auch noch sehr gut darin, Typen zu inferieren. Das
@@ -197,6 +197,53 @@ Weitere Quellen:
   Haddock is a tool for automatically generating documentation from annotated
   Haskell source code.\footnote{\url{http://www.haskell.org/haddock/}}
 \end{quote}
+
+\section{Das Haskell Typensystem}
+In Haskell weiß jeder Ausdruck bereits zur Compilezeit, welchen Typ er hat. So
+werden Fehler wie das Diviedieren eines Boolean durch eine Zahl bereits während
+des Compilierens aufgedeckt und müssen nicht durch Glück wärend des Ausführens
+gefunden werden. Gekennzeichnet werden Typenangaben in Haskell durch ħ::ħ als
+Infix-Operator. Die folgende Aussage bedeutet, dass eine Variable ħcountħ vom Typ
+ħIntħ ist.
+\begin{hcode}
+court :: Int
+\end{hcode}
+Da es in Haskell Higher-Order Funktionen gibt haben natürlich auch Funktionen
+einen Typ. Beispielsweise hat die Funktion ħheadħ, welche zu einer Liste das
+erste Element wiedergibt, den Typ:
+\begin{hcode}
+head :: [a] -> a
+\end{hcode}
+Zu bemerken ist hier, dass für die Funktion nicht vorgegeben ist, von welchem
+Typ die Elemente der Liste sind. So kann die Typen Variable ħaħ für jeden Typen
+stehen, also funktioniert die Funktion beispielsweise auf Listen von Zahlen.
+Ebenso funktioniert sie aber für Strings, welche in Haskell als Listen von
+Zeichen implementiert sind.
+
+Weiter gibt es Typen Klassen, welche beispielsweise den Interfaces von Java
+ähneln.  Eine Klasse beschreibt dabei ein Verhalten von Typen. Um zu sagen,
+dass ein Typ das Verhalten einer Klasse hat, muss man für diesen eine Instanz
+dieser Klasse implementieren.
+Dazu besteht jede Klasse aus einer vorgegebenen Liste von Funktionen, welche
+implementiert werden müssen. Ein gutes Beispiel hierfür ist ħEqħ, welches als
+einzige Funktion den Operator ħ(==)ħ\footnote{Die Schreibweise mit den Klammern
+dient dazu, Infix-Operatoren zu definieren.} enthält. Also muss man sagen,
+welche Werte oder Konstruktorterme des Typs gleich sein sollen.
+
+Die Funktion ħ(==)ħ selbst hat den Typ
+\begin{hcode}
+(==) :: (Eq a) => a -> a -> Bool
+\end{hcode}
+wobei das ħ=>ħ ein Zeichen ist, das eine Typen Klassen Restriktion beschreibt.
+Hier darf also die Typen Variable ħaħ nicht durch alle Typen ersetzt werden,
+sondern nur durch die, die eine Instanz ħEqħ haben. Also können wir Werte auf
+Gleichheit nur dann Prüfen, wenn wir eine Instanz ħEqħ haben. Freie Datentypen
+werden, sofern nicht extra eine Instanz von ħEqħ erzeugt wurde, auf
+strukturelle Gleichheit geprüft.
+
+Eine umfangreiche Liste an wichtigen Typen Klassen sowie eine ausführlichere
+Erklärung das Haskell Typensystems findet man beispielsweise in \cite{lyahfgg}
+im zweiten Kapitel.
 
 \section{Pragmas} %TODO: oder Paradigmen?
 Pragmas\footnote{\url{https://www.haskell.org/ghc/docs/7.0.4/html/users_guide/pragmas.html}}
