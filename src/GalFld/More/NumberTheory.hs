@@ -1,5 +1,5 @@
 module GalFld.More.NumberTheory (
-  möbFkt
+  moebFkt
   , primFactors
   , isPrime
   , divisors
@@ -9,10 +9,10 @@ import Data.List
 
 -- |Möbius-Funktion µ mit
 --  µ(n) = (-1)^k,falls n quadratfrei, k = #Primfaktoren, 0 sonst
-möbFkt :: Int -> Int
-möbFkt n | facs == nub facs && even (length facs) = 1
-         | facs == nub facs && odd (length facs)  = -1
-         | otherwise                             = 0
+moebFkt :: Int -> Int
+moebFkt n | facs == nub facs && even (length facs) = 1
+          | facs == nub facs && odd (length facs)  = -1
+          | otherwise                             = 0
   where facs = primFactors n
 
 -- |Primfaktorzerlegung (enthält Vielfache!)

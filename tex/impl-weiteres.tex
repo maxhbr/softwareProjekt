@@ -19,3 +19,111 @@ Diese drei Funktionen sind leider nur unter Linux verfügbar.
 
 \haskellinput{Core/ShowTex}{renderTex}
 \haskellinput{Core/ShowTex}{renderRawTex}
+
+\subsection{Spezielle Polynome und zahlentheoretische Funktionen}
+
+\texttt{GalFld/More/SpecialPolys.hs}
+\texttt{GalFld/More/NumberTheory.hs}
+
+Vorgreifend auf \autoref{sec:bsp-prim-norm} wird hier der Inhalt von 
+\texttt{SpecialPolys.hs} beschrieben. In dieser Datei wurden zwei spezielle
+Familien von Polynomen über endlichen Körpern implementiert: Die
+Kreisteilungspolynome und die Pi-Polynome.
+
+\subsubsection{Die Kreisteilungspolynome}
+
+Die Kreisteilungspolynome lassen sich auf verschiedene Arten definieren. Hier
+zitieren wir \cite[Abschnitt 4]{hach2013eki}.
+
+\begin{definition}[Kreisteilungspolynom]
+  Sei $\F_q$ ein endlicher Körper und $n\in \N$. Dann heißt für 
+  $d\mid q^n-1$
+  \[ \Phi_d(X) := \prod_{u \in C_d} (X-u)\]
+  \emph{$d$-tes Kreisteilungspolynom}, wobei
+  \[ C_d := \{ v\in \F_{q^n}^\ast:\ \ord(v) = d\}\]
+  die Menge der $d$-ten primitiven Einheitswurzeln in $\F_q$ ist.%
+  \footnote{Es sei vorausgesetzt, dass dem Leser nicht explizit definierten
+  Termini bekannt sind.}
+\end{definition}
+
+\begin{definition}[Möbius-Funktion]
+  Seien $n \in \N^\ast$ und $n = \prod_{j=1}^l p_j^{a_j}$ seine
+  Primfaktorzerlegung, so heißt
+  \[ \mu(n) := \begin{cases} 1, &n=1\\ 0,& \exists j: a_j \geq 2\\
+    (-1)^l, & a_j=1 \ \forall j \end{cases}\]
+  \emph{Möbius-Funktion von $n$}.
+\end{definition}
+
+\begin{prop}
+  Sei $d\in \N^\ast$. Dann gilt: 
+  \[ \Phi_d(X) = \prod_{n\mid d} (X^n-1)^{\mu(\frac{d}{n})} \,.\]
+\end{prop}
+\begin{proof}
+  \autocite[Abschnitt 4]{hach2013eki}.
+\end{proof}
+
+\paragraph{Implementierung}
+
+Damit ist klar, wie man die Kreisteilungspolynome effizient implementiert.
+
+\haskellinput{More/NumberTheory}{primFactors}
+\haskellinput{More/NumberTheory}{isPrime}
+\haskellinput{More/NumberTheory}{divisors}
+
+\haskellinput{More/NumberTheory}{moebFkt}
+
+\haskellinput{More/SpecialPolys}{cyclotomicPoly}
+
+\subsubsection{Die Pi-Polynome}
+
+\citeauthor{hach92} zeigt in \autocite{hach92} wie man
+\emph{alle} primtiven und normalen Elemente einer Körpererweiterung $\F_{q^n}$
+über $\F_q$ als Nullstellen eines Polynoms finden kann.
+
+\begin{bemerkung}
+  \label{bem:primnorm}
+  Wie man sich leicht überlegt, sind alle primitiven Elemente eines Körpers
+  $\F_q$, also $u \in \F_q^\ast$ mit $\ord u = q-1$, gerade Nullstellen des
+  $(q-1)$-ten Kreisteilungspolynoms. Auf ganz analoge Weise kann man die normalen
+  Elemente, also diejenigen $u\in \F_{q^n}$, deren additive Ordnung 
+  $\Ord_q(u)$ gleich $X^n-1$ ist, als Nullstellen der Pi-Polynome schreiben.
+\end{bemerkung}
+
+\begin{definition}[$q$-Polynom, {\autocite[Definition 1.2]{hach92}}]
+  Sei $f(X) = \sum_{i=0}^n f_i X^i \in \F_q[X]$, so heißt 
+  \[ F(X) := \sum_{i=0}^n f_i X^{q^i}\]
+  das \emph{zu $f$ assoziierte $q$-Polynom}.
+\end{definition}
+
+\begin{definition}[Pi-Polynom, {\autocite[Definition 3.4]{hach92}}]
+  Sei $f \in \F_q[X]$ ein monischer Teiler von $X^n-1$. Notiere
+  \[ A_f := \{ u \in \F_{q^n}:\ \Ord(u) = f\}\,.\]
+  Dann heißt 
+  \[ P_f(X) := \prod_{v\in A_f} (X-v)\]
+  das \emph{Pi-Polynom zu $f$ über $\F_q$}.
+\end{definition}
+
+\begin{definition}
+  Für $f,g\in \F_q[X]$ definiere
+  \[ (f\odot g)(X) := f(G(X))\,.\]
+\end{definition}
+
+Eine rekursiver Algorithmus zur Berechnung der Pi-Polynome ist dann nach
+\autocite[Abschnitt 4]{hach92} gegeben durch:
+\begin{pseudocode}{Berechnung Pi-Polynom}{alg:pipoly}
+Input: $f(X) \in \F_q[X]$.
+Output: $P_f(X) \in \F_q[X]$.
+Algorithmus PIPOLY($f$):
+  1. Berechne die vollständige Faktorisierung von $f$:
+     $f(X) = \prod_{i=1}^k f_i^{\nu_i}$.
+  2. Setze $P_{f_1} := F_1(X) X^{-1}$.
+  3. Berechne $P_{f_1\ldots f_k}$ rekursiv durch
+     $P_{f_1\ldots f_i} := (P_{f_1\ldots f_{i-1}} \odot f_i) P_{f_1\ldots f_{i-1}}^{-1}$
+  4. Setze $P_f := P_{f_1\ldots f_k} \odot ( \prod_{i=1}^k f_i^{\nu_i-1})$
+\end{pseudocode}
+
+\paragraph{Implementierung} Man kann offenbar \autoref{alg:pipoly} direkt
+in Haskell übertragen.
+
+\haskellinput{More/SpecialPolys}{piPoly}
+

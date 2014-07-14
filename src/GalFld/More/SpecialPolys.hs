@@ -22,7 +22,7 @@ cyclotomicPoly n e
   | isPrime n = pTupUnsave $ map (\i -> (i,1)) $ reverse [0..n-1]
   | otherwise = foldl (@/) numerator $ map fst $ filter (\(_,m) -> m==(-1)) l
   where numerator = product $ map fst $ filter (\(_,m)->m==1) l
-        l = [(pTupUnsave [(n `quot` d, 1), (0,-1)], möbFkt d) | d <- divisors n]
+        l = [(pTupUnsave [(n `quot` d, 1), (0,-1)], moebFkt d) | d <- divisors n]
 
 
 -- | Gibt das Pi-Polynom zu f

@@ -1,3 +1,11 @@
+Wir beginnen mit einer Körpererweiterung $\F_{q^n} \mid \F_q$ und stellen uns 
+die Frage nach einer Enumeration aller primitiven und normalen Elemente dieser 
+Erweiterung.
+Wie bereits in \thref{bem:primnorm} erläutert, sind die Nullstellen des
+Pi-Polynom zu $X^n-1$ gerade die normalen Elemente der Körpererweiterung und die 
+Nullstellen des Kreisteilungspolynoms $\Phi_{n-1}$ gerade die primitiven 
+Elemente. Folglich ist der $\ggT$ beider gerade das Produkt der Minimalpolynome
+aller primitiven \emph{und} normalen Elemente!
 
 \begin{code}
 {-# LANGUAGE QuasiQuotes #-}
