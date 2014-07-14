@@ -97,10 +97,10 @@ modMonom :: (Show a, Num a, Eq a, Fractional a) =>
 modMonom q d  = modMonom' n
   where n  = toInteger q ^ toInteger d 
         modMonom' n f 
-               | n < toInteger df
-                           = pTupUnsave [(fromInteger n,1)]
-               | even n    = g `modByP` f
-               | otherwise = multMonomP 1 g `modByP` f
+           | n < toInteger df
+                       = pTupUnsave [(fromInteger n,1)]
+           | even n    = g `modByP` f
+           | otherwise = multMonomP 1 g `modByP` f
           where df = uDegP f
                 m  = n `quot` 2
                 g  = h*h

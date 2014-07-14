@@ -205,10 +205,6 @@ den meisten Fällen am effizientesten Methode ist die Division mit Hilfe des
 Hornerschemas. Eine sehr gute und ausführliche Erklärung findet sich 
 in \autocite{wiki:synthetic-division}.
 
-\begin{beispiel}
-  
-\end{beispiel}
-
 Wiederum lässt sich die Division per Hornerschema sehr schön rekursiv in
 Haskell niederschreiben.
 \haskellinput{Core/Polynomials}{divPHornerM'\string\''}
@@ -324,11 +320,16 @@ keinerlei Vorteile gegenüber der Standardmultiplikation. Betrachten wir jedoch
 ein Beispiel über einem Erweiterungskörper, so kann der Karatsuba seien Vorteil
 ausspielen, da dort ja die Koeffizienten selbst Polynome sind, und daher
 Addition weitaus "`billiger"' ist als Multiplikation.
-\begin{beispiel}
-  Nehmen wir einmal das Polynom 
-  \[ f(X) = \in \F_{2^40}\]
-  dargestellt durch
-\end{beispiel}
+\autoref{fig:karavsnorm} zeigt dies deutlich.
+
+\begin{figure}
+  \caption{Vergleich von normaler Multiplikation mit Karatsuba}
+  \label{fig:karavsnorm}
+  \centering
+  \includegraphics[angle=-90,width=0.7\textwidth]{plots/benchNormVsKara_F5.pdf}
+  \includegraphics[angle=-90,width=0.7\textwidth]{plots/benchNormVsKara_F53.pdf}
+\end{figure}
+
 
 \subsubsection{FFT-Multiplikation: Der Schönhagen-Strassen-Algorithmus}
 Eine, was die Idee angeht, weitaus komplexere Möglichkeit Polynome zu

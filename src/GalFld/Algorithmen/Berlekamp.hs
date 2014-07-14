@@ -136,8 +136,8 @@ berlekampFactor2 f | isNullP f   = []
                 newKer m g  = fromListsM $! take r m'
                   where !(k,l) = boundsM m
                         !m'    = toListsM $ echelonM $ fromListsM
-                        [takeFill 0 l $ p2List $ modByP (pList (getRowM m i)) g
-                                   | i <- [1..k]]
+                                 [takeFill 0 l $ p2List $ 
+                                  modByP (pList (getRowM m i)) g | i <- [1..k]]
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
 
@@ -166,8 +166,8 @@ berlekampFactor f | isNullP f   = []
                 newKer m g  = fromListsM $! take r m'
                   where !(k,l) = boundsM m
                         !m'    = toListsM $ echelonM $ fromListsM
-                        [takeFill 0 l $ p2List $ modByP (pList (getRowM m i)) g
-                                   | i <- [1..k]]
+                                 [takeFill 0 l $ p2List $ 
+                                  modByP (pList (getRowM m i)) g | i <- [1..k]]
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                                  $ reverse m')
 
