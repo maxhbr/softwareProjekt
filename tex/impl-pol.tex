@@ -248,9 +248,39 @@ Algorithmus erhält man selbstverständlich auch den $\ggT$ zweier Polynome:
 
 \haskellinput{Core/Polynomials}{ggTP}
 
+\subsection{Weiteres}
 
+\paragraph{Nullstellensuche} Möchte man prüfen, ob ein Polynom in einer
+gewissen Menge von Elementen eine Nullstelle besitzt, so ist dies mit folgender
+Funktion möglich.
 
+\haskellinput{Core/Polynomials}{hasNs}
 
+\paragraph{Auflisten aller Polynome} 
+Folgende Funktion listet alle monischen Polynome auf, deren Grad in der Liste
+ħ[Int]ħ vorkommt und deren Koeffizienten in der Liste ħ[a]ħ liegen.
+
+\haskellinput{Core/Polynomials}{getAllMonicPs}
+
+Möchte man Polynome von Grad $0$ bis zu einem gewissen Grad, so liefert dies
+die Funktion ħgetAllMonicPħ.
+
+\haskellinput{Core/Polynomials}{getAllMonicP}
+
+Zuletzt kann man sich natürlich noch zusätzlich die nicht-monischen Polynome
+ausgeben lassen. Wie oben in beiden Varianten (d.h. Gräder als Liste oder als
+Obergrenze gegeben).
+
+\haskellinput{Core/Polynomials}{getAllPs}
+\haskellinput{Core/Polynomials}{getAllP}
+
+\paragraph{Conway-Polynome}
+Die \emph{Conway-Polynome} bieten in gewisser Weise eine kanonische Möglichkeit
+Körpererweiterungen endlicher Körper zu charakterisieren. Für Definitionen
+und Eigenschaften sei auf
+\url{http://www.math.rwth-aachen.de/~Frank.Luebeck/data/ConwayPol/index.html}
+verwiesen, wo auch die Conway-Polynome zu finden sind, die wir in der Datei
+\texttt{GalFld/Core/Polynomials/Conway.hs} hinterlegt haben.
 
 
 
@@ -594,30 +624,5 @@ Dazu ein kleines Beispiel.
   \[ r(X) := q(X)b(X) - a(X) = 3X^2 + 2X\,. \]
 \end{beispiel}
 
-\subsection{Weiteres}
-
-\paragraph{Nullstellensuche} Möchte man prüfen, ob ein Polynom in einer
-gewissen Menge von Elementen eine Nullstelle besitzt, so ist dies mit folgender
-Funktion möglich.
-
-\haskellinput{Core/Polynomials}{hasNs}
-
-\paragraph{Auflisten aller Polynome} 
-Folgende Funktion listet alle monischen Polynome auf, deren Grad in der Liste
-ħ[Int]ħ vorkommt und deren Koeffizienten in der Liste ħ[a]ħ liegen.
-
-\haskellinput{Core/Polynomials}{getAllMonicPs}
-
-Möchte man Polynome von Grad $0$ bis zu einem gewissen Grad, so liefert dies
-die Funktion ħgetAllMonicPħ.
-
-\haskellinput{Core/Polynomials}{getAllMonicP}
-
-Zuletzt kann man sich natürlich noch zusätzlich die nicht-monischen Polynome
-ausgeben lassen. Wie oben in beiden Varianten (d.h. Gräder als Liste oder als
-Obergrenze gegeben).
-
-\haskellinput{Core/Polynomials}{getAllPs}
-\haskellinput{Core/Polynomials}{getAllP}
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:
