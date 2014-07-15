@@ -8,6 +8,7 @@
 
 \lstdefinelanguage{HaskellUlisses}
 {
+  escapeinside={(*@}{@*)},
   basicstyle=\upshape\ttfamily\small,
   %backgroundcolor=\color{yellow},
   %frameshape={RYRYNYYYY}{yny}{yny}{RYRYNYYYY}, %contornos... muito nice...
@@ -30,7 +31,7 @@
   %columns=flexible,
   basewidth={0.5em,0.3em},
   columns=[l]fixed,
-  %fontadjust=true,
+  fontadjust=true,
   emph=
   {[1]
     FilePath,IOError,abs,acos,acosh,all,and,any,appendFile,approxRational,asTypeOf,asin,
@@ -90,8 +91,28 @@
     {€}{{\EUR}}1 {£}{{\pounds}}1
     %% Haskell Concealing
     {::}{{:\!\!:\ }}1 {\\}{{$\lambda$}}1 {->}{{\trightarrow}}1 
-    {<-}{{\tleftarrow}}1 {=>}{{\tRightarrow}}1 {==}{{\tequiv}}1
-    {/=}{{\tneq}}1 {++}{{\tdplus}}1 
+    {<-}{{\tleftarrow}}1 {=>}{{\tRightarrow}}2 {==}{{\tequiv}}1
+    {/=}{{\tneq}}1 {++}{{\tdplus}}1 {<=}{{$\leq$}}1 {>=}{{$\geq$}}1
+    {⁰}{{\textsuperscript{0}}}1
+    {¹}{{\textsuperscript{1}}}1
+    {²}{{\textsuperscript{2}}}1
+    {³}{{\textsuperscript{3}}}1
+    {⁴}{{\textsuperscript{4}}}1
+    {⁵}{{\textsuperscript{5}}}1
+    {⁶}{{\textsuperscript{6}}}1
+    {⁷}{{\textsuperscript{7}}}1
+    {⁸}{{\textsuperscript{8}}}1
+    {⁹}{{\textsuperscript{9}}}1
+    {₀}{{\textsubscript{0}}}1
+    {₁}{{\textsubscript{1}}}1
+    {₂}{{\textsubscript{2}}}1
+    {₃}{{\textsubscript{3}}}1
+    {₄}{{\textsubscript{4}}}1
+    {₅}{{\textsubscript{5}}}1
+    {₆}{{\textsubscript{6}}}1
+    {₇}{{\textsubscript{7}}}1
+    {₈}{{\textsubscript{8}}}1
+    {₉}{{\textsubscript{9}}}1
 }
 
 \DeclareUnicodeCharacter{2070}{{\textsuperscript{0}}}
@@ -104,6 +125,16 @@
 \DeclareUnicodeCharacter{2077}{{\textsuperscript{7}}}
 \DeclareUnicodeCharacter{2078}{{\textsuperscript{8}}}
 \DeclareUnicodeCharacter{2079}{{\textsuperscript{9}}}
+\DeclareUnicodeCharacter{2080}{{\textsubscript{0}}}
+\DeclareUnicodeCharacter{2081}{{\textsubscript{1}}}
+\DeclareUnicodeCharacter{2082}{{\textsubscript{2}}}
+\DeclareUnicodeCharacter{2083}{{\textsubscript{3}}}
+\DeclareUnicodeCharacter{2084}{{\textsubscript{4}}}
+\DeclareUnicodeCharacter{2085}{{\textsubscript{5}}}
+\DeclareUnicodeCharacter{2086}{{\textsubscript{6}}}
+\DeclareUnicodeCharacter{2087}{{\textsubscript{7}}}
+\DeclareUnicodeCharacter{2088}{{\textsubscript{8}}}
+\DeclareUnicodeCharacter{2089}{{\textsubscript{9}}}
 
 \RequirePackage{calc}
 
@@ -135,29 +166,45 @@
 
 %\newlength{\parskipsave}
 %\newcounter{mycount}
-\newcommand{\haskellinput}[2]{
+\newcommand{\haskellinput}[2]{%
   \typeout{^^JThis is Haskellinput ------------------------ look for^^J
     /usr/bin/awk 'BEGIN {RS="\string\n\string\n";} /.*?^#2 /'
     ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex
-    ^^J------------------------------}
+    ^^J------------------------------}%
   \immediate\write18{/usr/bin/awk 'BEGIN {RS="\string\n\string\n";} /.*?^#2 /'
-    ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex}
+    ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex}%
   \immediate\write18{/usr/bin/grep -n -Ff /tmp/temp.tex
     ../src/GalFld/#1.hs | /usr/bin/gawk 'NR==1
-      {print "\string\\begin\string\{lstlisting\string\}[firstnumber="$1"]"};'
-      FS=":" >/tmp/temp2.tex}
-  \immediate\write18{/usr/bin/cat /tmp/temp.tex >>/tmp/temp2.tex}
-  \immediate\write18{echo '\string\end\string{lstlisting\string}' >>/tmp/temp2.tex}
-  %Input File
-  \setlength{\parskipsave}{\bigskipamount}
-  \addtolength{\parskipsave}{\parskip}
-  \marginpar{\vspace*{\parskipsave}\scriptsize\path{GalFld/#1.hs}}
-  \input{/tmp/temp2.tex}
+      {print "\string\\begin\string\{lstlisting\string\}[firstnumber="$1"]
+       \string\n(*@\string\\emptynode@*)"};'
+      FS=":" >/tmp/temp2.tex}%
+  \immediate\write18{echo "$(cat /tmp/temp2.tex)$(cat /tmp/temp.tex)" 
+                     >/tmp/temp2.tex}%
+  \immediate\write18{echo '\string\end\string{lstlisting\string}'
+                     >>/tmp/temp2.tex}%
+  %Print Input File
+  \input{/tmp/temp2.tex}%
+  \tikzmarginpath{#1}%
   %Clean up
-  \immediate\write18{/usr/bin/rm /tmp/temp.tex}
-  \immediate\write18{/usr/bin/rm /tmp/temp2.tex}
-}
+  \immediate\write18{/usr/bin/rm /tmp/temp.tex}%
+  \immediate\write18{/usr/bin/rm /tmp/temp2.tex}%
+}%
 
+% Doofer Trick um den zusätzlichen vertical space zu vermeiden, den tikz
+% erzeugt, trotz overlay!
+\newcommand{\tikzmarginpath}[1]{%
+  \begin{minipage}[c][0pt][c]{\textwidth}%
+  \begin{tikzpicture}[overlay, remember picture]%
+    \node[font=\scriptsize, text width=0.9\marginparwidth,anchor=base]%
+      at (current page marginpar area.west|-beginlisting.center)%
+      {\path{GalFld/#1.hs}};
+  \end{tikzpicture}\end{minipage}\vspace{-2\parskip}}%
+
+
+\newcommand{\emptynode}{%
+  \tikz[remember picture,baseline]{
+    \useasboundingbox (0,0) rectangle (0,0);
+    \node[anchor=base] (beginlisting) {};}}
 
 
 

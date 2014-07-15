@@ -190,10 +190,6 @@ addPM ff@((i,f):fs) gg@((j,g):gs)
   | i>j         = (i,f) : addPM fs gg
    where !c = f+g
 
-{-# RULES
-"addPM/negate" forall f g. addPM f (negate g) = subtrPM f g
-"addPM/negate2" forall f g. addPM (negate f) g = subtrPM g f
-  #-}
 {-# INLINE subtrPM #-}
 -- | subtrahiere Polynome in Monomdarstellung, d.h
 --   [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist

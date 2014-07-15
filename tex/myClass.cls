@@ -4,6 +4,7 @@
 
 \LoadClassWithOptions{scrbook}
 
+
 \usepackage[utf8]{luainputenc}
 \usepackage[T1]{fontenc}
 
@@ -28,6 +29,7 @@
 
 \usepackage[german]{varioref}
 
+
 %%%% Listings in footnotes
 \usepackage{cprotect}
 
@@ -40,11 +42,11 @@
 \pagestyle{scrheadings}
 
 %%%%  Layout  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[scale=0.75]{geometry}
-\setlength{\unitlength}{1mm}
+%\usepackage[scale=0.75]{geometry}
+%\setlength{\unitlength}{1mm}
 %\emergencystretch 2em
 %\usepackage{multicol}
-\usepackage{lscape} % alt: pdflscape
+%\usepackage{lscape} % alt: pdflscape
 
 \allowdisplaybreaks
 
@@ -54,7 +56,7 @@
     \protect\makebox[0pt][r]{\csname the#1\endcsname\hspace{12pt}}}\makeatother
 \fi
 
-\renewcommand*{\thefootnote}{[\arabic{footnote}]}
+%\renewcommand*{\thefootnote}{[\arabic{footnote}]}
 
 
 \iftrue %Horizontale Linien
@@ -91,6 +93,11 @@
 \makeatletter
 %\linespread{1.5}
 
+\usepackage[babel,german=quotes]{csquotes}%
+\defineshorthand{"`}{\openautoquote}
+\defineshorthand{"'}{\closeautoquote}
+
+
 %%%%  Theoreme Styles  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[thref, hyperref, amsmath, thmmarks]{ntheorem}
 
@@ -112,6 +119,7 @@
 %\newtheorem*{dazu}{Dazu}
 
 \theoremstyle{definition}
+\theorembodyfont{\normalfont}
 \newtheorem{definition}[thm]{Definition}
 %\newtheorem{defn}[thm]{Definition}
 %\newtheorem{conj}[thm]{Conjecture}
@@ -174,6 +182,7 @@
   decorations.pathreplacing }
 \makeatletter
 \global\let\tikz@ensure@dollar@catcode=\relax
+\usepackage{tikzpagenodes}
 \makeatother
 
 %%%%  figures  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -231,7 +240,7 @@
 
 
 %%%% Tikz Pfeil setup (Für Listings) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\trightarrow}{\tikz[baseline]{
+\newcommand{\trightarrow}{\hspace{-1pt}\tikz[baseline]{
   \draw[round cap->,line width=0.6pt] (0,0.3em) -- (1.5ex,0.3em);}}
 \newcommand{\tleftarrow}{\tikz[baseline]{
   \draw[<-round cap,line width=0.6pt] (0,0.3em) -- (1.5ex,0.3em);}}
@@ -285,8 +294,6 @@
 
 %%%% Bibliography %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[style=numeric,backend=biber]{biblatex}
-\usepackage{fontspec}
-\usepackage[babel]{csquotes}
 %\usepackage{filecontents}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

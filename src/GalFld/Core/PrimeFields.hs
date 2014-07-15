@@ -59,10 +59,6 @@ import GalFld.Core.Polynomials
 class Numeral a where
   numValue :: a -> Int
 
-{-# RULES "MkMod/unMod"   forall x. MkMod (unMod x) = x #-}
-{-# RULES "unMod/MkMod"   forall x. unMod (MkMod x) = x #-}
-{-# RULES "MkMod.unMod"   MkMod . unMod = id #-}
-{-# RULES "unMod.MkMod"   unMod . MkMod = id #-}
 newtype Mod n = MkMod Int
 
 {-# INLINE unMod #-}
@@ -86,7 +82,7 @@ instance (Numeral n, Show n) => Show (Mod n) where
                        | c == '6' = '₆'
                        | c == '7' = '₇'
                        | c == '8' = '₈'
-                       | c == '9' = '₀'
+                       | c == '9' = '₉'
 #else
           showModulus' s = "^{" ++ s ++ "}"
 #endif

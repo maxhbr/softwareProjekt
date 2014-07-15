@@ -132,7 +132,7 @@ Da man in vielen Situationen das Inverse des Leitkoeffizienten des Polynoms
 bei der Normierung erhalten möchte, gibt es noch die folgende Variante der Normierung:
 \haskellinput{Core/Polynomials}{moniLcP}
 
-\paragraph{Formale Ableitung} 
+\paragraph{Formale Ableitung} \makebox{ }
 \haskellinput{Core/Polynomials}{deriveP}
 
 \paragraph{Das reziproke Polynom} 
@@ -189,7 +189,7 @@ Wiederum darf obige Subtraktion nur auf wohlgeformte Polynome angewandt werden.
 \paragraph{Multiplikation}
 Da auf dem Datentyp ħIntħ sowohl Multiplikation als auch Addition in gleicher
 Zeit erfolgen, hat sich herausgestellt, dass in den meisten Fällen die 
-"`Standardmultiplikation"' die effizienteste ist. Diese ist wie folgt
+,,Standardmultiplikation`` die effizienteste ist. Diese ist wie folgt
 implementiert:
 \haskellinput{Core/Polynomials}{multPM}
 \haskellinput{Core/Polynomials}{multPM'\string\''}
@@ -215,7 +215,7 @@ behandeln und die initialen Parameter festzulegen.
 \haskellinput{Core/Polynomials}{divP}
 \haskellinput{Core/Polynomials}{divPHorner}
 
-\paragraph{"`Division"'} Für den Fall, dass man bereits weiß, dass ein
+\paragraph{,,Division``} Für den Fall, dass man bereits weiß, dass ein
 Polynom durch ein anderes teilbar ist, haben wir den Operator ħ(@/)ħ definiert
 \footnote{Zu beachten ist hierbei, dass die Benutzung 
 von \lstinline{(/)}nicht möglich 
@@ -288,7 +288,7 @@ verwiesen, wo auch die Conway-Polynome zu finden sind, die wir in der Datei
 \subsubsection{Karatsuba}
 Einer der häufigsten Multiplikationsalgorithmen für Polynome ist sicher der
 Karatsuba. Er basiert auf der Idee Multiplikationen durch Additionen zu
-ersetzen, die im Allgemeinen "`billiger"' sind. 
+ersetzen, die im Allgemeinen ,,billiger`` sind. 
 
 Der Basisfall für die Multiplikation zweier Polynome von Grad 1, lässt die Idee
 des Algorithmus deutlich werden:
@@ -320,7 +320,7 @@ gegenüber der Standardmultiplikation.
 Betrachten wir jedoch
 ein Beispiel über einem Erweiterungskörper, so kann der Karatsuba seien Vorteil
 ausspielen, da dort ja die Koeffizienten selbst Polynome sind, und daher
-Addition weitaus "`billiger"' ist als Multiplikation.
+Addition weitaus ,,billiger`` ist als Multiplikation.
 \autoref{fig:karavsnorm} zeigt dies deutlich.
 
 \begin{figure}
@@ -422,7 +422,7 @@ ist:
   
 \end{proof}
 
-Das bedeutet, wir "`erzwingen"' die Existenz einer passenden primitiven
+Das bedeutet, wir ,,erzwingen`` die Existenz einer passenden primitiven
 Einheitswurzel. Damit bleibt nur noch die Frage, wie wir ein Polynom 
 $f(X) \in R[X]$ als bivariates Polynom in $R[X,Y]\big/(Y^n+1)$ lesen können, um
 dort die FFT-Multiplikation anwenden zu können. Eine Antwort und das konkrete
@@ -434,7 +434,7 @@ Output: $h(X) = f(X)g(X) \in R[X]$
 Algorithmus SS($f$,$g$):
   1. Wähle $n = 2^l$ mit $\deg f + \deg g < n$.
   2. Setze $m := 2^{\lfloor\tfrac l 2\rfloor}$ und $m' := \tfrac n m$.
-  3. Zerlege $f$ und $g$ in "`Blöcke"':
+  3. Zerlege $f$ und $g$ in ,,Blöcke``:
      $f(X) = \sum_{j=0}^{m'-1} f_j(X) X^{mj}$
      $g(X) = \sum_{j=0}^{m'-1} g_j(X) X^{mj}$
   4. Setze $R_{2m} := R[X]\big/(X^{2m}+1)$ und 
