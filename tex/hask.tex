@@ -123,7 +123,7 @@ Für Haskell gibt es eine umfangreiche Auswahl an Programmen, die einem bei der
 Entwicklung von Haskell Bibliotheken und Programmen helfen. Hier sollen die
 erwähnt werden, die für dieses Projekt genutzt wurden.
 
-\subsection{Testing: \texttt{hspec}}
+\subsection{Tests: \texttt{hspec}}
 \begin{quote}
   Hspec is roughly based on the Ruby library RSpec. However, Hspec is just a
   framework for running HUnit and QuickCheck tests. Compared to other options,
@@ -176,6 +176,21 @@ Finished in 0.0028 seconds
   benchmarks, and to analyse their
   results.\footnote{\url{https://hackage.haskell.org/package/criterion}}
 \end{quote}
+Die Bibliotheki \texttt{criterion} liefert Funktionen zum testen und vergleichen
+von Code-Performance.
+Um Funktionen mit sehr kurzer Ausführunszeit zu vergleichen oder einfach nur um
+bessere Werte zu bekommen werden die Tests mehrfach ausgeführt.
+Dazu werden Erkenntnisse aus der Statistik verwendet und beispielsweise
+Ausreißer werden intelligent erkannt und aus der Auswertung weggelassen.
+
+Weitere Pakete die gute Test-Frameworks bieten sind unter anderem:
+\begin{itemize}
+  \item \texttt{QuickCheck},
+  \item \texttt{SmallCheck} und
+  \item \texttt{QuickSpec}.
+\end{itemize}
+Weiter gibt es das Paket \texttt{Tasty} welches mehrere Frameworks unter einer
+einheitlichen API zusammenfasst.
 
 \subsection{Zusammenfügen: \texttt{cabal}}
 \begin{quote}
@@ -187,16 +202,29 @@ Finished in 0.0028 seconds
   organizing, and cataloging Haskell libraries and
   tools.\footnote{\url{https://hackage.haskell.org/package/Cabal}}
 \end{quote}
-Weitere Quellen:
-\begin{itemize}
-  \item \url{http://www.haskell.org/haskellwiki/How_to_write_a_Haskell_program}
-\end{itemize}
+\texttt{cabal} ist ein Paketmanager und gleichzeitig auch ein Build-System. Die
+Configuration übernimmt für jedes Pakete eine \texttt{.cabal} Datei, welche
+definiert was das Paket ist und was es enthält. Auch kann darin definiert
+werden, wo sich Tests oder Benchmarks befinden, damit diese zentral ausgeführt
+werden können.
+
+Ein relativ neu (Ab Versionen >1.18) dazugekommenes Feature sind Sandboxen.
+Diese erzeugen in einem verstecktem Ordner \texttt{.cabal-sandbox} eine
+virtuelle Umgebung, in die man benötigte Abhängigkeiten Installieren kann, ohne
+dass diese global installiert werden.
+
+Gute Anleitungen zum lesen und erstellen finden sich im
+HaskellWiki\footnote{\url{http://www.haskell.org/haskellwiki/How_to_write_a_Haskell_program}}.
 
 \subsection{Dokumentation: \texttt{haddock}}
 \begin{quote}
   Haddock is a tool for automatically generating documentation from annotated
   Haskell source code.\footnote{\url{http://www.haskell.org/haddock/}}
 \end{quote}
+Das Programm \texttt{haddock} nutzt die Kommentare in Haskell Quellcode Dateien
+um daraus eine HTML verlinkte Dokumentation zu erstellen, welche zu den
+restlichen Haskell Dokumentationen passt und im besten Fall dort nahtlos
+eingefügt werden kann.
 
 \section{Das Haskell Typensystem}
 In Haskell weiß jeder Ausdruck bereits zur Compilezeit, welchen Typ er hat. So

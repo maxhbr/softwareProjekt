@@ -67,18 +67,20 @@
     \color{myheadLineColor}
     \sectionrule{0pt}{0pt}{-5pt}{2pt}
     }
-  \sectionfont{
-    \color{myheadLineColor}
-    \sectionrule{0pt}{0pt}{-5pt}{0.8pt}
-    }
-  \subsectionfont{
-    \color{myheadLineColor}
-    \sectionrule{0pt}{0pt}{-5pt}{0.6pt}
-    }
-  \subsubsectionfont{
-    \color{myheadLineColor}
-    \sectionrule{0pt}{0pt}{-5pt}{0.4pt}
-    }
+  \iffalse
+    \sectionfont{
+      \color{myheadLineColor}
+      \sectionrule{0pt}{0pt}{-5pt}{0.8pt}
+      }
+    \subsectionfont{
+      \color{myheadLineColor}
+      \sectionrule{0pt}{0pt}{-5pt}{0.6pt}
+      }
+    \subsubsectionfont{
+      \color{myheadLineColor}
+      \sectionrule{0pt}{0pt}{-5pt}{0.4pt}
+      }
+  \fi
 \fi
 
 %%%%  Typography  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
