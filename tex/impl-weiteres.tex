@@ -20,6 +20,33 @@ Diese drei Funktionen sind leider nur unter Linux verfügbar.
 \haskellinput{Core/ShowTex}{renderTex}
 \haskellinput{Core/ShowTex}{renderRawTex}
 
+\subsection{Serialisierung}
+Alle hier genutzten Datentypen haben eine Instanz vom Typ \texttt{Binary},
+welche einfache Serialisierung ermöglicht. Dazu müssen nur die zwei Funktionen
+\texttt{put} und \texttt{get} implementiert werden.
+
+Als Beispiel dient die folgende Funktion, die einen Dateinamen als
+\texttt{String} und eine Liste von Polynomen, welche über einer Erweiterung von
+einer Erweiterung von \texttt{PF} leben.
+\begin{hcode}
+import qualified Data.Binary as B
+
+saveToFile :: String -> [Polynom (FFElem (FFElem PF))] -> IO ()
+saveToFile fileName polys = writeFile fileName (B.encode (polys))
+\end{hcode}
+
+Die erzeugte Binärdatei lässt sich ebensoeinfach wieder auslesen, indem man die
+Daten in eine Variable \texttt{raw} lädt und diese mittels des Befehls
+\texttt{decode} decodiert. Dabei muss angegeben werden, welchen Typ das
+gelesene haben soll.
+\begin{hcode}
+readFromFile :: String -> IO [Polynom (FFElem (FFElem PF))]
+readFromFile fileName = do
+  raw <- readFile fileName
+  let ls = B.decode raw :: [Polynom (FFElem (FFElem PF))]
+  return ls
+\end{hcode}
+
 \subsection{Spezielle Polynome und zahlentheoretische Funktionen}
 
 \texttt{GalFld/More/SpecialPolys.hs}

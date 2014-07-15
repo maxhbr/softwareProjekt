@@ -183,6 +183,10 @@ bessere Werte zu bekommen werden die Tests mehrfach ausgeführt.
 Dazu werden Erkenntnisse aus der Statistik verwendet und beispielsweise
 Ausreißer werden intelligent erkannt und aus der Auswertung weggelassen.
 
+Damit das Ergebnis trotz der Lazyness komplett ausgewertet wird, braucht der
+Typ der Berechnung eine Instanz vom Typen \texttt{NFData}. Ohne diesen kann nur
+garantiert werden, dass bis zur Weak Head Normal Form ausgewertet wird.
+
 Weitere Pakete die gute Test-Frameworks bieten sind unter anderem:
 \begin{itemize}
   \item \texttt{QuickCheck},
