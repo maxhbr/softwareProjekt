@@ -160,6 +160,9 @@
 
 \lstMakeShortInline[mathescape=true]ħ
 
+\lstnewenvironment{hlisting}[2][]{%
+  \lstset{language=Haskellulisses,belowskip=\smallskipamount,#1}%
+  \center\emptynode\penalty1000000000\tikzmarginpath{#2}\penalty1000000000}{\endcenter}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Source to Latex Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -175,16 +178,14 @@
     ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex}%
   \immediate\write18{/usr/bin/grep -n -Ff /tmp/temp.tex
     ../src/GalFld/#1.hs | /usr/bin/gawk 'NR==1
-      {print "\string\\begin\string\{lstlisting\string\}[firstnumber="$1"]
-       \string\n(*@\string\\emptynode@*)"};'
+      {print "\string\\begin\string\{hlisting\string\}[firstnumber="$1"]%
+      \string\{#1\string\}"};'
       FS=":" >/tmp/temp2.tex}%
-  \immediate\write18{echo "$(cat /tmp/temp2.tex)$(cat /tmp/temp.tex)" 
-                     >/tmp/temp2.tex}%
-  \immediate\write18{echo '\string\end\string{lstlisting\string}'
+  \immediate\write18{cat /tmp/temp.tex >>/tmp/temp2.tex}%
+  \immediate\write18{echo '\string\end\string{hlisting\string}'
                      >>/tmp/temp2.tex}%
   %Print Input File
   \input{/tmp/temp2.tex}%
-  \tikzmarginpath{#1}%
   %Clean up
   \immediate\write18{/usr/bin/rm /tmp/temp.tex}%
   \immediate\write18{/usr/bin/rm /tmp/temp2.tex}%
@@ -197,14 +198,16 @@
   \begin{tikzpicture}[overlay, remember picture]%
     \node[font=\scriptsize, text width=0.9\marginparwidth,anchor=base]%
       at (current page marginpar area.west|-beginlisting.center)%
+      (margin)
       {\path{GalFld/#1.hs}};
+    \draw[red] (margin.west) -- (beginlisting.center);
   \end{tikzpicture}\end{minipage}\vspace{-2\parskip}}%
 
 
 \newcommand{\emptynode}{%
   \tikz[remember picture,baseline]{
     \useasboundingbox (0,0) rectangle (0,0);
-    \node[anchor=base] (beginlisting) {};}}
+    \node[anchor=base,draw=red] (beginlisting) {};}}
 
 
 
