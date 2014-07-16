@@ -9,9 +9,9 @@
 \usepackage[T1]{fontenc}
 
 %%%% General
-\clubpenalty = 10000
-\widowpenalty = 10000
-\displaywidowpenalty = 10000
+%\clubpenalty = 10000
+%\widowpenalty = 10000
+%\displaywidowpenalty = 10000
 
 %%%% Sprache
 \usepackage{polyglossia}

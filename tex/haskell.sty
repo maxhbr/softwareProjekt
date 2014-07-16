@@ -138,18 +138,6 @@
 
 \RequirePackage{calc}
 
-\newlength{\parskipsave}
-\newcounter{mycount}
-\newcommand{\codeinput}[3]{
-  \setlength{\parskipsave}{\bigskipamount}
-  \addtolength{\parskipsave}{\parskip}
-  \marginpar{\vspace*{\parskipsave}\scriptsize\path{Projekt/#1.hs}}
-  \setcounter{mycount}{#2}
-  \addtocounter{mycount}{#3}
-  \lstinputlisting[firstline=#2,lastline={\value{mycount}},firstnumber=#2]%
-    {../src/Projekt/#1.hs}
-}
-
 
 \lstnewenvironment{hcode}{%
   \lstset{language=Haskellulisses,numbers=none,belowskip=\smallskipamount}}{}
@@ -162,14 +150,16 @@
 
 \lstnewenvironment{hlisting}[2][]{%
   \lstset{language=Haskellulisses,belowskip=\smallskipamount,#1}%
-  \center\emptynode\penalty1000000000\tikzmarginpath{#2}\penalty1000000000}{\endcenter}
+  \tikzmarginpath{#2}\penalty1000000000}{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Source to Latex Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%\newlength{\parskipsave}
-%\newcounter{mycount}
+\newif\ifnoupdatelistings%\noupdatelistingstrue
+\newcounter{mycount}
+\setcounter{mycount}{1}
 \newcommand{\haskellinput}[2]{%
+\ifnoupdatelistings
   \typeout{^^JThis is Haskellinput ------------------------ look for^^J
     /usr/bin/awk 'BEGIN {RS="\string\n\string\n";} /.*?^#2 /'
     ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex
@@ -178,36 +168,40 @@
     ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex}%
   \immediate\write18{/usr/bin/grep -n -Ff /tmp/temp.tex
     ../src/GalFld/#1.hs | /usr/bin/gawk 'NR==1
-      {print "\string\\begin\string\{hlisting\string\}[firstnumber="$1"]%
-      \string\{#1\string\}"};'
-      FS=":" >/tmp/temp2.tex}%
-  \immediate\write18{cat /tmp/temp.tex >>/tmp/temp2.tex}%
-  \immediate\write18{echo '\string\end\string{hlisting\string}'
-                     >>/tmp/temp2.tex}%
+      {print "\string\\begin\string\{lstlisting\string\}[firstnumber="$1"]
+      \string\n(*@\string\\tikzmarginpath\string\{#1\string\}@*)"};'
+      FS=":" >/tmp/listing\themycount.tex}%
+  \immediate\write18{echo "$(cat /tmp/listing\themycount.tex)$(cat /tmp/temp.tex)"
+                     >/tmp/listing\themycount.tex}%
+  \immediate\write18{echo '\string\end\string{lstlisting\string}'
+                     >>/tmp/listing\themycount.tex}%
+  \input{/tmp/listing\themycount.tex}%
+  \stepcounter{mycount}
+\else
   %Print Input File
-  \input{/tmp/temp2.tex}%
-  %Clean up
-  \immediate\write18{/usr/bin/rm /tmp/temp.tex}%
-  \immediate\write18{/usr/bin/rm /tmp/temp2.tex}%
+  \input{/tmp/listing\themycount.tex}%
+  \stepcounter{mycount}
+\fi
 }%
 
 % Doofer Trick um den zusätzlichen vertical space zu vermeiden, den tikz
 % erzeugt, trotz overlay!
 \newcommand{\tikzmarginpath}[1]{%
-  \begin{minipage}[c][0pt][c]{\textwidth}%
-  \begin{tikzpicture}[overlay, remember picture]%
-    \node[font=\scriptsize, text width=0.9\marginparwidth,anchor=base]%
+  \emptynode%
+  \tikz[overlay, remember picture]{
+    \node[font=\scriptsize, text width=0.9\marginparwidth,anchor=base,
+      xshift=1cm]%
       at (current page marginpar area.west|-beginlisting.center)%
       (margin)
       {\path{GalFld/#1.hs}};
-    \draw[red] (margin.west) -- (beginlisting.center);
-  \end{tikzpicture}\end{minipage}\vspace{-2\parskip}}%
+    %\draw[red] (margin.west) -- (beginlisting.center);
+}}
 
 
 \newcommand{\emptynode}{%
   \tikz[remember picture,baseline]{
     \useasboundingbox (0,0) rectangle (0,0);
-    \node[anchor=base,draw=red] (beginlisting) {};}}
+    \node[anchor=base] (beginlisting) {};}}
 
 
 
