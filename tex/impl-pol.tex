@@ -10,10 +10,10 @@ Grundsätzlich gibt es zwei verschiedene Möglichkeiten Polynome zu
 implementieren: \emph{sparse} und \emph{dense}, d.h. 
 \begin{itemize}
   \item entweder entscheidet man
-    sich ein Polynom $f(X) = a_nX^n + \ldots + a_0$ als Liste\footnote{Was genau 
-    eine ``Liste'' in der jeweilig benutzten Sprache bedeuten soll, bleibt der
-    Interpretation überlassen.} der Länge $n$ zu hinterlegen,
-  \item oder man speichert lediglich eine Liste von Tupel $(i,a_i)$, so dass
+    sich, ein Polynom $f(X) = a_nX^n + \ldots + a_0$ als Liste\footnote{Was genau 
+    eine ,,Liste`` in der jeweilig benutzten Sprache bedeuten soll, bleibt der
+    Interpretation überlassen.} der Länge $n+1$ zu hinterlegen,
+  \item oder man speichert lediglich eine Liste von Tupeln $(i,a_i)$, sodass
     $i \in \{0,\ldots,n\}$ den Index/Exponenten des Koeffizienten $a_i$ angibt
     und alle Koeffizienten, die Null sind, ausgelassen werden.
 \end{itemize}
@@ -25,7 +25,7 @@ Konkret ist ein Polynom also definiert durch:
 \haskellinput{Core/Polynomials}{data Polynom}
 
 Um diese Darstellung \emph{dense} nennen und mit ihr effizient arbeiten zu 
-können, treffen wir folgende Beschränkungen an die Implementierung:
+können, legen wir folgende Beschränkungen für die Implementierung fest:
 \begin{invariante}
   \label{inv:poly}
   Für ħPMS $L$ Trueħ gilt stets, dass die Monome in $L$ alle nicht Null 
@@ -55,7 +55,7 @@ kann:
 
 \subsection{Instanzen}
 Es wurden die offensichtlichen Instanzen implementiert, d.h.
-ħEqħ und ħNumħ. Zudem wurden zu Anzeige von Polynomen ħShowħ und ħShowTexħ, zur
+ħEqħ und ħNumħ. Zudem wurden zur Anzeige von Polynomen ħShowħ und ħShowTexħ, zur
 binären Speicherung ħBinaryħ und für eine Auswertung trotz Lazyness ħNFDataħ
 implementiert.
 
@@ -75,12 +75,12 @@ Alle auftauchenden Funktionen werden im weiteren Verlauf näher erläutert.
 
 \subsection{Polynome erstellen}
 \paragraph{Allgemein}
-Diese Einschränkung erfordert auch, dass der Konstruktor des Polynomdatentyps
+\thref{inv:poly} erfordert auch, dass der Konstruktor des Polynomdatentyps
 nicht öffentlich gemacht wird und wir benötigen separate Funktionen, um
 Polynome zu erstellen. Diese sind selbsterklärend:
 \haskellinput{Core/Polynomials}{pList}
 \haskellinput{Core/Polynomials}{pTup}
-Ferner existiert noch eine Variante der ``unsicheren'' Erstellung von
+Ferner existiert noch eine Variante der ,,unsicheren`` Erstellung von
 Polynomen, die eine korrekte Darstellung nach \thref{inv:poly} voraussetzt,
 diese jedoch nicht prüft. 
 \haskellinput{Core/Polynomials}{pTupUnsave}
@@ -95,7 +95,7 @@ bewerkstelligen:
 
 
 \paragraph{Spezielle Polynome}
-Eines der am häufigsten verwendenten Polynome ist das Nullpolynom. Daher gibt
+Eines der am häufigsten verwendeten Polynome ist das Nullpolynom. Daher gibt
 es sowohl eine Prüfung, ob ein Polynom null ist, als auch das Nullpolynom
 selbst als Objekt:
 \haskellinput{Core/Polynomials}{nullP}
@@ -117,8 +117,8 @@ Es ist klar, dass man meistens einen ħIntħ als Grad haben möchte, daher haben
 wir folgende Funktion implementiert:
 \haskellinput{Core/Polynomials}{uDegP}
 
-\paragraph{Auswerten} Natürlich muss auch etwas in ein Polynom einsetzen
-können, was wir mit Hilfe des Hornerschemas (vgl.
+\paragraph{Auswerten} Natürlich muss man auch etwas in ein Polynom einsetzen
+können, was wir mit Hilfe des Horner-Schemas (vgl.
 \autocite{wiki:horner-schema})
 implementiert haben. Dies zeigt eine schöne Anwendung der Haskellfunktion 
 ħfoldlħ:
@@ -168,9 +168,9 @@ genau dann gleich, wenn ihre Koeffizienten übereinstimmen:
 \haskellinput{Core/Polynomials}{eqP}
 
 
-\paragraph{Addition} Hier kommt zum ersten mal ein kleiner Nachteil der
+\paragraph{Addition} Hier kommt zum ersten Mal ein kleiner Nachteil der
 \emph{dense} Darstellung zu Tage, da das Addieren zweier Polynome nicht einfach
-das elementweise summieren zweier Listen ist, sondern stets geprüft werden
+das elementweise Summieren zweier Listen ist, sondern stets geprüft werden
 muss, bei welchem Grad man gerade ist:
 \haskellinput{Core/Polynomials}{addPM}
 ħaddPMħ darf offensichtlich nur ausgeführt werden, wenn die beiden Polynome
@@ -178,17 +178,16 @@ muss, bei welchem Grad man gerade ist:
 dass besagte Invariante erhalten bleibt.
 
 \paragraph{Subtraktion} Da die funktionale Programmierung lediglich 
-nicht veränderbare Objekte (\emph{immutable Objects}) vorsieht, würde durch die
+nicht veränderbare Objekte (\emph{immutable objects}) vorsieht, würde durch die
 Standarddefinition der Subtraktion, nämlich Addition des ersten mit dem
 negierten zweiten Argument, das zweite Polynom doppelt durchlaufen (einmal beim
-Negieren und einmal beim Addieren) werden. Um dies zu verhindern, haben wir die
+Negieren und einmal beim Addieren). Um dies zu verhindern, haben wir die
 Subtraktion separat geschrieben.
 \haskellinput{Core/Polynomials}{subtrPM}
 Wiederum darf obige Subtraktion nur auf wohlgeformte Polynome angewandt werden.
 
 \paragraph{Multiplikation}
-Da auf dem Datentyp ħIntħ sowohl Multiplikation als auch Addition in gleicher
-Zeit erfolgen, hat sich herausgestellt, dass in den meisten Fällen die 
+Es hat sich herausgestellt, dass in den meisten Fällen die 
 ,,Standardmultiplikation`` die effizienteste ist. Diese ist wie folgt
 implementiert:
 \haskellinput{Core/Polynomials}{multPM}
@@ -199,13 +198,13 @@ auf FFT-Grundlage implementiert, wie in \autoref{subsec:multAlgs} nachzulesen is
 \paragraph{Division mit Rest}
 Wie auch schon bei der Multiplikation von Polynomen, kennt man bei der Division
 mit Rest verschiedene Algorithmen. Als erste und einfachste Wahl bietet sich
-die Division mit Rest nach Grundschulmethode an. Diese hat sich jedoch am
-langsamsten erwiesen und wurde daher wieder aus dem Code entfernt. Die nun in
-den meisten Fällen am effizientesten Methode ist die Division mit Hilfe des
-Hornerschemas. Eine sehr gute und ausführliche Erklärung findet sich 
+die Division mit Rest nach Grundschulmethode an. Diese hat sich jedoch als
+langsamste erwiesen und wurde daher wieder aus dem Code entfernt. Die nun in
+den meisten Fällen schnellste Methode ist die Division mit Hilfe des
+Horner-Schemas. Eine sehr gute und ausführliche Erklärung findet sich 
 in \autocite{wiki:synthetic-division}.
 
-Wiederum lässt sich die Division per Hornerschema sehr schön rekursiv in
+Wiederum lässt sich die Division per Horner-Schema sehr schön rekursiv in
 Haskell niederschreiben.
 \haskellinput{Core/Polynomials}{divPHornerM'\string\''}
 
@@ -219,12 +218,13 @@ behandeln und die initialen Parameter festzulegen.
 Polynom durch ein anderes teilbar ist, haben wir den Operator ħ(@/)ħ definiert
 \footnote{Zu beachten ist hierbei, dass die Benutzung 
 von \lstinline{(/)}nicht möglich 
-ist, da es eine \lstinline{Num}-Instanz erfordern würde, die es auf Polynomen ja
-offenbar nicht gibt.}.
+ist, da es eine \lstinline{Fractional}-Instanz erfordern würde, 
+die es auf Polynomen ja offenbar nicht gibt.}.
 Dieser ist selbstredend nichts anderes als Division mit Rest, wobei lediglich
 der erste Eintrag des Tupels zurückgegeben wird.
 
-%\haskellinput{Core/Polynomials}{(\string@/)}
+% TODO
+%\haskellinput{Core/Polynomials}{(\string\@\string\/)}
 
 
 \paragraph{Modulo} Dual zu ħ(@/)ħ ist ħmodByPħ, das einfach den zweiten Eintrag
@@ -239,7 +239,7 @@ rekursiv -- hier gegeben durch:
 
 \haskellinput{Core/Polynomials}{eekP}
 
-\paragraph{Größter gemeinsamer Teiler} Aus des erweiterten Euklidischen
+\paragraph{Größter gemeinsamer Teiler} Aus dem erweiterten Euklidischen
 Algorithmus erhält man selbstverständlich auch den $\ggT$ zweier Polynome:
 
 \haskellinput{Core/Polynomials}{ggTP}
@@ -264,7 +264,7 @@ die Funktion ħgetAllMonicPħ.
 \haskellinput{Core/Polynomials}{getAllMonicP}
 
 Zuletzt kann man sich natürlich noch zusätzlich die nicht-monischen Polynome
-ausgeben lassen. Wie oben in beiden Varianten (d.h. Gräder als Liste oder als
+ausgeben lassen; wie oben in beiden Varianten (d.h. Grade als Liste oder als
 Obergrenze gegeben).
 
 \haskellinput{Core/Polynomials}{getAllPs}
@@ -287,21 +287,21 @@ verwiesen, wo auch die Conway-Polynome zu finden sind, die wir in der Datei
 
 \subsubsection{Karatsuba}
 Einer der häufigsten Multiplikationsalgorithmen für Polynome ist sicher der
-Karatsuba. Er basiert auf der Idee Multiplikationen durch Additionen zu
+Karatsuba. Er basiert auf der Idee, Multiplikationen durch Additionen zu
 ersetzen, die im Allgemeinen ,,billiger`` sind. 
 
-Der Basisfall für die Multiplikation zweier Polynome von Grad 1, lässt die Idee
+Der Basisfall für die Multiplikation zweier Polynome von Grad 1 lässt die Idee
 des Algorithmus deutlich werden:
 \[ (a_1 X + b_1) \cdot (a_2 X + b_2) = 
   A X^2 + (C - A - B) X + B\]
 wobei 
 \[ A = a_1 b_1, \qquad B = a_2b_2, \qquad C = (a_1+b_1)(a_2+b_2) \,.\]
-Damit können die ursprünglich 4 auftretenden Multiplikation des
-Standardalgorithmus durch 3 Multiplikation und 4 Additionen ersetzt werden.
+Damit können die ursprünglich 4 auftretenden Multiplikationen des
+Standardalgorithmus durch 3 Multiplikationen und 4 Additionen ersetzt werden.
 Dies lässt sich natürlich rekursiv anwenden. Da die Polynome jedoch nicht immer
-von gleichem Grad sind und dieser selten eine Zweierpotenz ist (letzteres ist
+gleichen Grades sind und dieser selten eine Zweierpotenz ist (letzteres ist
 notwendig, damit der Algorithmus rekursiv bis zu obigem Grundfall laufen kann),
-wählt man die nächstkleinere Zweierpotenz des Maximums der beiden Gräder als
+wählt man die nächstkleinere Zweierpotenz des Maximums der beiden Grade als
 Teilungspunkt für den rekursiven Aufruf.
 Die Implementierung erfolgt dabei in drei Schritten: 
 \haskellinput{Core/Polynomials}{multPK}
@@ -315,10 +315,10 @@ auch in diesem Fall effizienter.
 \haskellinput{Core/Polynomials}{multPMK'\string\''}
 
 \paragraph{Ein kleiner Vergleich}
-Auf Polynomen über den ħPrimeFieldsħ bringt der Karatsuba nur wenig Vorteil
-gegenüber der Standardmultiplikation. 
+Auf Polynomen über den ħPrimeFieldsħ bringt der Karatsuba erst bei sehr hohen
+Graden einen leichten Vorteil gegenüber der Standardmultiplikation. 
 Betrachten wir jedoch
-ein Beispiel über einem Erweiterungskörper, so kann der Karatsuba seien Vorteil
+ein Beispiel über einem Erweiterungskörper, so kann der Karatsuba seinen Vorteil
 ausspielen, da dort ja die Koeffizienten selbst Polynome sind, und daher
 Addition weitaus ,,billiger`` ist als Multiplikation.
 \autoref{fig:karavsnorm} zeigt dies deutlich.
@@ -332,16 +332,18 @@ Addition weitaus ,,billiger`` ist als Multiplikation.
 \end{figure}
 
 
-\subsubsection{FFT-Multiplikation: Der Schönhagen-Strassen-Algorithmus}
-Eine, was die Idee angeht, weitaus komplexere Möglichkeit Polynome zu
-multiplizieren, ist die FFT-Multiplikation. Sie ist die bislang schnellste
+\subsubsection{FFT-Multiplikation: Der Schönhage-Strassen-Algorithmus}
+Eine der Idee nach weitaus komplexere Möglichkeit Polynome zu
+multiplizieren, ist die Multiplikation auf Basis der schnellen
+Fourier-Transformation (engl. \emph{fast Fourier transform} (FFT)). 
+Sie ist die bislang schnellste
 bekannte Methode. Allerdings gilt dies nur für die asymptotische Laufzeit!
 Daher konnten wir leider nur feststellen, dass die FFT-Multiplikation stets
 weitaus langsamer ist, als der Standardalgorithmus oder Karatsuba.
 
 Die Idee der FFT-Multiplikation basiert auf der Tatsache, dass sich das Produkt
-zweier Polynome in Diskreter Fourier-Transformation (DFT) als komponentenweises
-Produkt der Fourier-Transformierten der beiden Polynome berechnen lässt. 
+zweier Polynome in diskreter Fourier-Transformation (DFT) als komponentenweises
+Produkt der Fourier-Transformierten beider Polynome berechnen lässt. 
 Dies wollen wir uns näher betrachten:
 
 Im Folgenden sei stets $R$ ein kommutativer Ring mit Eins und 
@@ -349,7 +351,7 @@ $\omega\in R$ eine primitive $n$-te Einheitswurzel.
 
 \begin{definition}
    Ist $f\in R[X]$ ein Polynom, so ist seine
-  \emph{Diskrete Fourier-Transformation (DFT)} definiert als
+  \emph{diskrete Fourier-Transformation (DFT)} definiert als
   \[ f^\wedge(\omega) = (f(\omega^j):\ j=1,\ldots,n-1) \in R^n\,.\]
 \end{definition}
 
@@ -361,7 +363,7 @@ Eine wesentliche Eigenschaft liefert folgende Proposition.
   \[ f(X) = (\tfrac 1 n F^\wedge(\omega^{-1}))(X) \,.\]
 \end{prop}
 \begin{proof}
-  
+  \autocite[Proposition 4.9]{fft}. 
 \end{proof}
 
 Die auftauchende Frage zur Notation eines $n$-Tupels als Polynom beantwortet
@@ -380,7 +382,7 @@ $n = 2^l$ eine Zweierpotenz setzt:
 \begin{pseudocode}{FFT}{alg:fft}
 Input: $n = 2^l$, $\omega \in R$ eine primitive $n$-te Einheitswurzel, $f \in R^n$
 Output: $f^\wedge(\omega)$
-Algorithmus: FFT($n$,$\omega$,$f$)
+Algorithmus FFT($n$,$\omega$,$f$):
   1. Setze
     $r := \big(f_j + f_{j+\frac n 2}:\ j=0,\ldots,\tfrac n 2\big)$
     $r_\omega := \big( \omega^j (f_j - f_{j+\frac n 2}):\
@@ -403,32 +405,32 @@ Algorithmus FFTM($f$,$g$,$n$,$\omega$):
 
 
 Es bleiben ein paar Probleme offen: Um mit obigem Algorithmus Polynome zu
-multplizieren, muss es in $R$ für jede Zweierpotenz $n$ eine $n$-te
-Einheitswurzel und $2$ muss eine Einheit sein. Die Tatsache, dass 2 eine
-Einheit sei, spielt für den Fall der Anwendung -- nämlich Multiplikation von
-Polynomen über endlichen Körpern -- keine Rolle, da dies dort ja immer gegeben
-ist. Jedoch bleibt offen, wie man eine $n$-te Einheitswurzel finden soll.
-Die allgemeine Antwort lautet in diesem Fall: Wir suchen gar nicht, sondern
-modifizieren das Setting so, dass stets eine $n$-te Einheitswurzel gegeben
-ist:
+multiplizieren, muss in $R$ für jede Zweierpotenz $n$ eine primitive $n$-te
+Einheitswurzel existieren und $2$ eine Einheit sein. Die Tatsache, dass 2 eine
+Einheit sein muss, spielt für den Fall der Anwendung -- nämlich Multiplikation 
+von Polynomen über endlichen Körpern -- keine Rolle, da dies dort ja immer 
+gegeben ist. Jedoch bleibt offen, wie man eine $n$-te Einheitswurzel finden 
+soll.  Die allgemeine Antwort lautet in diesem Fall: Wir suchen gar nicht, 
+sondern modifizieren das Setting so, dass stets eine $n$-te Einheitswurzel 
+gegeben ist:
 
 \begin{lemma}
-  Sei $R$ ein kommutativer Ring und $2 \in R$ eine Einheit. Sei fernen 
+  Sei $R$ ein kommutativer Ring und $2 \in R$ eine Einheit. Sei ferner
   $n = 2^l$ mit $l\geq 1$. Dann ist 
   \[ \omega := X\  \in\ R_n := R[X]\big/(X^n+1)\]
   eine primitive $(2n)$-te Einheitswurzel.
 \end{lemma}
 \begin{proof}
-  
+  \autocite[Lemma 4.15]{fft}.
 \end{proof}
 
 Das bedeutet, wir ,,erzwingen`` die Existenz einer passenden primitiven
 Einheitswurzel. Damit bleibt nur noch die Frage, wie wir ein Polynom 
 $f(X) \in R[X]$ als bivariates Polynom in $R[X,Y]\big/(Y^n+1)$ lesen können, um
 dort die FFT-Multiplikation anwenden zu können. Eine Antwort und das konkrete
-Vorgehen gibt der Schönhagen-Strassen-Algorithmus:
+Vorgehen gibt der Schönhage-Strassen-Algorithmus:
 
-\begin{pseudocode}{Schönhagen-Strassen-Multiplikation}{alg:ssm}
+\begin{pseudocode}{Schönhage-Strassen-Multiplikation}{alg:ssm}
 Input: $f(X),g(X) \in R[X]$, so dass $2 \in R$ eine Einheit
 Output: $h(X) = f(X)g(X) \in R[X]$
 Algorithmus SS($f$,$g$):
@@ -448,9 +450,18 @@ Algorithmus SS($f$,$g$):
   9. Setze $h(X) := H(X,X^m) \bmod{X^n-1}$.
 \end{pseudocode}
 
+\begin{thm}
+  \autoref{alg:ssm} multipliziert zwei Polynome von Grad $<\tfrac n 2$ in
+  \[ \cO(n\log_2 n\log_2\log_2 n) \]
+  Ringoperationen.
+\end{thm}
+\begin{proof}
+  \autocite[Algorithmus 4.18]{fft}.
+\end{proof}
+
 \paragraph{Implementierung}
 Zunächst führen wir ein paar kleine Hilfsfunktionen an, die wir in der
-Implementierung des Schönhagen-Strassen-Algorithmus brauchen werden:
+Implementierung des Schönhage-Strassen-Algorithmus brauchen werden:
 \haskellinput{Core/Polynomials/FFTTuple}{intersperseL}
 \haskellinput{Core/Polynomials/FFTTuple}{zipWith'\string\''}
 \haskellinput{Core/Polynomials/FFTTuple}{log2}
@@ -472,14 +483,14 @@ Polynomebene und dann auf den eigentlichen Listen:
 Des Weiteren ist eine schnelle Reduktion $\pmod x^n+1$ nötig:
 \haskellinput{Core/Polynomials/FFTTuple}{reduceModxn}
 
-Zuletzt haben wir noch die Multiplikation mit dem Monom $x^{j*j}$ als separate
+Zuletzt haben wir noch die Multiplikation mit dem Monom $x^{i*j}$ als separate
 Funktion gestaltet, die offenbar schneller ist, als der normale
 Multiplikationsalgorithmus.
 \haskellinput{Core/Polynomials/FFTTuple}{multx}
 
 \subsection{Division mit Rest mit Inversen $\bmod x^l$}
 Im Folgenden stellen wir eine Möglichkeit vor, die Division mit Rest zweier
-Polynome in genau der gleichen asymptotischen Laufzeit zu bewerkstelligen, wie
+Polynome in genau der gleichen asymptotischen Laufzeit zu bewerkstelligen wie
 die Multiplikation. Wir halten uns dabei eng an 
 \cite{divHensel} und \cite{divHensel2}.
 Die Idee für diese schöne und zugleich schnelle Methode liefert folgende 
@@ -527,15 +538,15 @@ erinnere sich kurz an die Definition des reziproken Polynoms von Ordnung $d$
 aus \thref{def:reziprokesPoly})
 
 \begin{pseudocode}{Division mit Rest durch Invertieren $\bmod X^l$}{alg:divInv}
-Input: $a,b\in R[X]$ mit $\deg b \leq \deg a$.
-Output $q,r \in R[X]$ mit $a = qb + r$.
+Input: $a,b\in R[X]$ mit $\deg b \leq \deg a$
+Output $q,r \in R[X]$ mit $a = qb + r$
 Algorithmus DIV_INV($a$,$b$):
   1. Setze $n := \deg a$, $m := \deg b$, $l:= n-m+1$
   2. Setze $\bar b(X) := \tfrac{1}{b_m} b(X)$ für $b_m$ den Leitkoeffizienten von $b$
   2. Setze $f(X) := \bar b^\ast_l(X)$
   3. Berechne $g(X) := $ INV_MOD_MONOM($f$,$l$)
   4. Berechne $q'(X) := g(X)\,a^\ast_l(X)\ \bmod X^l$
-  5. Setze $q(X) := b_m \cdot {q'}^\ast_{n-m}(X)$ und $r(X) := a(X) - b(X) q(X)$.
+  5. Setze $q(X) := b_m \cdot {q'}^\ast_{n-m}(X)$ und $r(X) := a(X) - b(X) q(X)$
 \end{pseudocode}
 
 \begin{thm}

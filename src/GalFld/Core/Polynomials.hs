@@ -41,15 +41,15 @@ import GalFld.Core.ShowTex
 --------------------------------------------------------------------------------
 --  Data Definition
 
--- |Polynome sind Listen von Monomen, welche durch Paare (Integer,a)
--- dargestellt werden. In der ersten Stelle steht der Grad, in der zweiten der
+-- |Polynome sind Listen von Monomen, welche durch Paare (In,a)
+-- dargestellt werden. An erster Stelle steht der Grad, an zweiter der
 -- Koeffizient.
 data Polynom a = PMS { unPMS :: [(Int,a)], clean :: Bool } deriving ()
 
--- |Das Nullpoylnom
+-- |Das Nullpolynom
 nullP = PMS [] True
 
--- |Erzeuge ein Polynom aus einer Liste von Koeffizienten
+-- |Erzeugt ein Polynom aus einer Liste von Koeffizienten
 pList :: (Num a, Eq a) => [a] -> Polynom a
 pList ms = PMS (list2TupleSave ms) True
 
@@ -107,7 +107,7 @@ eqP f g  = eqP (cleanP f) (cleanP g)
 
 {-# INLINE isNullP #-}
 isNullP (PMS ms _) = isNullP' ms
-isNullP' []         = True
+isNullP' []        = True
 isNullP' ((i,m):ms) | m /= 0     = False
                     | otherwise = isNullP' ms
 
@@ -178,8 +178,8 @@ instance (Num a, Eq a) => Num (Polynom a) where
   negate (PMS ms b) = PMS ((map . A.second) negate ms) b
 
 {-# INLINE addPM #-}
--- | addiere Polynome in Monomdarstellung, d.h
---   [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist
+-- |Addiert Polynome in Monomdarstellung, d.h
+--  [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist
 addPM :: (Eq a,Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 addPM [] gs          = gs
 addPM fs []          = fs
@@ -191,8 +191,8 @@ addPM ff@((i,f):fs) gg@((j,g):gs)
    where !c = f+g
 
 {-# INLINE subtrPM #-}
--- | subtrahiere Polynome in Monomdarstellung, d.h
---   [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist
+-- |Subtrahiert Polynome in Monomdarstellung, d.h
+--  [(Int,a)] wobei die Liste in Int ABSTEIGEND sortiert ist
 subtrPM :: (Eq a,Num a) => [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 subtrPM [] gs          = map (A.second negate) gs
 subtrPM fs []          = fs
@@ -350,7 +350,7 @@ moniP f@(PMS ms True) = PMS ns True
         l  = snd $ head ms
 moniP f               = moniP $ cleanP f
 
--- |Normiert f und gibt gleichzeitig das Inverse des Leitkoeefizieten zurück
+-- |Normiert f und gibt gleichzeitig das Inverse des Leitkoeffizienten zurück
 moniLcP :: (Num a, Eq a, Fractional a) => Polynom a -> (a,Polynom a)
 moniLcP f@(PMS [] _)    = (0,f)
 moniLcP f@(PMS ms True) = (l,PMS ns True)
@@ -426,8 +426,7 @@ divP' a b = fst $ divP a b
 
 {-# INLINE modByP #-}
 -- |Nimmt ein Polynom und rechnet modulo ein anderes Polynom.
--- Also Division mit rest und Rüchgabewert ist der Rest.
---
+--  Also Division mit Rest und Rückgabe des Rests.
 modByP :: (Show a, Eq a, Fractional a) => Polynom a -> Polynom a -> Polynom a
 modByP f p = snd $ divP f p
 
@@ -464,9 +463,7 @@ invModMonom h k  | isNullP h  = nullP
   where hs = unPMS $ cleanP h
         invModMonom' !a !l
           | l >= k     =  a
-          | otherwise = --trace ("invModMonom' l="++show l++" lnew="++show lnew
-                        --  ++"\n\t=> a'="++show (pTup a')++" b="++show (pTup b)) $
-                        invModMonom' b lnew
+          | otherwise = invModMonom' b lnew
           where -- g_i+1 = (2*g_i - h*g_i^2) mod x^(2^i)
                 b = map (A.second negate) a' ++ a
                 -- a' = h*g_i^2
@@ -544,8 +541,8 @@ ggTP f g = (\ (x,_,_) -> x) $ eekP f g
 --  Weiteres
 
 {-# INLINE evalP #-}
--- |Nimmt einen Wert und ein Polynom umd wertet das Polynom an dem Wert aus.
--- Mittels Horner Schema
+-- |Nimmt einen Wert und ein Polynom und wertet es dort aus.
+--  Mittels Horner Schema
 evalP :: (Eq a, Num a) => a -> Polynom a -> a
 evalP x f = evalP' x (unPMS $ cleanP f)
 evalP' :: (Num a) => a -> [(Int,a)] -> a
@@ -561,17 +558,16 @@ hasNs' f es = [evalP e f | e <- es]
 
 -- |Nimmt eine Liste und Grad und erzeugt daraus alle Polynome bis zu diesem
 -- Grad.
--- Das Nullpoylnom (P[]) ist NICHT enthalten
+-- Das Nullpolynom (P[]) ist NICHT enthalten.
 getAllP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
 getAllP es d = [PMS (map (A.second (e*)) $ unPMS f) True | f <- getAllMonicP es d
                                        , e <- es , e /= 0]
 
--- |Nimmt eine Liste und eine Liste von Grädern und erzeugt daraus alle
--- Polynome deren Gräder in der Liste enthalten sind
+-- |Nimmt eine Liste und eine Liste von Grade und erzeugt daraus alle
+-- Polynome, deren Grade in der Liste enthalten sind.
 getAllPs :: (Num a, Fractional a, Eq a) => [a] -> [Int] -> [Polynom a]
--- TODO: Man muss nur das letzte Element in der Liste verändern
-getAllPs es ds = [PMS (map (A.second (e*))$ unPMS f) True | f <- getAllMonicPs es ds
-                                         , e <- es , e /= 0]
+getAllPs es ds = [PMS (map (A.second (e*))$ unPMS f) True 
+                   | f <- getAllMonicPs es ds , e <- es , e /= 0]
 
 getAllMonicP :: (Num a, Fractional a, Eq a) => [a] -> Int -> [Polynom a]
 getAllMonicP es d = getAllMonicPs es [0..d]

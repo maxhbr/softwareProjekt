@@ -2,7 +2,7 @@ Wir beginnen mit einer Körpererweiterung $\F_{q^n} \mid \F_q$ und stellen uns
 die Frage nach einer Enumeration aller primitiven und normalen Elemente dieser 
 Erweiterung.
 Wie bereits in \thref{bem:primnorm} erläutert, sind die Nullstellen des
-Pi-Polynom zu $X^n-1$ gerade die normalen Elemente der Körpererweiterung und die 
+Pi-Polynoms zu $X^n-1$ gerade die normalen Elemente der Körpererweiterung und die 
 Nullstellen des Kreisteilungspolynoms $\Phi_{n-1}$ gerade die primitiven 
 Elemente. Folglich ist der $\ggT$ beider gerade das Produkt der Minimalpolynome
 aller primitiven \emph{und} normalen Elemente!
@@ -14,24 +14,22 @@ module Main
   where
 \end{code}
 
-Imports zum messen der Ausführzeit und zum verarbeiten von Input Parametern.
+Imports zum Messen der Ausführungszeit und zum Verarbeiten von Input-Parametern.
 
 \begin{code}
 import System.CPUTime
 import System.Environment
 \end{code}
 
-Importiere auch die nötige Bibliothek \texttt{GalFld} und
-\texttt{GalFld.More.SpecialPolys} welches standartmäßig nicht enthalten ist, da
-es eine sehr spezielle Funktion enthält.
+Ferner benötigen wir die Bibliothek ħGalFldħ und 
+ħGalFld.More.SpecialPolysħ.
 
 \begin{code}
 import GalFld.GalFld
 import GalFld.More.SpecialPolys
 \end{code}
 
-Wir Erzeugen uns einen Primkörper mit charakteristik \texttt{p} mit dem Namen
-\texttt{PF}.
+Wir erzeugen einen Primkörper der Charakteristik 2 mit dem Namen ħPFħ.
 
 \begin{code}
 $(genPrimeField 2 "PF")
@@ -40,19 +38,21 @@ pf = 1::PF
 p = charakteristik pf
 \end{code}
 
-Wir machen uns eine Datenstruktur \texttt{T} in der wir später Information
-speichern wollen.
+Anschließend erstellen wir eine neue Datenstruktur, genannt ħTħ, die die 
+gesammelten Informationen speichern soll.
 
 \begin{code}
 data T = T { deg :: Int -- Grad der Erweiterung
            , countP :: Int -- Anzahl primitiver Elemente
            , countN :: Int -- Anzahl normaler Elemente
-           , countPN :: Int } -- Anzahl primitivNormaler Elemente
+           , countPN :: Int } -- Anzahl primitiv-normaler Elemente
 \end{code}
 
-Hier nun die Funktion \texttt{genPrimNorm}, die zu einem gegebenem \texttt{Int}
-als Grad die ganze Arbeit erledigt und die notwendigen Polynome generiert und
-den ggT dieser faktorisiert.
+
+Nach diesen Schritten der Vorbereitung können wir nun den zentralen Teil 
+des Beispiels formulieren: Die Berechnung der primitiv-normalen Elemente durch 
+Faktorisierung des $\ggT$ des Kreisteilungspolynoms und des passenden 
+Pi-Polynoms.
 
 \begin{code}
 genPrimNorm :: Int -> (T, [(Int, Polynom PF)])
@@ -64,8 +64,7 @@ genPrimNorm n = (record, fac)
         record = T n (uDegP cyP) (uDegP piP) (uDegP ggT)
 \end{code}
 
-Nun definieren wir noch eine praktische Funktion \texttt{if'}, die leider in
-Prelude fehlt.
+Bleibt nur noch ħif'ħ als kleines Hilfsmittel zu formulieren
 
 \begin{code}
 if' :: Bool -> a -> a -> a
@@ -73,7 +72,7 @@ if' True  x _ = x
 if' False _ y = y
 \end{code}
 
-In der \texttt{main} wird alles zusammengefügt und schön formatiert ausgegeben. 
+und in einer ħmainħ-Funktion die Ein- und Ausgaben zusammenzufügen.
 
 \begin{code}
 main = do

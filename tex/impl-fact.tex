@@ -5,7 +5,7 @@
 
 
 \paragraph{Faktorisierungsalgorithmen} Grundsätzlich sind alle Algorithmen, die
-in \autoref{chap:algs} beschrieben und der konkreten Faktorisierung von
+in \autoref{chap:algs} beschrieben werden und der konkreten Faktorisierung von
 Polynomen dienen, als ħPolynom a -> [(Int, Polynom a)]ħ beschrieben. Das
 bedeutet, dass eine \emph{Faktorisierung} stets als Liste von Tupeln zu
 verstehen ist, wobei der erste Eintrag die Multiplizität des zweiten Eintrags,
@@ -13,7 +13,7 @@ dem konkreten Faktor, angibt.
 
 
 \subsection{Triviale Faktoren} Kann man aus einem Polynom $f(X)$ 
-den trivialen Faktor $X$ ausklammern so leistet dies die Funktion
+den trivialen Faktor $X$ ausklammern, so leistet dies die Funktion
 ħobviousFactorħ.
 
 \haskellinput{Core/Factorization}{obviousFactor}
@@ -28,12 +28,12 @@ zurückgegeben zu können, haben wir ħtoFactħ implementiert.
 
 \paragraph{Anwenden von Faktorisierungen} 
 Es ist klar, dass man verschiedene Algorithmen kombinieren will, die teilweise
-Faktorisierungen herstellen (vgl. z.B. quadratfrei Faktorisierung mit
-anschließendem Berlekamp). Dazu braucht man Funktionen die einen
+Faktorisierungen herstellen (vgl. z.B. quadratfreie Faktorisierung mit
+anschließendem Berlekamp). Dazu braucht man Funktionen, die einen
 Faktorisierungsalgorithmus (also eine Funktion 
 ħPolynom a -> [(Int,Polynom a)]ħ) auf eine bereits vorhandene 
 Faktorisierung anwenden und anschließend das
-Ergebnis zusammenfassen. Dazu gibt es den nachstehen Wrapper ħappFactħ.
+Ergebnis zusammenfassen. Hierfür gibt es den nachstehenden Wrapper ħappFactħ.
 
 \haskellinput{Core/Factorization}{appFact}
 
@@ -54,14 +54,14 @@ anwenden. Daher gibt es für jeden Faktorisierungsalgorithmus eine Funktion
 \haskellinput{Algorithmen/Berlekamp}{appBerlekamp}
 \haskellinput{Algorithmen/Berlekamp}{appBerlekamp2}
 
-Wie bereits erwähnt wird auf die konkreten Algorihmen erst in
+Wie bereits erwähnt wird auf die konkreten Algorithmen erst in
 \autoref{chap:algs} eingegangen.
 
 \paragraph{Zusammenfassen von Faktorisierungen} Es ist sicherlich leicht
 vorstellbar, dass durch Anwendung von ħappħ$A$ verschiedene Tupel entstehen,
-deren eigentlicher Faktor jedoch der gleiche ist. Da diese erstmal nicht
-erkannt werden, gibt es ħaggFactħ, um am Ende in einer Faktorisierung nur
-paarweise verschiedene Faktoren zu haben.
+deren eigentlicher Faktor jedoch der gleiche ist. 
+ħaggFactħ ermöglicht die Zusammenfassung dieser Tupel nach Anwendung der 
+Faktorisierungalgorithmen.
 
 \haskellinput{Core/Factorization}{aggFact}
 

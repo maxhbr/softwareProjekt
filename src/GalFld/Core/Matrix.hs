@@ -39,8 +39,8 @@ import GalFld.Core.ShowTex
 --  Data Definition
 
 
--- Eine Matrix ist im inneren als ein zwei dimensionales Array dargestellt,
--- wobei die erste Stelle die Zeile und dei zweite die Spalte darstellt
+-- Eine Matrix ist als zweidimensionales Array dargestellt,
+-- wobei die erste Stelle die Zeile und dei zweite die Spalte entspricht.
 data Matrix a = M {unM :: Array (Int, Int) a} | Mdiag a
 
 --------------------------------------------------------------------------------
@@ -78,34 +78,34 @@ toListsM (M m) = [[m!(i,j) | j <- [1..l]] | i <- [1..k]]
 --------------------------------------------------------------------------------
 --  Getter
 
--- |Gibt zu einer Matrix den Wert an der Position (row,col) zurrück
+-- |Gibt zu einer Matrix den Wert an der Position (row,col) zurück
 {-# INLINE atM #-}
 atM :: Matrix a -> Int -> Int -> a
 atM (M m) row col = m!(row,col)
 
--- |Gibt zu einer Matrix die Anzahl der Zeilen zurrück
+-- |Gibt zu einer Matrix die Anzahl der Zeilen zurück
 {-# INLINE getNumRowsM #-}
 getNumRowsM :: Matrix a -> Int
 getNumRowsM (M m) = fst $ snd $ bounds m
 
--- |Gibt zu einer Matrix die Anzahl der Spalten zurrück
+-- |Gibt zu einer Matrix die Anzahl der Spalten zurück
 {-# INLINE getNumColsM #-}
 getNumColsM :: Matrix a -> Int
 getNumColsM (M m) = snd $ snd $ bounds m
 
--- |Gibt zu einer Matrix die i-te Zeile zurrück
+-- |Gibt zu einer Matrix die i-te Zeile zurück
 {-# INLINE getRowM #-}
 getRowM :: Matrix a -> Int -> [a]
 getRowM (M m) i = [m!(i,j) | j <- [1..l]]
   where (k,l) = snd $ bounds m
 
--- |Gibt zu einer Matrix die i-te Spalte zurrück
+-- |Gibt zu einer Matrix die i-te Spalte zurück
 {-# INLINE getColM #-}
 getColM :: Matrix a -> Int -> [a]
 getColM (M m) i = [m!(j,i) | j <- [1..k]]
   where (k,l) = snd $ bounds m
 
--- |Gibt zu einer Matrix die Grenzen zurrück
+-- |Gibt zu einer Matrix die Grenzen zurück
 -- Das Ergebnis hat die Form ((1,k),(1,l))
 {-# INLINE boundsM #-}
 boundsM :: Matrix a -> (Int,Int)
@@ -218,7 +218,7 @@ instance (Num a, Binary a) => Binary (Matrix a) where
 --  Funktionen auf Matrizen
 
 {-# INLINE subM #-}
--- |Gibt zu einer Matrix eine Untermatrix zurrück
+-- |Gibt zu einer Matrix eine Untermatrix zurück
 -- Input:
 --      (k0,l0) : erste übernommene Spalte und Zeile
 --      (k1,l1) : letzte übernommene Spalte und Zeile
@@ -229,7 +229,7 @@ subM (k0,l0) (k1,l1) (M m)     = M $ subArr (k0,l0) (k1,l1) m
 
 
 {-# INLINE subArr #-}
--- |Gibt zu einer Matrix eine Untermatrix zurrück
+-- |Gibt zu einer Matrix eine Untermatrix zurück
 subArr :: Num a => (Int,Int) -> (Int,Int) -> Array (Int, Int) a
                                                           -> Array (Int, Int) a
 subArr (k0,l0) (k1,l1) m =  array ((1,1),(k,l))
@@ -240,7 +240,7 @@ subArr (k0,l0) (k1,l1) m =  array ((1,1),(k,l))
 -- |Vertauscht zwei Zeilen in einer Matrix
 swapRowsM :: Num a => Int -> Int -> Matrix a -> Matrix a
 swapRowsM _ _ (Mdiag x) =
-  error "GalFld.Core.Matrix.swapRowsM: Not enougth information given"
+  error "GalFld.Core.Matrix.swapRowsM: Not enough information given"
 swapRowsM k0 k1 (M m)   = M $ swapRowsArr k0 k1 m
 
 {-# INLINE swapRowsArr #-}
@@ -257,7 +257,7 @@ swapRowsArr k0 k1 m = array ((1,1),(k,l))
 -- |Vertauscht zwei Spalten in einer Matrix
 swapColsM :: Num a => Int -> Int -> Matrix a -> Matrix a
 swapColsM _ _ (Mdiag x) =
-  error "GalFld.Core.Matrix.swapColsM: Not enougth information given"
+  error "GalFld.Core.Matrix.swapColsM: Not enough information given"
 swapColsM l0 l1 (M m) = M $ swapColsArr l0 l1 m
 
 {-# INLINE swapColsArr #-}
@@ -283,7 +283,7 @@ detLapM :: (Eq a, Num a) => Matrix a -> a
 detLapM (Mdiag 0) = 0
 detLapM (Mdiag 1) = 1
 detLapM (Mdiag _) =
-  error "GalFld.Core.Matrix.detLapM: Not enougth information given"
+  error "GalFld.Core.Matrix.detLapM: Not enough information given"
 detLapM m | isQuadraticM m = detLapM' $ unM m
           | otherwise      = 0
 {-# INLINE detLapM' #-}
@@ -300,17 +300,17 @@ detLapM' m | b == (1,1) = m!(1,1)
                                        , j' <- [1..(snd b - 1)]]
 
 {-# INLINE detM #-}
--- |Berechne die Determinante effektiver als detLapM aber braucht Fractional
+-- |Berechnet die Determinante effektiver als detLapM; braucht aber Fractional
 detM :: (Eq a, Num a, Fractional a) => Matrix a -> a
 detM (Mdiag 0) = 0
 detM (Mdiag 1) = 1
 detM (Mdiag _) =
-  error "GalFld.Core.Matrix.detM: Not enougth information given"
+  error "GalFld.Core.Matrix.detM: Not enough information given"
 detM m         | isQuadraticM m = detArr $ unM m
                | otherwise      =
   error "GalFld.Core.Matrix.detM: Matrix not quadratic"
     where {-# INLINE detArr #-}
-          -- |detM auf Array ebene
+          -- |detM auf Array-Ebene
           detArr :: (Eq a, Num a, Fractional a) => Array (Int, Int) a -> a
           detArr m | k == 1       = m!(1,1)
                    | m!(1,1) == 0 = - detArrPivot m
@@ -319,7 +319,7 @@ detM m         | isQuadraticM m = detArr $ unM m
             where !(k,l) = snd $ bounds m
 
           {-# INLINE detArrPivot #-}
-          -- |Sucht ein Pivot Element und vertauscht wenn nötig
+          -- |Sucht ein Pivotelement und vertauscht wenn nötig
           detArrPivot :: (Eq a, Num a, Fractional a) => Array (Int, Int) a -> a
           detArrPivot m | null lst  = 0
                         | otherwise = detArr $ swapRowsArr 1 (minimum lst) m
@@ -370,7 +370,7 @@ echelonM (M m)     = M $ echelonM' m
 
 -- |Berechnet den Kern einer Matrix, d.h.
 --  kernelM gibt eine Matrix zurück, deren Spalten eine Basis des
---  des Kerns sind
+--  Kerns sind
 {-# INLINE kernelM #-}
 kernelM :: (Show a, Eq a, Num a, Fractional a) => Matrix a -> Matrix a
 kernelM (Mdiag m) = error "GalFld.Core.Matrix.kernelM: No kernel here"
@@ -389,7 +389,7 @@ kernelM m     = M $ array ((1,1), (k,lzs))
 
 {-# INLINE getAllM #-}
 -- |Gibt eine Liste aller Matrizen, welche Einträge aus einer Liste besitzen
--- und eine gewisse größe haben, zurrück
+-- und eine gewisse Größe haben, zurück
 getAllM :: [a] -> (Int,Int) -> [Matrix a]
 getAllM cs (k,l) = map fromListsM $ rowMs k
   where lines = lines' l

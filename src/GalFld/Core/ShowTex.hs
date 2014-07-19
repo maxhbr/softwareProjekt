@@ -35,13 +35,13 @@ outputDIR = "/tmp"
 outputDVI = outputDIR ++ "/article.dvi"
 outputPNG = outputDIR ++ "/snipet.png"
 
--- |wie renderRawTex, nur dass zunächst ShowTex aufgerufen wird.
+-- |Wie renderRawTex, nur dass zunächst ShowTex aufgerufen wird.
 renderTex :: (ShowTex a) => a -> IO ()
 renderTex = renderRawTex . showTex
 
--- |Nimmt einen Latex-String und packt diesen in ein minimales Latex Dokument,
+-- |Nimmt einen Latex-String und packt diesen in ein minimales Latex-Dokument,
 -- rendert dieses und wandelt es danach in ein Bild um, wobei unnötiger Rand
--- entfernt wird
+-- entfernt wird.
 renderRawTex :: String -> IO ()
 renderRawTex x = do createProcess (shell cmd)
                     return ()

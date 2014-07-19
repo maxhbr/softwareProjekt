@@ -1,12 +1,12 @@
 \section{Endliche Körper}
 \subsection{Primkörper}
-Die Primkörper werden in dem Modul \texttt{Projekt.Core.PrimeFields}
+Die Primkörper werden in dem Modul \texttt{GalFld.Core.PrimeFields}
 spezifiziert. Diese werden implementiert als ħIntħ Werte, die durch den Wrapper
-ħModħ noch Zusätzlich information enthalten, in welchem Primekörper sich das
-Element befindet.
+ħModħ noch zusätzlich die Information enthalten, in welchem 
+Primkörper sich das Element befindet.
 
-Da wir uns die Charakteristik zu einem solchem Körper auf Typenebene speichern
-wollen, führen wir dazu zunächst eine neue Klasse von Datentypen mit dem Namen
+Da wir die Charakteristik zu einem solchem Körper auf Typebene speichern
+wollen, führen wir zunächst eine neue Typklasse mit dem Namen
 ħNumeralħ ein, welche als einzige Funktion 
 ħnumValue :: a -> Intħ besitzen.
 Diese Funktion soll konstant die Charakteristik wiedergeben.
@@ -16,29 +16,26 @@ Nun können wir durch
 Primkörper definieren, wobei für den Parameter \texttt{n} ein
 Datentyp von der Klasse \texttt{Numeral} eingesetzt werden soll.
 
-Um zu einem Element im Primkörper einen Repräsentanten in $\Z$ zu bekommen gibt
+Um zu einem Element im Primkörper einen Repräsentanten in $\Z$ zu erhalten, gibt
 es die Funktion
 \haskellinput{Core/PrimeFields}{unMod}
-Einen Repräsentanten, der nichtnegativ aber kleiner als die Charakteristik ist,
-bekommt man durch
+Einen Repräsentanten, der nichtnegativ, aber kleiner als die Charakteristik ist,
+liefert
 \haskellinput{Core/PrimeFields}{getRepr}
 
-Die Instanzen von ħShowħ und ħShowTexħ ermöglicht es, Elemente von Primkörpern
-als String oder als Rohes Tex darzustellen.
+Die Instanzen von ħShowħ und ħShowTexħ ermöglichen es, Elemente von Primkörpern
+als String oder als \LaTeX{}-Code darzustellen.
 \haskellinput{Core/PrimeFields}{instance .*?=> Show}
 \haskellinput{Core/PrimeFields}{instance .*?=> ShowTex}
 
-Da es sich hier um einen Nichtfreien Datentyp handelt, brauchen wir noch ein
-Extensionalitätsaxiom, das beschreibt, wann zwei Elemente gleich sein sollen:
+Ferner implementieren wir Instanzen von ħEqħ, ħNumħ und ħFiniteFieldħ.
 \haskellinput{Core/PrimeFields}{instance .*?=> Eq}
-
-Außerdem wollen wir damit rechnen können und das ganze ist dann auch ein
-Endlicher Körper:
 \haskellinput{Core/PrimeFields}{instance .*?=> Num}
 \haskellinput{Core/PrimeFields}{instance .*?=> FiniteField}
 \haskellinput{Core/PrimeFields}{modulus}
 
-Zum bequemen invertieren haben wir auch noch eine Instanz ħFractionalħ
+Zum bequemen Invertieren haben wir auch noch eine Instanz von ħFractionalħ
+hinzugefügt.
 \haskellinput{Core/PrimeFields}{instance .*?=> Fractional}
 
 Weiterhin haben wir noch die folgenden Instanzen:
@@ -46,19 +43,20 @@ Weiterhin haben wir noch die folgenden Instanzen:
 \haskellinput{Core/PrimeFields}{instance .*?=> NFData}
 
 \subsubsection{Erzeugen von Primkörpern}
-Möchte man nun einen Primkörper von beliebiger Charakteristik in einem Haskell
-Programm, bietet sich die ħTemplateHaskellħ Funktion ħgenPrimeFieldħ an. Diese
+Möchte man nun einen Primkörper von beliebiger Charakteristik in einem 
+Haskell- Programm benutzen,
+bietet sich die ħTemplateHaskellħ Funktion ħgenPrimeFieldħ an. Diese
 übernimmt das Erzeugen von diversen Instanzen, die nötig sind.
 \haskellinput{Core/PrimeFields}{genPrimeField}
 
 Da es sich hierbei um eine Funktion handelt, die per ħTemplateHaskellħ zur
-Compilezeit ausgeführt wird, sind zum nutzen zunächst zwei Pragmas nötig:
+Compilezeit ausgeführt wird, sind die beiden folgenden Pragmas nötig:
 \begin{hcode}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 \end{hcode}
-Dann kann man sich einen Primkörper der Charakteristik $7$ mit Namen
-\texttt{PF} durch die Ziele
+Dann kann beispielsweise der Primkörper der Charakteristik $7$ namens
+\texttt{PF} durch 
 \begin{hcode}
 $(genPrimeField 7 "PF")
 \end{hcode}
@@ -66,42 +64,41 @@ $(genPrimeField 7 "PF")
 erzeugt werden.
 
 \subsection{Erweiterungskörper}
-Um Erweiterungskörper darzustellen verwenden wir Polynome, welche modulo einem
-Minimalpolynom gelesen werden sollen. Das ganze codieren wir in dem Datentypen
+Um Erweiterungskörper darzustellen, verwenden wir Polynome, welche modulo einem
+Minimalpolynom gelesen werden sollen; codiert in dem Datentyp
 \texttt{FFElem}.
 \haskellinput{Core/FiniteFields}{data FFElem}
-Natürlich haben wir die kanonische inclusion des Grundkörpers die durch
-\texttt{FFKonst} realisiert ist.
 
 Durch dieses Konzept kann man einfach in Erweiterungen von Erweiterungen
 rechnen.
-Startet man mit einem Primkörper, beisielsweise dem $\F_2$. Dann haben wir
+Startet man mit einem Primkörper, beispielsweise $\F_2$, so haben wir
 darin das Element $1$:
 \begin{hcode}
 f2 = 1::F2
 \end{hcode}
-Durch das Minimalpolynom $x^2+x+1$ erzeugen wir uns eine Grad $2$ Erweiterung.
+Durch das Minimalpolynom $X^2+X+1$ erzeugen wir uns eine Erweiterung vom 
+Grad 2:
 \begin{hcode}
-e2f2Mipo = pList [1::F2,1,1] -- x²+x+1
+e2f2Mipo = pList [1::F2,1,1] -- x^2+x+1
 e2f2 = FFElem (pList [0,1::F2]) e2f2Mipo
 \end{hcode}
-Hier ist \texttt{e2f2} ein erzeugendes Element in dem Erzeugtem Körper. Also
-reicht dieses uns, um alle Körperelemente zu bekommen.
-Durch eine weitere Grad $2$ Erweiterung erhalten wir das folgende:
+Hier ist \texttt{e2f2} ein erzeugendes Element. Dies reicht, 
+um alle Körperelemente generieren zu können.
+Durch eine weitere Grad $2$ Erweiterung erhalten wir:
 \begin{hcode}
-e2e2f2Mipo = pList [e2f2,one,one] -- x²+x+e2f2
+e2e2f2Mipo = pList [e2f2,one,one] -- x^2+x+e2f2
 e2e2f2 = FFElem (pList [0,e2f2]) e2e2f2Mipo
 \end{hcode}
 Alternativ kann man auch durch eine Grad $4$ Erweiterung über $\F_2$ den
 gleichen Körper erhalten:
 \begin{hcode}
-e4f2Mipo = pList [1::F2,1::F2,0,0,1::F2] -- x⁴+x²+1
+e4f2Mipo = pList [1::F2,1::F2,0,0,1::F2] -- x^4+x^2+1
 e4f2 = FFElem (pList [0,1::F2]) e4f2Mipo
 \end{hcode}
 
 Öffnet man \texttt{GalFld.Sandbox.FFSandbox} mit \texttt{GHCI} startet der
 Interpreter und man befindet sich in einer Umgebung, in der die Körper bereits
-Erzeugt wurden. Nachdem wir also bereits das element \texttt{e2e2f2} haben,
+erzeugt wurden. Nachdem wir also bereits das Element \texttt{e2e2f2} haben,
 können wir uns dieses anzeigen lassen, indem wir einfach nur \texttt{e2e2f2} in
 die Konsole eintippen und bestätigen. Damit erhalten wir
 \begin{lstlisting}[language=bash
@@ -109,10 +106,10 @@ die Konsole eintippen und bestätigen. Damit erhalten wir
                   ,backgroundcolor=\color{lightgray}]
 ((1₂·X mod 1₂·X²+1₂·X+1₂)·X mod (1₂ mod ...)·X²+(1₂ mod ...)·X+(1₂·X mod 1₂·X²+1₂·X+1₂))
 \end{lstlisting}
-Ein Element in einer Körpererweiterung wird beisielsweise dargestellt als
+Ein Element in einer Körpererweiterung wird beispielsweise dargestellt als
 \begin{itemize}
   \item \texttt{(1₂·X mod 1₂·X²+1₂·X+1₂)}, welches die Äquivalenzklasse von $x$
-  in $\F_2[x]/(x^2+x+1)$ bezeichnet. Die \LaTeX{} Darstellung dazu ist 
+  in $\F_2[X]/(X^2+X+1)$ bezeichnet. Die \LaTeX{} Darstellung dazu ist 
   $\left(
       \underline{
         1_{2}
@@ -124,11 +121,10 @@ Ein Element in einer Körpererweiterung wird beisielsweise dargestellt als
   \item \texttt{(1₂ mod ...)} bedeutet, dass noch nicht klar ist, modulo
   welchem Polynom dieses Element gelesen wird. Es ist also die
   $1\in\F_2[x]/(g(x))$
-  wobei $g(x)$ erst wärend der Berechnung inferiert werden muss.
+  wobei $g(x)$ erst während der Berechnung inferiert werden muss.
   Dies ist nötig, um die Inklusion des Grundkörpers zu realisieren.
 \end{itemize}
-Dadurch, dass wir eine \texttt{ShowTex} Instanz haben, können wir aus
-\texttt{e2e2f2} auch eine \LaTeX{} Darstellung erzeugen:
+Durch die ħShowTexħ-Instanz können wir ħe2e2f2ħ auch in \LaTeX{} darstellen:
 \[
 \left(
   \underline{
@@ -158,17 +154,18 @@ Ersetzen wir \texttt{(1₂·X mod 1₂·X²+1₂·X+1₂)} mit \texttt{Y} dann k
                   ,backgroundcolor=\color{lightgray}]
 (Y·X mod (1₂ mod ...)·X²+(1₂ mod ...)·X+Y)
 \end{lstlisting}
-Dieses Element ist also die Äquivalenzklasse von $yx$ in
-$\F_2[y,x]/(y^2+y+1,x^2+x+y)$.
+Dieses Element ist also die Äquivalenzklasse von $YX$ in
+$\F_2[Y,X]/(Y^2+Y+1,X^2+X+Y)$.
 
-Nun können wir auch Berechnungen machen und erhalten beisielsweise für
-\texttt{e2e2f2 + e2e2f2 * e2e2f2} das folgende.
+Nun können wir z.B.
+ħe2e2f2 + e2e2f2 * e2e2f2ħ berechnen und erhalten:
 \begin{lstlisting}[language=bash
                   ,numbers=none
                   ,backgroundcolor=\color{lightgray}]
-((1₂ mod 1₂·X²+1₂·X+1₂)·X+(1₂ mod 1₂·X²+1₂·X+1₂) mod (1₂ mod ...)·X²+(1₂ mod ...) ·X+(1₂·X mod 1₂·X²+1₂·X+1₂))
+((1₂ mod 1₂·X²+1₂·X+1₂)·X+(1₂ mod 1₂·X²+1₂·X+1₂) mod (1₂ mod ...)·X²+
+(1₂ mod ...) ·X+(1₂·X mod 1₂·X²+1₂·X+1₂))
 \end{lstlisting}
-Was in der \LaTeX{} Darstellung dem folgendem entspricht:
+In \LaTeX{}:
 \[
 \left(
   \underline{
@@ -199,20 +196,28 @@ Was in der \LaTeX{} Darstellung dem folgendem entspricht:
 \]
 
 \subsubsection{Funktionen auf Körpererweiterungen}
-Zu einem Polynom bekommen wir die Charakteristik durch die folgende Funktion.
+Wie wir gesehen haben, ist der zugrunde liegende Körper nicht bei jedem
+Koeffizienten eines Polynoms klar. Daher liefert ħgetReprPħ für ein Polynom
+einen passenden Repräsentanten und ħcharOfPħ als abkürzende Schreibweise dessen
+Charakteristik.
+\haskellinput{Core/FiniteFields}{getReprP'"'"'}
 \haskellinput{Core/FiniteFields}{charOfP}
-Auch kann man die $p$-te Wurzel eines Polynomes ziehen mittels der Funktion:
+Bekanntlich ist $(\_)^p$ auf endlichen Körpern der Charakteristik $p$ 
+ein Automorphismus, was das Ziehen von $p$-ten Wurzeln rechtfertigt.
+Sicherlich gibt es dazu bessere Algorithmen, jedoch haben wir uns aufgrund der
+Einfachheit entschieden, dies in $\F_{p^m}$ durch $(\_)^{p^{m-1}}$ zu
+implementieren.
 \haskellinput{Core/FiniteFields}{charRootP}
 
-Instanzen haben wir für \texttt{Eq}, \texttt{Show} und \texttt{ShowTex}.
-%\haskellinput{Core/FiniteFields}{instance .*?=> Eq}
-%\haskellinput{Core/FiniteFields}{instance .*?=> Show}
-%\haskellinput{Core/FiniteFields}{instance .*?=> ShowTex}
-Zum rechnen haben wir \texttt{Num} und \texttt{Fractional}.
-%\haskellinput{Core/FiniteFields}{instance .*?=> Num}
-%\haskellinput{Core/FiniteFields}{instance .*?=> Fractional}
-Dazu haben wir noch \texttt{NFData} und \texttt{Binary}.
-%\haskellinput{Core/FiniteFields}{instance .*?=> NFData}
-%\haskellinput{Core/FiniteFields}{instance .*?=> Binary}
+\subsubsection{Instanzen}
+Die implementierten Instanzen sind selbstredend gleich denen der Primkörper.
+
+\haskellinput{Core/FiniteFields}{instance .*?=> Eq}
+\haskellinput{Core/FiniteFields}{instance .*?=> Show}
+\haskellinput{Core/FiniteFields}{instance .*?=> ShowTex}
+\haskellinput{Core/FiniteFields}{instance .*?=> Num}
+\haskellinput{Core/FiniteFields}{instance .*?=> Fractional}
+\haskellinput{Core/FiniteFields}{instance .*?=> NFData}
+\haskellinput{Core/FiniteFields}{instance .*?=> Binary}
 
 % vim:set ft=tex foldmethod=marker foldmarker={{{,}}}:

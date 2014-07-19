@@ -11,11 +11,12 @@ Eine Matrix ist dabei der folgende Datentyp:
 
 \haskellinput{Core/Matrix}{data Matrix}
 
-Man hätte auch die Möglichkeit gehabt Matrizen als ħ[[a]]ħ (also als doppelte
-Liste) zu implementieren, jedoch haben Listen eine Zugriffszeite von $\cO(l)$ auf
+Es hätte auch die Möglichkeit bestanden, Matrizen als ħ[[a]]ħ (also als doppelte
+Liste) zu implementieren, jedoch haben Listen eine Zugriffszeit von $\cO(l)$ auf
 das $l$-te Element und die Abfrage der Länge dauert bei einer Liste der Länge
-$n$ $\cO(n)$. ħArraysħ schaffen beides in $\O(1)$, jedoch mit einer
+$n$ $\cO(n)$. ħArraysħ schaffen beides in $\cO(1)$, jedoch mit einer
 weit größeren Konstante (vgl. \url{}). 
+%TODO
 
 \subsection{Erzeugung von Matrizen und Basisoperationen}
 
@@ -32,7 +33,7 @@ Funktion verwenden.
 \begin{beispiel}
   Möchte man die Matrix $\begin{bmatrix} 2 & 0 \\ 0 & 2 \end{bmatrix} \in
   \Z^{2\times 2}$
-  erzeugen, so gibt es die folgenden drei verschiedenen Varianten:
+  erzeugen, so gibt es drei verschiedene Varianten:
   \begin{enumerate}
     \item ħarray ((1,1),(2,2)) [((1,1),2::Int), ((1,2),2::Int), ((2,1),2::Int), ((2,2),2::Int)]ħ
     \item ħgenDiagM (2::Int) 2ħ
@@ -47,7 +48,7 @@ Funktion verwenden.
 \end{bemerkung}
 
 \paragraph{Basisoperationen} 
-Selbstredend möchte man eine Matrix auch wieder in Listenform zurückwandeln:
+Selbstredend möchte man eine Matrix auch wieder in Listenform zurückverwandeln:
 
 \haskellinput{Core/Matrix}{toListsM}
 
@@ -79,8 +80,8 @@ Wenn man zwei Matrizen horizontal bzw. vertikal aneinanderfügt, erhält man ein
 neue Matrix. Dies ist gerade beim Anwenden des Gaußschen Eliminationsverfahrens
 von großem Nutzen.
 
-%\haskellinput{Core/Matrix}{(<|>)}
-%\haskellinput{Core/Matrix}{(<->)}
+\haskellinput{Core/Matrix}{\string\(<|>\string\)}
+\haskellinput{Core/Matrix}{\string\(<->\string\)}
 
 \paragraph{Untermatrizen} Untermatrizen erhält man wie folgt.
 
@@ -88,7 +89,7 @@ von großem Nutzen.
 \haskellinput{Core/Matrix}{subArr}
 
 \paragraph{Vertauschen von Zeilen bzw. Spalten} Ebenfalls beim Gauß-Verfahren
-von Nöten ist das Vertauschen von Zeilen bzw. Spalten.
+vonnöten ist das Vertauschen von Zeilen bzw. Spalten.
 
 \haskellinput{Core/Matrix}{swapRowsM}
 \haskellinput{Core/Matrix}{swapColsM}
@@ -109,7 +110,7 @@ implementiert.
 
 \subsection{Lineare Algebra}
 
-\paragraph{Transponieren} 
+\paragraph{Transponieren} \makebox{}
 
 \haskellinput{Core/Matrix}{transposeM}
 
@@ -124,14 +125,14 @@ Ist das aktuell zu bearbeitende Element $0$ und die gesamte darunterliegende
 Spalte auch, so geht es mit ħechelonM'_noPivotħ weiter. Ist der aktuelle 
 Eintrag $0$, wird aber ein Pivotelement gefunden, so vertauscht man die Zeilen
 passend (ħswapRowsArrħ). Ist der aktuelle Eintrag $\neq 0$, so liefert 
-ħechelonM'_Pivotħ den passenden Eliminationsschritt, durch die Anwendung von
+ħechelonM'_Pivotħ den passenden Eliminationsschritt durch die Anwendung von
 ħarrElimħ.
 
 \haskellinput{Core/Matrix}{arrElim}
 
 
 \begin{beispiel}
-  Wir versuchen einmal die ,,Telefonmatrix`` 
+  Wir versuchen einmal die ,,Numblock-Matrix`` 
   \[ M = \begin{bmatrix} 7&8&9\\ 4&5&6\\ 1&2&3\end{bmatrix} = 
       \begin{bmatrix}2&3&4 \\ 4&0&1\\ 1&2&3\end{bmatrix} \ 
       \in \F_5^{3\times 3}\]
@@ -166,7 +167,7 @@ echeonM'_Pivot m'=
 
 \paragraph{Kern} Mit Hilfe der Zeilenstufenform kann man wie folgt den Kern 
 einer Matrix berechnen: Fügt man die Einheitsmatrix passender Größe unten an
-die ursprüngliche Matrix an, berechnet dann die Spaltenstufenform der
+die ursprüngliche Matrix an und berechnet dann die Spaltenstufenform der
 zusammengesetzten Gesamtmatrix, so sind die Nichtnullspalten des unteren Teils
 des Ergebnisses gerade eine Basis des Kerns der ursprünglichen Matrix (vgl.
 \cite[Abschnitt Basis]{wiki:matrix-kernel}). Dies lässt sich durch
@@ -175,7 +176,7 @@ zurückführen.
 
 \haskellinput{Core/Matrix}{kernelM}
 
-\paragraph{Determinante} Offensichtlich kann man mit der Zeilenstufenform auch
+\paragraph{Determinante} Offensichtlich lässt sich in Zeilenstufenform auch
 die Determinante einer Matrix berechnen.
 
 \haskellinput{Core/Matrix}{detM}
@@ -199,7 +200,7 @@ stehen.}
 
 \subsection{Weiteres}
 
-\paragraph{Alle Matrizen mit gewissen Einträgen} Möchte man alle Matrizen
+\paragraph{Alle Matrizen mit vorgegebenen Einträgen} Möchte man alle Matrizen
 erzeugen, die eine vorgegebene Größe und vorgegebene Einträge besitzen, so
 liefert ħgetAllMħ die Antwort.
 

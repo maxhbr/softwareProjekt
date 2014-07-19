@@ -22,7 +22,7 @@ $g(X)^q - g(X) \bmod f(X)$ haben, dann
 \[ f(X) \mid \prod_{a\in \F_q} (g(X)-a) \,,\]
 was zumindest eine teilweise Faktorisierung von $f(X)$ liefern könnte.
 
-Dass dies in der Tat funktioniert zeigt die nachstehender Satz, die obige
+Dass dies in der Tat funktioniert, zeigt nachstehender Satz, der obige
 Idee zusammenfasst und konkretisiert.
 
 %\begin{lemma}
@@ -80,13 +80,13 @@ Nun können wir ein wesentliches Resultat zitieren:
 
 Nun stellt sich natürlich die Frage, wie man konkret Elemente aus der
 Berlekamp-Algebra zu $f(X)$ findet. Blickt man noch einmal auf die Definition
-von $\cB_f$, so erkennt man dass $\cB_f$ gerade der Kern folgender linearen
+von $\cB_f$, so erkennt man, dass $\cB_f$ gerade der Kern folgender linearen
 Abbildung ist:
 \[ \Gamma_f:\ \funcdef{
   \F_q[X]_{<\deg f} &\to& \F_q[X]_{<\deg f},\\
   g(X) &\mapsto& g(X)^q - g(X) \bmod f(X)\,.}\]
 Nun können wir aber eine Darstellungsmatrix von $\Gamma_f$ angeben, da wir
-simplerweise eine Basis von $\F_q[X]_{<\geq f}$ angeben können durch
+simplerweise eine Basis von $\F_q[X]_{<\deg f}$ angeben können durch
 \[ \{ 1, X, X^2, \ldots, X^{\deg f -1}\}\,. \]
 
 \subsection{Der Berlekamp-Algorithmus}
@@ -94,7 +94,7 @@ simplerweise eine Basis von $\F_q[X]_{<\geq f}$ angeben können durch
 Eine Kleinigkeit fehlt obigem Vorgehen noch, um daraus sicher eine teilweise
 Faktorisierung von $f(X)$ gewinnen zu können. Es ist a priori nicht klar, dass
 in \thref{satz:berlekamp1} die auftretenden $\ggT$s eine echte, also nicht
-degenierte, Faktorisierung von $f(X)$ liefern. Doch dies ist offensichtlich,
+degenerierte, Faktorisierung von $f(X)$ liefern. Doch dies ist offensichtlich,
 falls $g(X) \in \cB_f \setminus \F_q$ gewählt wird. Dann ist $\deg g < \deg f$
 und daher $\ggT(f(X),g(X)-a) \neq f(X)$ für alle $a \in \F_q$.
 
@@ -117,7 +117,7 @@ Anwendung des Algorithmus:
 
 
 \subsubsection{Implementierung}
-Um tatsächlich eine \emph{vollständige} Faktorisierung zu erhalten muss man 
+Um tatsächlich eine \emph{vollständige} Faktorisierung zu erhalten, muss man 
 sich noch überlegen, dass dies mit Hilfe des Berlekamp-Algorithmus nur möglich 
 ist, falls $f(X)$ quadratfrei ist (vgl. \thref{satz:berlekamp2}!). Daher sei 
 im Folgenden $f(X)$ stets ein quadratfreies, monisches Polynom über $\F_q[X]$.
@@ -133,14 +133,14 @@ kanonischen Basis von $\F_q[X]\big/(f(X))$.
 
 \paragraph{Der Berlekamp-Algorithmus} Bei einer konkreten Umsetzung des
 Berlekamp-Algorithmus bleibt immer die Frage, wie ein Element $g(X)\in
-\cB_f\setminus \F_q$ zu wählen ist. Wir haben uns entschieden stets das zweite
+\cB_f\setminus \F_q$ zu wählen ist. Wir haben uns entschieden, stets das zweite
 Basiselement (das erste ist immer $1$) zu wählen. Sicherlich könnte man auch
-ein zufälliges Element wählen, was aber der Funktionalität von Haskell
-widerspricht.
+ein zufälliges Element wählen; dies widerspricht aber der Funktionalität 
+von Haskell.
 
 \haskellinput{Algorithmen/Berlekamp}{berlekampFactor}
 
-Die Berechnung der neuen Basis bei der rekursive Anwendung ist aufgrund
+Die Berechnung der neuen Basis bei der rekursiven Anwendung ist aufgrund
 \thref{lemma:berlekamp3} relativ einfach, da $\pi$ simplerweise auf die schon
 vorhandene Berlekampbasis angewendet werden kann.
 
@@ -157,7 +157,7 @@ vorhandene Berlekampbasis angewendet werden kann.
   \end{array} \]
   und erhalten damit eine Darstellungsmatrix von $\Gamma$ bezüglich der Basis 
   $\{ 1, X, X^2, X^3, X^4\}$ von $\F_5[X]_{<5}$ und können diese in
-  Zeilenstufenform bringen
+  Zeilenstufenform bringen:
   \[ D_\Gamma = \begin{bmatrix}
       1& 0& 0& 0& 0\\ 
       3& 3& 2& 2& 4\\ 
@@ -176,7 +176,7 @@ vorhandene Berlekampbasis angewendet werden kann.
   aus und berechnen
   \[ \begin{array}{r|lllll}
       a\in \F_q & 0 & 1 & 2 & 3 & 4 \\\hline
-      \ggT(f(X), h(X)-a) & X^2+2 & X^2+4X+3 & 1 & 1 & X+2\end{array}\]
+      \ggT(f(X), h(X)-a) & X^2+2 & X^2+4X+3 & 1 & 1 & X+2\end{array}\,.\]
   Dies erlaubt nun iterative Anwendung des Berlekamp-Algorithmus, nämlich für 
   $X^2+2$, $X^2+4X+3$ und für $X+2$. Letzteres ist natürlich offensichtlich 
   irreduzibel.

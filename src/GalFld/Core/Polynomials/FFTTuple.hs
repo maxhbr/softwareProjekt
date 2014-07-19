@@ -14,13 +14,13 @@ import Debug.Trace
 -- FFT
 
 
--- |Berechnet die FFT eines Polynoms f
+-- |Berechnet die FFT eines Polynoms f.
 --  Benötigt eine primitive n-te Einheitswurzel,
 --  wobei n eine 2er Potenz ist (Dies wird NICHT überprüft!)
 --  Diese wird dargestellt als Funktion w: Int -> a -> a,
 --  wobei f(i,x) = w^i*x für die n-te EWL w auswertet.
 --  
---  vgl Computer Algebra Algorithmus 4.11
+--  vgl. Computer Algebra Algorithmus 4.11
 fftP :: (Show a, Num a, Eq a) => (Int -> a -> a) -> Int -> Polynom a -> [a]
 fftP w n f = fft w (+) (-) 0 1 n (p2List f)
 
@@ -47,11 +47,11 @@ fft w addF subF zero i n fs = intersperseL ls' rs'
 
 
 -------------------------------------------------------------------------------
--- Schönhagen-Strassen Multiplikation
+-- Schönhage-Strassen Multiplikation
 
 
 {-# INLINE ssP #-}
--- | Schönhagen-Strassen für Polynome
+-- | Schönhage-Strassen für Polynome
 ssP :: (Show a, Fractional a, Num a, Eq a) => Polynom a -> Polynom a -> Polynom a
 ssP f g | isNullP f || isNullP g = nullP
         | otherwise              = pTup $ ss l fs gs
@@ -61,7 +61,7 @@ ssP f g | isNullP f || isNullP g = nullP
         l  = 1 + log2 (uDegP f + uDegP g)
 
 
--- |Der eigentliche Schönhagen-Strassen Algorithmus
+-- |Der eigentliche Schönhage-Strassen Algorithmus.
 --  Funktioniert nur, falls 2 eine Einheit ist!
 ss :: (Show a, Num a, Fractional a, Eq a) => Int -> [(Int,a)] -> [(Int,a)] -> [(Int,a)]
 -- ss funktioniert nur für l>2
@@ -88,7 +88,7 @@ ss l f g
                                               (addPM) (subtrPM) [] 1 m' gs'
         -- Multiplikation der Ergebnisse und rekursiver Aufruf von ss
         !fftHs = reduceModxn (2*m) $ zipWith (ss (l'+1)) fftFs fftGs
-        -- Inverse-FFt
+        -- Inverse-FFT
         !hs''  = reduceModxn (2*m) $ fft (multx (xi*(2*m'-2))) 
                                             (addPM) (subtrPM) [] 1 m' fftHs
         -- * 1/m'
@@ -130,6 +130,7 @@ multx j i xs    = map (A.first (\i->i+k)) xs
 
 -------------------------------------------------------------------------------
 -- Helper
+
 {-# INLINE intersperseL #-}
 -- |Intersperse mit 2 Listen
 intersperseL :: [a] -> [a] -> [a]
@@ -140,8 +141,7 @@ intersperseL (y:ys) (x:xs)  = y : x : intersperseL ys xs
 
 
 {-# INLINE zipWith' #-}
--- like @zipWith@ except that when the end of either list is
--- reached, the rest of the output is the rest of the longer input list.
+-- wie zipWith. Setzt das Ende der längeren Liste an die kürzere an.
 zipWith' :: (t->t->t) -> t -> [t] -> [t] -> [t]
 zipWith' _ _ xs [] = xs
 zipWith' f t [] ys = map (f t) ys

@@ -1,4 +1,4 @@
-Über endlichen Körpern existieren Über endlichen Körpern existieren 
+Über endlichen Körpern existieren 
 verschiedene Ansätze, um ein Polynom zu faktorisieren. Diese sollen nun im
 Folgenden erläutert werden.
 
@@ -6,7 +6,7 @@ Folgenden erläutert werden.
 Wir beginnen mit der Beschreibung eines Algorithmus zur quadratfreien 
 Faktorisierung. Dazu sei im Folgenden $k$ ein beliebiger Körper. 
 Als Referenz dieses Abschnitts sei 
-\autocite[Section 9]{cohan:algebra} und \autocite[Section
+\autocite[Section 9]{cohen:algebra} und \autocite[Section
 8.3]{geddes:algorithms} genannt.
 
 
@@ -32,7 +32,7 @@ Bekanntlich ist für jedes nichttriviale Polynom $f(X)$ über einem Körper der
 Charakteristik Null $\ggT(f(X),f'(X)) \neq 0$, wobei $f'(X)$ die formale
 Ableitung von $f$ meint. Damit kann man folgern, dass $\ggT(f(X),f'(X)) = 1$
 genau dann, wenn $f(X)$ quadratfrei ist. (vgl. \autocites[Theorem
-9.4]{cohan:algebra}[Theorem 9.5]{cohan:algebra}) Über endlichen Körpern geht
+9.4]{cohen:algebra}[Theorem 9.5]{cohen:algebra}) Über endlichen Körpern geht
 dies nicht so einfach, wie folgendes Beispiel zeigt:
 
 \begin{beispiel}
@@ -76,7 +76,7 @@ beliebige Körper!
   \[ b(X) = b_k X^k + \ldots + b_1 X + b_0 \quad\text{mit}\quad
     b_i = a_{pi}^{\frac 1 p}\ i=0,\ldots,k\,.\]
   Da wir wissen, dass der Frobenius $\F \to \F, x \mapsto x^p$ ein
-  Automorphismus auf $\F$ ist, ist $(.)^{\frac 1 p}$ ein wohldefinierter
+  Automorphismus auf $\F$ ist, ist $(\_)^{\frac 1 p}$ ein wohldefinierter
   Ausdruck und es gilt 
   \[ f(X) = b(X)^p\,.\]
 \end{proof}
@@ -95,7 +95,7 @@ endlichen Körpern formulieren.
 \begin{pseudocode}{Quadratfreie Faktorisierung über endlichen Körpern}%
  {alg:sfree}
 Input:  $f(X) \in \F_q[X]$ monisch, $q=p^n$ eine Primzahlpotenz.
-Output: $f(X) = r(X) = \prod_{i=1}^m r_i(X)^i$ quadratfreie Faktorisierung
+Output: $f(X) = r(X) = \prod_{i=1}^m r_i(X)^i$ quadratfreie Faktorisierung.
 Algorithmus SFF($f(X)$):
 $i:=1$, $r(X) := 1$, $b(X) := f'(X)$.
 if $b(X) \neq 0$ then		(1)
@@ -126,11 +126,11 @@ endif
   Faktoren 
   \[ f(X) = \prod_{i=1}^d f_i(X)^{\nu_i}\]
   \begin{description}
-    \item[Schritt 2.] Beginnen wir mit dem kürzeren Fall.
+    \item[Schritt (2).] Beginnen wir mit dem kürzeren Fall.
       Ist $b(X) = f'(X) = 0$, so existiert nach \thref{prop:sfree1} eine
       $p$-te Wurzel des Polynoms. Auf diese lässt sich dann der Algorithmus
       rekursiv anwenden.
-    \item[Schritt 1.] Kommen wir nun zu dem Fall, wo auch wirklich etwas zu tun
+    \item[Schritt (1).] Kommen wir nun zu dem Fall, wo auch wirklich etwas zu tun
       ist. Sei zunächst eine quadratfreie Faktorisierung von $f(X)$ gegeben,
       d.h.
       \[ f(X) = \prod_{i=1}^m a_i(X)^i \]
@@ -153,11 +153,11 @@ endif
         y(X) &= \ggT(w(X),c(X)) = \prod_{j=i_1}^{i_k} a_j(X)\,,\\
         z(X) &= \frac{w(X)}{y(X)} = a_{i_1}(X)\,.
       \end{align*}
-      Nun ist klar, dass man die weiteren Faktoren deren Exponenten in $A$
-      liegen durch iterative Anwendung dieser Idee erhält, wie man im 
+      Nun ist klar, dass man die weiteren Faktoren, deren Exponenten in $A$
+      liegen, durch iterative Anwendung dieser Idee erhält, wie man im 
       Algorithmus erkennen kann. Letztlich bleibt nur die Frage, wie man an die
       Faktoren kommt, deren Exponenten Vielfache der Charakteristik sind.
-      Dies ist aber auch offensichtlich, betrachtet man erneut
-      \thref{prop:sfree1} und die Umsetzung in Schritt 1.2. 
+      Dies ist aber offensichtlich, betrachtet man erneut
+      \thref{prop:sfree1} und die Umsetzung in Schritt (1.2). 
   \end{description}
 \end{proof}

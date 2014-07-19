@@ -31,7 +31,7 @@ import Debug.Trace
 --  Definition
 
 -- Ein Element im Körper ist repräsentiert durch ein Paar von Polynomen. Das
--- erste beschreibt das Element und das zweite beschreibt das Minimalpolynom
+-- erste beschreibt das Element, das zweite das Minimalpolynom
 -- und damit den Erweiterungskörper.
 -- Zusätzlich ist auch die kanonische Inklusion aus dem Grundkörper durch
 -- FFKonst implementiert.
@@ -149,17 +149,11 @@ charOfP :: (Eq a, FiniteField a, Num a) => Polynom a -> Int
 charOfP f = charakteristik $ getReprP f
 
 {-# INLINE charRootP #-}
--- |Zieht die p-te wurzel aus einem Polynom, wobei p die charakteristik ist
+-- |Zieht die p-te Wurzel aus einem Polynom, wobei p die Charakteristik ist
 charRootP :: (Show a, FiniteField a, Num a) => Polynom a -> Polynom a
-charRootP f | isNullP f     = --trace ("charRootP f="++show f++" => "++show nullP) $
-                              nullP
-            | f == pKonst 1  = --trace ("charRootP f="++show f++" => "++show (pKonst 1)) $
-                              pKonst 1
-            | otherwise     = --trace ("charRootP f="++show f++" => "++
-                              --show (pTupUnsave
-                              --    [(i,m^l) | (i,m) <- p2Tup f, i `rem` p == 0]))$
-                              pTupUnsave
-                          [(i `quot` p,m^l) | (i,m) <- p2Tup f]
+charRootP f | isNullP f     = nullP
+            | f == pKonst 1  = pKonst 1
+            | otherwise     = pTupUnsave [(i `quot` p,m^l) | (i,m) <- p2Tup f]
   where p = charOfP f
         q = elemCount $ getReprP f
         l = max (quot q p) 1

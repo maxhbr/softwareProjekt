@@ -5,15 +5,14 @@ implementiert, welche es entsprechenden Datentypen mit dieser Klasse
 ermöglicht, nach \LaTeX{} zu rendern.
 
 Die einzige zur Klasse gehörende Funktion ist \texttt{showTex}, welche einen
-String mit \LaTeX{} code zurückgibt.
+String mit \LaTeX{}-Code zurückgibt.
 
-Es sind auch noch Funktionen implementiert, die 
+Ferner wurden Funktionen implementiert, die 
 \begin{itemize}
-  \item ein Datentyp der Klasse \texttt{ShowTex} zu einem PNG rendern können
-    bzw.
-  \item einen String mit \LaTeX{} code rendern.
-  \item Sowie eine Funktion, die das Programm \texttt{sxiv} nutzt, um diese PNG
-    anzuzeigen.
+  \item einen Datentyp der Klasse \texttt{ShowTex} bzw.
+  \item einen String mit \LaTeX{}-Code in ein \texttt{PNG}-Bild umwandeln,
+  \item sowie eine Funktion, die das Programm \texttt{sxiv} nutzt, 
+    um die erzeugten \texttt{PNG}-Bilder anzuzeigen.
 \end{itemize}
 Diese drei Funktionen sind leider nur unter Linux verfügbar.
 
@@ -23,11 +22,11 @@ Diese drei Funktionen sind leider nur unter Linux verfügbar.
 \subsection{Serialisierung}
 Alle hier genutzten Datentypen haben eine Instanz vom Typ \texttt{Binary},
 welche einfache Serialisierung ermöglicht. Dazu müssen nur die zwei Funktionen
-\texttt{put} und \texttt{get} implementiert werden.
+ħputħ und ħgetħ implementiert werden.
 
-Als Beispiel dient die folgende Funktion, die einen Dateinamen als
-\texttt{String} und eine Liste von Polynomen, welche über einer Erweiterung von
-einer Erweiterung von \texttt{PF} leben.
+Als Beispiel dient folgende Funktion, der ein Dateiname als
+ħStringħ und eine Liste von Polynomen über einer Erweiterung von
+einer Erweiterung von ħPFħ übergeben wird.
 \begin{hcode}
 import qualified Data.Binary as B
 
@@ -35,10 +34,11 @@ saveToFile :: String -> [Polynom (FFElem (FFElem PF))] -> IO ()
 saveToFile fileName polys = writeFile fileName (B.encode (polys))
 \end{hcode}
 
-Die erzeugte Binärdatei lässt sich ebensoeinfach wieder auslesen, indem man die
-Daten in eine Variable \texttt{raw} lädt und diese mittels des Befehls
-\texttt{decode} decodiert. Dabei muss angegeben werden, welchen Typ das
-gelesene haben soll.
+Die erzeugte Binärdatei lässt sich ebenso einfach wieder auslesen, 
+indem man die
+Daten in eine Variable ħrawħ lädt und diese mittels des Befehls
+ħdecodeħ decodiert. Dabei muss der Typ der einzulesenden Rohdaten spezifiziert
+werden.
 \begin{hcode}
 readFromFile :: String -> IO [Polynom (FFElem (FFElem PF))]
 readFromFile fileName = do
@@ -52,9 +52,9 @@ readFromFile fileName = do
 \texttt{GalFld/More/SpecialPolys.hs}
 \texttt{GalFld/More/NumberTheory.hs}
 
-Vorgreifend auf \autoref{sec:bsp-prim-norm} wird hier der Inhalt von 
+Vorgreifend auf \autoref{chap:bsp-prim-norm} wird hier der Inhalt von 
 \texttt{SpecialPolys.hs} beschrieben. In dieser Datei wurden zwei spezielle
-Familien von Polynomen über endlichen Körpern implementiert: Die
+Familien von Polynomen über endlichen Körpern implementiert: die
 Kreisteilungspolynome und die Pi-Polynome.
 
 \subsubsection{Die Kreisteilungspolynome}
@@ -69,8 +69,8 @@ zitieren wir \cite[Abschnitt 4]{hach2013eki}.
   \emph{$d$-tes Kreisteilungspolynom}, wobei
   \[ C_d := \{ v\in \F_{q^n}^\ast:\ \ord(v) = d\}\]
   die Menge der $d$-ten primitiven Einheitswurzeln in $\F_q$ ist.%
-  \footnote{Es sei vorausgesetzt, dass dem Leser nicht explizit definierten
-  Termini bekannt sind.}
+  \footnote{Es sei vorausgesetzt, dass dem Leser/der Leserin 
+  die nicht explizit definierten Termini bekannt sind.}
 \end{definition}
 
 \begin{definition}[Möbius-Funktion]
@@ -103,8 +103,8 @@ Damit ist klar, wie man die Kreisteilungspolynome effizient implementiert.
 
 \subsubsection{Die Pi-Polynome}
 
-\citeauthor{hach92} zeigt in \autocite{hach92} wie man
-\emph{alle} primtiven und normalen Elemente einer Körpererweiterung $\F_{q^n}$
+\citeauthor{hach92} zeigt in \autocite{hach92}, wie man
+\emph{alle} primitiven und normalen Elemente einer Körpererweiterung $\F_{q^n}$
 über $\F_q$ als Nullstellen eines Polynoms finden kann.
 
 \begin{bemerkung}

@@ -284,8 +284,10 @@
 	xrightmargin = 0.1\linewidth,
 	escapechar=!,
 	tabsize=3,
-	keywords={if, and, or, is, then, else, endif, while, endwhile, for, from,
+  emphstyle={[1]\bfseries},
+	emph={[1]if, and, or, is, then, else, endif, while, endwhile, for, from,
 	to, do, endfor, Input, Output, Algorithmus, return},
+  emph={[2]}, emph={[3]},
 	morecomment=[l]{//},
   deletestring=[b]",
 	columns=flexible,
@@ -295,7 +297,10 @@
 \renewcommand{\lstlistingname}{Algorithmus}
 
 %%%% Bibliography %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[style=numeric,backend=biber]{biblatex}
+\usepackage[style=numeric,backend=biber,
+  isbn=false,
+  firstinits=true
+  ]{biblatex}
 %\usepackage{filecontents}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
