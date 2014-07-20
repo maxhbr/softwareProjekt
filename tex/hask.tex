@@ -254,13 +254,17 @@ Möchte man nun die Gleichheit auf Listen als Gleichheit der Elemente
 implementieren, so könnte man ħ[a]ħ eine ħinstanceħ von ħEqħ geben:
 \begin{hcode}
 instance (Eq a) => [a] where
-  xs == ys  = all (True) (zipWith (==) xs ys)
+  xs == ys  = and (zipWith (==) xs ys)
 \end{hcode}
 Natürlich muss man nun -- anders als in der Definition der Typ-Klasse -- 
 ħ(==)ħ mit konkreter Bedeutung füllen.
 ħ=>ħ beschreibt dabei eine Typen-Klassen-Restriktion.
 Hier darf also die Typen-Variable ħaħ nicht durch alle Typen ersetzt werden,
 sondern nur durch die, die eine Instanz ħEqħ haben. 
+
+Die Typen-Klasse ħEqħ stellt eigentlich die zwei Prädikate ħ==ħ und ħ/=ħ
+bereit. Da sich die eine Funktion aber jeweils durch negation aus der anderen
+definieren lässt, muss man in der Instantiierung nur eine von diesen definieren.
 
 Eine umfangreiche Liste an wichtigen Typ-Klassen sowie eine ausführlichere
 Erklärung des Typensystems findet man z.B.
