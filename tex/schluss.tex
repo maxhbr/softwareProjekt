@@ -1,0 +1,46 @@
+In den vorherigen Kapiteln konnten wir die Umsetzung einer Bibliothek von
+Grundfunktionen auf endlichen Körpern in Haskell erläutern und demonstrieren.
+Sicherlich sind die bisher implementierten Funktionen bei weitem nicht
+ausreichend, um dieses Library als vollständig bezeichnen zu können. So ist
+klar, dass die meisten Computer-Algebra-Systeme, was den Funktionsumfang
+endlicher Körper betrifft, unserem kleinen Softwareprojekt überlegen
+sind. Es gilt jedoch zu bemerken, dass wir gerade auf den Funktionsumfang für 
+Polynome über endlichen Körpern, insbesondere was verschiedene
+Multiplikations- und Faktorisierungsalgorithmen angeht, besonderes Augenmerk
+gelegt haben.
+
+\addsec{Wie könnte es weitergehen?}
+Statt einer Schlussbemerkung drängt sich daher sicherlich die Frage nach einer
+Fortsetzung des Projekts auf.
+
+\paragraph{Performance der Implementierung} Trotz der ,,Schönheit`` funktionaler
+Programmierung mussten wir an vielen Stellen bemerken, dass das Konzept der
+unveränderlichen Objekte auf Kosten der Performance geht. Insbesondere bei
+großen Datenstrukturen, wie z.B. Polynomen über Körpererweiterungen (also
+Polynome, deren Koeffizienten wiederum Polynome sind) oder auch Matrizen mit
+polynomialen Einträgen, nimmt der \emph{garbage collector}, also dasjenige
+Unterprogramm der Ausführung, das den Speicher nicht mehr benutzter Objekte
+wieder frei gibt, einen großen, wenn nicht sogar den größten Teil der
+Ausführungszeit ein. An diesem Punkt besteht sicherlich großes
+Optimierungspotential. Ein Ansatz könnte es sein, an den berechnungsintensiven
+Stellen von der Funktionalität abzuweichen und in \emph{Monaden}%
+\footnote{Übrigens sind Monaden aus Sicht der Kategorientheorie sehr
+interessante Objekte}
+(z.B. \autocite{haskellwiki:monaden}) zu wechseln. Alternativ könnte man
+natürlich versuchen, \emph{mehr} statt weniger Funktionalität
+zur Verbesserung der Laufzeit einzusetzen. Da, wie bereits öfters erwähnt,
+Haskell Ausdrücke nicht auswertet, solange sie nicht de facto benötigt werden,
+könnte man versuchen, die entstehenden \emph{Thunk}s 
+(z.B. \autocite{haskellwiki:thunk}), also die noch nicht ausgewerteten Stellen,
+zu vereinfachen. Beide Herangehensweisen sind sicherlich legitim, würden 
+jedoch eine weitaus intensivere Einarbeitung in die tiefe Struktur von Haskell
+erfordern und den Rahmen dieses Projekts sprengen.
+
+\paragraph{Erweiterung des Funktionsumfangs} Auch  das Hinzufügen neuer
+Funktionen könnte das Projekt fortsetzen. Aus hauptsächlich
+mathematisch interessierter Sicht ist dies vermutlich die interessantere 
+Aufgabe. Bekanntlich existieren gerade für endliche Körper der Charakteristik 2 
+spezielle Algorithmen, die weitaus effizienter sind, als ihre Pendents in
+allgemeiner Charakteristik. 
+
+
