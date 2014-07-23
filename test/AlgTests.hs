@@ -18,7 +18,7 @@ import GalFld.More.NumberTheory
 
 -- |Anzahl monischer irreduzibler Polynome von Grad n über F_q
 countMonicIrreds :: Int -> Int -> Int
-countMonicIrreds q n = (sum [(möbFkt d)*q^(n `quot` d) | d <- divisors n]) `quot` n
+countMonicIrreds q n = (sum [(moebFkt d)*q^(n `quot` d) | d <- divisors n]) `quot` n
 
 
 -- |Anzahl monischer irreduzibler Polynome von Grad n über F_q
@@ -43,7 +43,7 @@ irredTestsF5 func = [it ("findIrreds von Grad "++show n++" über F_5") $
 --------------------------------------------------------------------------------
 compareBerlekampRabin = it "compare Berlekamp und Rabin" $
   and ls `shouldBe` True
-    where ls = map (\f -> (isTrivialFact (appFact berlekamp (sff f)))== rabin f)
+    where ls = map (\f -> (isTrivialFact (sffAndBerlekamp f))== rabin f)
                    $ take 100
                    $ getAllMonicPs (elems (1 :: F3)) [40]
 

@@ -31,11 +31,11 @@ import GalFld.Algorithmen.SFreeFactorization
 --------------------------------------------------------------------------------
 --  Wrapper
 
-appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a) => 
+appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a) =>
                                         [(Int,Polynom a)] -> [(Int,Polynom a)]
 appBerlekamp = appFact berlekampFactor
 
-appBerlekamp2 :: (Show a, FiniteField a, Num a, Fractional a) => 
+appBerlekamp2 :: (Show a, FiniteField a, Num a, Fractional a) =>
                                         [(Int,Polynom a)] -> [(Int,Polynom a)]
 appBerlekamp2 = appFact berlekampFactor2
 
@@ -47,7 +47,7 @@ sffAndBerlekamp :: (Show a, Fractional a, Num a, FiniteField a)
 sffAndBerlekamp f = appBerlekamp $ sff f
 
 -- |Wählt aus einer Liste von Polynomen das erste Irreduzibele Polynom heraus
-findIrred :: (Show a, Fractional a, Num a, FiniteField a) => 
+findIrred :: (Show a, Fractional a, Num a, FiniteField a) =>
                                                        [Polynom a] -> Polynom a
 findIrred = head . findIrreds
 
@@ -81,7 +81,7 @@ findIrreds fs = do
 -- Wendet zuvor (die offensichtliche Faktorisierung und) SFF an
 --
 -- Ist parallelisiert mittels Strategie rpar.
-findTrivialsB :: (Show a, Fractional a, Num a, FiniteField a) => 
+findTrivialsB :: (Show a, Fractional a, Num a, FiniteField a) =>
                                              [Polynom a] -> [[(Int,Polynom a)]]
 findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp (findTrivialsSff ps)
                      , isTrivialFact fs]
@@ -116,10 +116,10 @@ berlekampFactor2 f | isNullP f   = []
                                       => Polynom a -> Matrix a -> [(Int,Polynom a)]
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
                              | getNumRowsM m == 1 = [(1,f)]
-                             | otherwise         = 
+                             | otherwise         =
                                 berlekampFactor' g n ++ berlekampFactor' g' n'
           where {-# INLINE g #-}
-                g  = head [x | x <- [ggTP f (h - pKonst s) 
+                g  = head [x | x <- [ggTP f (h - pKonst s)
                                 | s <- elems (getReprP f)] , x /= 1]
                 {-# INLINE g' #-}
                 g' = f @/ g
@@ -133,7 +133,7 @@ berlekampFactor2 f | isNullP f   = []
                 newKer m g  = fromListsM $! take r m'
                   where !(k,l) = boundsM m
                         !m'    = toListsM $ echelonM $ fromListsM
-                                 [takeFill 0 l $ p2List $ 
+                                 [takeFill 0 l $ p2List $
                                   modByP (pList (getRowM m i)) g | i <- [1..k]]
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
@@ -152,10 +152,10 @@ berlekampFactor f | isNullP f   = []
                                   => Polynom a -> Matrix a -> [(Int,Polynom a)]
         berlekampFactor' f m | uDegP f <= 1       = [(1,f)]
                              | getNumRowsM m == 1 = [(1,f)]
-                             | otherwise         = 
+                             | otherwise         =
                              concat [berlekampFactor' g (newKer m g) | g <- gs]
           where {-# INLINE gs #-}
-                gs  = [x | x <- [ggTP f (h - pKonst s) 
+                gs  = [x | x <- [ggTP f (h - pKonst s)
                             | s <- elems (getReprP f)] , x /= 1]
                 {-# INLINE h #-}
                 h  = pList $ getRowM m 2
@@ -163,7 +163,7 @@ berlekampFactor f | isNullP f   = []
                 newKer m g  = fromListsM $! take r m'
                   where !(k,l) = boundsM m
                         !m'    = toListsM $ echelonM $ fromListsM
-                                 [takeFill 0 l $ p2List $ 
+                                 [takeFill 0 l $ p2List $
                                   modByP (pList (getRowM m i)) g | i <- [1..k]]
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                                  $ reverse m')
