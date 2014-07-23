@@ -25,8 +25,6 @@ import Control.Arrow as A
 
 import GalFld.Core.FiniteFields
 import GalFld.Core.Polynomials
-
-import Debug.Trace
 --------------------------------------------------------------------------------
 
 -- |Erzeugt eine triviale Faktorisierung zu einem Polynom

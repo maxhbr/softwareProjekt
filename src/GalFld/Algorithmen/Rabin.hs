@@ -14,7 +14,6 @@ module GalFld.Algorithmen.Rabin (
   ) where
 
 import GalFld.Core
-import Debug.Trace
 import Data.List
 
 -- |Gibt ein irreduzibles monisches Polynom von Grad n über dem Körper von x

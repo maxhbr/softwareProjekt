@@ -3,8 +3,6 @@ module GalFld.More.SpecialPolys (
   , piPoly
   ) where
 
-import Debug.Trace
-
 import GalFld.More.NumberTheory
 import GalFld.Core
 import GalFld.GalFld

@@ -19,8 +19,6 @@ module GalFld.Algorithmen.Berlekamp
   , berlekampFactor2, appBerlekamp2
   )where
 
-import Debug.Trace
-
 import Data.Maybe
 import Data.List
 import Control.Monad
@@ -96,8 +94,7 @@ findTrivialsB ps = [fs | fs <- parMap rpar appBerlekamp (findTrivialsSff ps)
 --  aufspannen bzgl der kanonischen Basis { 1, x, x², x³, ... }
 berlekampBasis :: (Show a, Fractional a, Num a, FiniteField a)
                                                        => Polynom a -> Matrix a
-berlekampBasis f = --trace ("mods = \n"++show (fromListsM [red i | i <- [0..(n-1)]])) $
-    transposeM $ kernelM $ transposeM $!
+berlekampBasis f = transposeM $ kernelM $ transposeM $!
                         fromListsM [red i | i <- [0..(n-1)]] - genDiagM 1 n
   where !n     = fromJust $ degP f
         !q     = elemCount a

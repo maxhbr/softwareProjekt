@@ -6,9 +6,6 @@ import Data.List
 import qualified Control.Arrow as A
 import GHC.Integer.Logarithms
 import GalFld.Core.Polynomials
-import Debug.Trace
-
-
 
 -------------------------------------------------------------------------------
 -- FFT

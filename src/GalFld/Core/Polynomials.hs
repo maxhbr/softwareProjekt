@@ -33,8 +33,6 @@ import Data.Binary
 import Data.Ord
 import Control.DeepSeq
 
-import Debug.Trace
-
 import GalFld.Core.ShowTex
 
 
@@ -438,14 +436,8 @@ modByP f p = snd $ divP f p
 --invModMonom h k  | isNullP h  = nullP
 --               | otherwise  = invModMonom' (pKonst 1) 1 1 [] (unPMS h)
 --  where invModMonom' !a !l !lold !h0 !h1
---          | l >= k     =  trace ("invModMonom' done l="++show l++" a="++show (length $ unPMS a))$
---                        modMonomP k a
---          | otherwise = trace ("invModMonom' l="++show l++" a="++show a
---                        ++ ", h0="++show h0++", h1="++show h1++"\n"
---                        ++ ", h0'="++show h0'++", h1'="++show h1'
---                        ++ ", a*h0="++show (a*(PMS h0' True))
---                        ++ ", c="++show c ++", b="++show b++"\n")$
---                        invModMonom' (a+a') l' l h0' h1'
+--          | l >= k     = modMonomP k a
+--          | otherwise = invModMonom' (a+a') l' l h0' h1'
 --          where b = negate $ multPShortDown l a $!
 --                            multPShortDown l a (PMS h1' True) + PMS c True
 --                a' = multMonomP l b

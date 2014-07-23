@@ -25,8 +25,6 @@ import GalFld.Core.PrimeFields as X
 import GalFld.Core.Polynomials
 import GalFld.Core.ShowTex
 
-import Debug.Trace
-
 --------------------------------------------------------------------------------
 --  Definition
 
@@ -138,7 +136,7 @@ instance (Num a, Binary a) => Binary (FFElem a) where
            case t of
                 0 -> liftM FFKonst get
                 1 -> liftM2 FFElem get get
-                _ -> trace (show t) undefined
+                _ -> undefined
 
 --------------------------------------------------------------------------------
 --  Funktionen auf Polynomen über Endlichen Körpern

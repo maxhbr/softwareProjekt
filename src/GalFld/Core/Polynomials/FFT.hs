@@ -6,7 +6,6 @@ import Data.List
 import qualified Control.Arrow as A
 import GHC.Integer.Logarithms
 import GalFld.Core.Polynomials
-import Debug.Trace
 
 
 
@@ -35,16 +34,13 @@ fftP w n f = fft w (+) (-) 0 1 n (p2List f)
 --   -> [a]         Ausgabeliste
 fft :: (Show a) => (Int -> a -> a) -> (a->a->a) -> (a->a->a) -> a
                                                 -> Int -> Int -> [a] -> [a]
-fft _ _ _ _ _ 1 fs = --trace ("fftEnd: fs="++show fs) $ 
-             fs
-fft w addF subF zero i n fs = --trace ("fft: n="++show n++" m="++show m++" fs="++show fs++" fss="++show fss
-               -- ++"\n\t=>ls="++show ls++" rs="++show rs) $ 
-             intersperseL ls' rs'
+fft _ _ _ _ _ 1 fs = fs
+fft w addF subF zero i n fs = intersperseL ls' rs'
   where !i'  = 2*i
         !ls' = fft w addF subF zero i' m ls
         !ls  = take m $ zipWith' addF zero fs fss
         !rs' = fft w addF subF zero i' m rs
-        !rs  = take m $ zipWith w [0..] $ zipWith' (subF) zero fs fss
+        !rs  = take m $ zipWith w [0..] $ zipWith' subF zero fs fss
         !fss = drop m fs
         !m   = n `quot` 2
 
@@ -70,17 +66,8 @@ ss :: (Show a, Num a, Fractional a, Eq a) => Int -> [a] -> [a] -> [a]
 ss 1 f g = multLists f g
 ss 2 f g = multLists f g
 ss l f g 
-  | (all (==0) f) || (all (==0) g) = [] 
-  | otherwise = trace ("ss with l="++show l++" l'="++show l'++" m="++show m++" m'="++show m'
-      ++"\nf="++show f++"\ng="++show g
-      ++"\n\t fs="++show fs++" gs="++show gs
-      ++"\n\t fs'="++show fs'++" gs'="++show gs'
-      ++"\n\t fftFs="++show (map (pList) fftFs)++"\n\tffTGs="++show (map pList fftGs)
-      ++"\n\t -> ffTHs"++show (map pList fftHs)
-      ++"\n\t xi*(2*m'-2)="++show (xi*(2*m'-2))++" hs''="++show (map pList hs'')
-      ++"\n\t hs'="++show hs'++" \n\txi*(2*m'-1)="++show (xi*(2*m'-1)) 
-      ++" hs'''="++show (map (p2Tup . pList) (zipWith (multx (xi*(2*m'-1))) [0..] hs' ))++" hs="++show (map pList hs)) $
-      foldr1 (zipWith' (+) 0) $  reduceModxn (2^l) $ zipWith (multx (m)) [0..] hs
+  | all (==0) f || all (==0) g = [] 
+  | otherwise = foldr1 (zipWith' (+) 0) $  reduceModxn (2^l) $ zipWith (multx m) [0..] hs
   where -- << n = 2^l = m * m' >>
         !l' = l `quot` 2
         !m  = 2^l'
@@ -88,8 +75,8 @@ ss l f g
         !fs = ssBuildBlocks (m*(m'-1)) m $ zip [0..] f
         !gs = ssBuildBlocks (m*(m'-1)) m $ zip [0..] g 
         -- auf FFT vorbereiten
-        !fs' = zipWith (multx (xi)) [0..] fs
-        !gs' = zipWith (multx (xi)) [0..] gs 
+        !fs' = zipWith (multx xi) [0..] fs
+        !gs' = zipWith (multx xi) [0..] gs 
         {-fs' = zipWith (++|) [take i $ cycle [0] | i<-[0..]] fs-}
         {-gs' = zipWith (++|) [take i $ cycle [0] | i<-[0..]] gs-}
         -- FFT durchführen
@@ -103,7 +90,7 @@ ss l f g
         !hs''  = reduceModxn (2*m) $ fft (multx (xi*(2*m'-2))) (zipWith' (+) 0) 
                                                 (zipWith' (-) 0) [0] 1 m' fftHs
         -- * 1/m'
-        !hs'   = map (map (\x -> x / (fromIntegral m'))) hs''
+        !hs'   = map (map (\x -> x / fromIntegral m')) hs''
         -- Rückwandlung zu H(x,y)
         !hs    = reduceModxn (2*m) $ zipWith (multx (xi*(2*m'-1))) [0..] hs'
 
@@ -111,13 +98,10 @@ ss l f g
 {-[># INLINE reduceModxn #<]-}
 -- | Reduziert die innere Liste modulo x^n+1
 reduceModxn :: (Show a, Num a) => Int -> [[a]] -> [[a]]
-reduceModxn _ [] = --trace ("reduceModxn empty") $ 
-                    []
+reduceModxn _ [] = []
 reduceModxn n x@(xs:xss) 
-    | l > n     = --trace ("reduceModxn n="++show n++" l="++show l++" l>n") $ 
-                  reduceModxn n (ys:xss) 
-    | otherwise = --trace ("reduceModxn n="++show n++" l="++show l++" l<=n x="++show x++" xs="++show xs++" xss="++show xss)$ 
-                  xs : reduceModxn n xss
+    | l > n     = reduceModxn n (ys:xss) 
+    | otherwise = xs : reduceModxn n xss
   where l = length xs
         ys = zipWith' (-) 0 (take n xs) (drop n xs)
 
@@ -126,12 +110,10 @@ reduceModxn n x@(xs:xss)
 ssBuildBlocks :: (Show a, Eq a, Num a) => Int -> Int -> [(Int,a)] -> [[a]]
 ssBuildBlocks _ _ [] = []
 ssBuildBlocks 0 _ fs = [checkEmpty $ map snd fs]
-ssBuildBlocks n m fs = --trace ("fs="++show fs++" n="++show n++" m="++show m
-                       -- ++"\n\t=>ms'="++show ms'++" ns="++show ns) $
-                      (ssBuildBlocks (n - m) m ns) ++ [checkEmpty ms]
+ssBuildBlocks n m fs = ssBuildBlocks (n - m) m ns ++ [checkEmpty ms]
   where ms' = filter (\(i,x) -> i >= n) fs
         ns  = fs \\ ms'
-        ms  = map (snd) ms'
+        ms  = map snd ms'
 
 
 {-[># INLINE multx #<]-}
@@ -140,7 +122,7 @@ multx :: (Num a) => Int -> Int -> [a] -> [a]
 multx _ _ []    = []
 multx j i xs 
     | k < 0     = drop k xs
-    | otherwise = (take k $ cycle [0]) ++ xs
+    | otherwise = replicate k 0 ++ xs
   where k = j*i
 
 
@@ -162,7 +144,7 @@ intersperseL (y:ys) (x:xs)  = y : x : intersperseL ys xs
 zipWith' :: (t->t->t) -> t -> [t] -> [t] -> [t]
 zipWith' _ _ xs [] = xs
 zipWith' f t [] ys = map (f t) ys
-zipWith' f t (x:xs) (y:ys) = (f x y) : zipWith' f t xs ys
+zipWith' f t (x:xs) (y:ys) = f x y : zipWith' f t xs ys
 
 
 

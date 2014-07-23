@@ -14,7 +14,6 @@ import Control.Parallel
 import Control.Parallel.Strategies
 
 import GalFld.Core
-import Debug.Trace
 --------------------------------------------------------------------------------
 --  Wrapper
 

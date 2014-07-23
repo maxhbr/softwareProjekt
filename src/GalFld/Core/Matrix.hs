@@ -25,8 +25,6 @@ module GalFld.Core.Matrix
   )
   where
 
-import Debug.Trace
-
 import Data.List
 import Data.Array
 import Data.Array.IArray (amap)

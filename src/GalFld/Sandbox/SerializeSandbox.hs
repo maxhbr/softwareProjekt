@@ -11,8 +11,6 @@ module GalFld.Sandbox.SerializeSandbox
   where
 import Prelude hiding (writeFile, readFile)
 
-import Debug.Trace
-
 import GalFld.Core
 import GalFld.Algorithmen
 import Data.List
