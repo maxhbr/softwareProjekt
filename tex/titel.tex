@@ -1,0 +1,54 @@
+\begin{titlepage}
+\thispagestyle{empty}
+\newcommand{\Rule}{\rule{\textwidth}{1mm}}
+\begin{center}\sffamily\bfseries
+\LARGE\textcolor{gray}{Softwareprojekt}
+\par\vspace*{1cm}
+\tikz[baseline]{ \node[anchor=base, minimum width=\textwidth,
+  inner xsep=5pt,
+  inner ysep=10pt,
+  align=center,
+  text width=0.8\textwidth,
+  font=\Huge]
+  (main title 1) {GalFld};
+\node[anchor=base, minimum width=\textwidth,
+  inner xsep=5pt,
+  inner ysep=10pt,
+  align=center,
+  text width=\textwidth,
+  font=\Large,
+  below=10pt of main title 1.south]
+  (main title) {%
+    Eine Umsetzung endlicher Körper \\
+    in der Programmiersprache Haskell\\
+    mit besonderer Betrachtung der \\
+    Faktorisierung von Polynomen über endlichen
+    Körpern};
+  \draw[overlay, line width=1mm, gray,
+    line cap=round]
+    (main title.south west)
+    ++(0,-10pt) -- +(\textwidth,0)
+    (main title 1.north west)
+    ++(0,10pt) -- +(\textwidth,0);
+  \draw[overlay, line width=1pt, gray,
+    line cap=round]
+    (main title 1.south west)
+    ++(2cm,-5pt) -- +($(\textwidth,0)+(-4cm,0)$);
+}
+\vfill
+\normalfont\sffamily\large vorgelegt von\par
+\bfseries\LARGE Maximilian Huber und Stefan Hackenberg
+\vfill
+\normalfont\sffamily\large am\\
+\bfseries\Large Institut für Mathematik\\
+\normalfont\sffamily\large der\\
+\bfseries\Large Universität Augsburg
+\vfill
+\normalfont\sffamily\large betreut durch \\
+\bfseries\Large Prof. Dr. Dirk Hachenberger\par
+\vfill
+\normalfont\sffamily\large abgegeben am\\
+\bfseries\Large\itshape In der Zukunft
+\end{center}
+\end{titlepage}
+
