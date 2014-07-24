@@ -156,11 +156,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Source to Latex Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newif\ifnoupdatelistings\noupdatelistingstrue
+\newif\ifupdatelistings\updatelistingstrue
 \newcounter{mycount}
 \setcounter{mycount}{1}
 \newcommand{\haskellinput}[2]{%
-\ifnoupdatelistings
+\ifupdatelistings
   \typeout{^^JThis is Haskellinput ------------------------ look for^^J
     /usr/bin/awk 'BEGIN {RS="\string\n\string\n";} /.*?^#2 /'
     ../src/GalFld/#1.hs | sed '/./,$!d' >/tmp/temp.tex

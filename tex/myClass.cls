@@ -18,14 +18,13 @@
 \setdefaultlanguage{german}
 \setotherlanguages{english}
 
-\usepackage{hyperref}
 \usepackage{amsmath,amssymb}
 \usepackage{latexsym}
 \usepackage{enumerate}
 \usepackage{graphicx}
 \usepackage[table]{xcolor}
 
-\usepackage{url} % URLS in bibtex
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref}
 
 \usepackage[german]{varioref}
 

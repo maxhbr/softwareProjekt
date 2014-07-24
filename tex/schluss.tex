@@ -13,6 +13,15 @@ gelegt haben.
 Statt einer Schlussbemerkung drängt sich daher sicherlich die Frage nach einer
 Fortsetzung des Projekts auf.
 
+\paragraph{Erweiterung des Funktionsumfangs} Das Hinzufügen neuer
+Funktionen könnte das Projekt fortsetzen. 
+Bekanntlich existieren gerade für endliche Körper der Charakteristik 2 
+spezielle Algorithmen, die weitaus effizienter sind, als ihre Pendents in
+allgemeiner Charakteristik. Aus hauptsächlich
+mathematisch interessierter Sicht ist dies vermutlich eine spannende
+Aufgabe, da -- wie wir im Laufe des Projekts erkennen konnten -- die Syntax von
+Haskell der Art und Weise mathematischer Notation besonders ähnlich ist.
+
 \paragraph{Performance der Implementierung} Trotz der ,,Schönheit`` funktionaler
 Programmierung mussten wir an vielen Stellen bemerken, dass das Konzept der
 unveränderlichen Objekte auf Kosten der Performance geht. Insbesondere bei
@@ -34,13 +43,30 @@ könnte man versuchen, die entstehenden \emph{Thunk}s
 (z.B. \autocite{haskellwiki:thunk}), also die noch nicht ausgewerteten Stellen,
 zu vereinfachen. Beide Herangehensweisen sind sicherlich legitim, würden 
 jedoch eine weitaus intensivere Einarbeitung in die tiefe Struktur von Haskell
-erfordern und den Rahmen dieses Projekts sprengen.
+erfordern und den Rahmen dieses Projekts sprengen. 
 
-\paragraph{Erweiterung des Funktionsumfangs} Auch  das Hinzufügen neuer
-Funktionen könnte das Projekt fortsetzen. Aus hauptsächlich
-mathematisch interessierter Sicht ist dies vermutlich die interessantere 
-Aufgabe. Bekanntlich existieren gerade für endliche Körper der Charakteristik 2 
-spezielle Algorithmen, die weitaus effizienter sind, als ihre Pendents in
-allgemeiner Charakteristik. 
+Obwohl an vielen Stellen sicherlich noch Optimierungspotential bezüglich der
+Performance des Projekts besteht, möchten wir anmerken, dass Haskell im
+Allgemeinen mindestens genauso schnell ist, wie andere Programmiersprachen.
+(vgl. \autocite{haskellwiki:performance}) 
 
+Nun möchten wir das Wort an 
+Philip Greenspun und Autrijus Tang übergeben, um abschließend ein Gefühl für das
+Programmieren in Haskell zu geben.
 
+\begin{quote}
+  \itshape SQL, Lisp, and Haskell are the only programming languages that 
+  I've seen where one spends more time thinking than typing.
+  \hfill\normalfont\sffamily\small Philip Greenspun%
+  \footnote{%
+  \url{http://blogs.law.harvard.edu/philg/2005/03/07/how-long-is-the-average-internet-discussion-forum-posting/}}
+\end{quote}
+
+\begin{quote}
+  \itshape 
+  Haskell is faster than C++, more concise than Perl, more regular than Python,
+  more flexible than Ruby, more typeful than C\#, more robust than Java, and 
+  has absolutely nothing in common with PHP.
+  \hfill\normalfont\sffamily\small Autrijus Tang%
+  \footnote{\url{http://www.perl.com/pub/2005/09/08/autrijus-tang.html?page=2}}
+\end{quote}
