@@ -32,7 +32,7 @@ import GalFld.More.SpecialPolys
 Wir erzeugen einen Primkörper der Charakteristik 2 mit dem Namen ħPFħ.
 
 \begin{code}
-$(genPrimeField 2 "PF")
+$(genPrimeField 3 "PF")
 
 pf = 1::PF
 p = charakteristik pf
@@ -96,7 +96,7 @@ main = do
               putStrLn $ "\t\t" ++ show cPN ++ " primitive und normale Elemente"
             putPolys fs = do
               putStrLn "Mit Minimalpolynomen:"
-              mapM_ (\(_,f) -> putStrLn $ "\t" ++ show f) fs
+              --mapM_ (\(_,f) -> putStrLn $ "\t" ++ show f) fs
             putTime st = do
               ft <- getCPUTime
               putStrLn $ "("
