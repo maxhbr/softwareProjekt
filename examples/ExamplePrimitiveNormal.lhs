@@ -96,7 +96,7 @@ main = do
               putStrLn $ "\t\t" ++ show cPN ++ " primitive und normale Elemente"
             putPolys fs = do
               putStrLn "Mit Minimalpolynomen:"
-              --mapM_ (\(_,f) -> putStrLn $ "\t" ++ show f) fs
+              mapM_ (\(_,f) -> putStrLn $ "\t" ++ show f) fs
             putTime st = do
               ft <- getCPUTime
               putStrLn $ "("
