@@ -5,7 +5,7 @@
 #    cPN.sh TOP
 #    cPN.sh TOP "PRIME1 PRIME2 ..."
 #
-# Last modified: Mon Aug 18, 2014  12:31
+# Last modified: Mo Aug 18, 2014  02:43
 
 ###############################################################################
 # Config
@@ -20,6 +20,8 @@ else
   LIST="2 3 5 7 11 13 17"
   LIMIT=8
 fi
+
+nCPUm1=7
 
 ###############################################################################
 FAIL=0
@@ -135,7 +137,7 @@ for p in $LIST; do
   fi
 
   # limit subprocesses to 4
-  while [ $(jobs -p | wc -l) -gt 3 ] ; do
+  while [ $(jobs -p | wc -l) -gt $nCPUm1 ] ; do
     sleep 1
   done
 done
