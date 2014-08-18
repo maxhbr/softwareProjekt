@@ -5,7 +5,7 @@
 #    cPN.sh TOP
 #    cPN.sh TOP "PRIME1 PRIME2 ..."
 #
-# Last modified: Sat Aug 16, 2014  06:44
+# Last modified: Mon Aug 18, 2014  12:31
 
 ###############################################################################
 # Config
@@ -49,6 +49,7 @@ module Main
 import System.Environment
 import System.Directory
 import Control.Monad
+import Data.Time
 
 import GalFld.GalFld
 import GalFld.More.SpecialPolys
@@ -80,6 +81,7 @@ main = do
   mapM_ (\n -> do
     let t = fst $ genPrimNorm n
     putInfo t p
+    getCurrentTime >>= print
     putToFile t p) indxs
       where putInfo !(T n cP cN cPN) p = do
               putStrLn $ "In F" ++ show p ++ "^" ++ show n ++ " über F" ++ show p
