@@ -49,7 +49,7 @@ der scheinbar unendlichen Liste der natürlichen Zahlen beginnend bei 1.
 
 Haskell ist \emph{statisch typisiert}.
 Das bedeutet, dass der Computer bereits zur Compilezeit zwischen Typen
-unterschiedet. Auf diese Weise können viele Fehler bereits vor dem 
+unterscheidet. Auf diese Weise können viele Fehler bereits vor dem 
 eigentlichen Ausführen des Programms erkannt werden.
 
 Darüber hinaus kann Haskell Typen \emph{inferieren},
@@ -84,7 +84,7 @@ noch besseres Ergebnis verspricht \texttt{-O2} auf Kosten der Dauer des
 Compilierens.
 
 Die Compiler-Option \texttt{-threaded} bereitet die ausführbare Datei darauf
-vor, parallel ausgeführt zu werden. Werden diese mit \texttt{-RTS -N$X$}
+vor, parallel ausgeführt zu werden. Wird diese mit \texttt{-RTS -N$X$}
 gestartet, so nutzt das Programm $X$ Prozessorkerne.
 
 \section{Installieren von Haskell-Paketen}
@@ -166,8 +166,8 @@ Finished in 0.0028 seconds
 Um Funktionen mit sehr kurzer Ausführungszeit zu vergleichen oder um
 statistische Schwankungen auszugleichen, werden Tests mehrfach ausgeführt.
 
-Damit das Ergebnis trotz Lazyness vollständig ausgewertet wird, braucht der
-Typ der Berechnung eine Instanz von \texttt{NFData}.
+Damit das Ergebnis trotz Lazyness vollständig ausgewertet wird, muss der Typ
+der Berechnung eine Instanz von \texttt{NFData}.
 
 Weitere Frameworks für Tests sind beispielsweise
 \begin{itemize}
