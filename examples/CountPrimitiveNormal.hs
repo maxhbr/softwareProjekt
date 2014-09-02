@@ -21,18 +21,19 @@ data T = T { ext :: Int -- Grad des Grundkörpers über dem Primkörper
            , countN :: Int -- Anzahl normaler Elemente
            , countPN :: Int } -- Anzahl primitiv-normaler Elemente
 
-genPrimNorm :: Int -> Int -> (T, [(Int, Polynom (FFElem PF))])
-genPrimNorm m n = (record, fac)
-  where one     = extendFFBy m pf
-        cyP     = cyclotomicPoly (p^(n*m)-1) one
-        piP     = piPoly $ pTupUnsave [(n,one),(0,-1)]
-        ggT     = ggTP cyP piP
-        fac     = factorP ggT
-        record  = T m n (uDegP cyP) (uDegP piP) (uDegP ggT)
-
 if' :: Bool -> a -> a -> a
 if' True  x _ = x
 if' False _ y = y
+
+genPrimNorm :: (FiniteField a, Show a, Fractional a) =>
+                    Int -> Int -> a -> Int -> (T, [(Int, Polynom (FFElem a))])
+genPrimNorm m n pf p = (record, fac)
+  where one    = extendFFBy m pf
+        cyP    = cyclotomicPoly (p^(n*m)-1) one
+        piP    = piPoly $ pTupUnsave [(n,one),(0,-1)]
+        ggT    = ggTP cyP piP
+        fac    = factorP ggT
+        record = T m n (uDegP cyP) (uDegP piP) (uDegP ggT)
 
 main = do
   mainSub (1::F2)
@@ -56,7 +57,7 @@ mainSub pf = do
     putInfo t p
     {-putToFile t p-}
     putTime st) indxs)) [1..5]
-      where putInfo (T n cP cN cPN) p = do
+      where putInfo (T m n cP cN cPN) p = do
               putStrLn $ "In F" ++ show p ++ "^" ++ show n ++ " über F" ++ show p
                 ++ " gibt es:"
               putStrLn $ "\t\t" ++ show cP ++ " primitive Elemente"
@@ -70,7 +71,7 @@ mainSub pf = do
             outFile p = "/tmp/CalcPrimNubers_p="++show p++".csv"
             putHeaderToFile p =
               writeFile (outFile p) "p,n,#primilive,#normal,#primitivNormal\n"
-            putToFile (T n cP cN cPN) p =
+            putToFile (T m n cP cN cPN) p =
               appendFile (outFile p )$ show p ++ ","
                                      ++ show n ++ ","
                                      ++ show cP ++ ","
