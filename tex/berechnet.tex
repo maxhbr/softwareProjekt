@@ -1,0 +1,17 @@
+\chapter{Berechnete Werte}
+
+Die folgenden Tabellen sind nach Charakteristik der Körper sortiert. Diese
+Charakteristik wird mit $p$ bezeichnet. In jeder Tabelle gibt es zu
+verschiedenen Körpererweiterungen, welche mit $n$ bezeichnet werden, je eine
+Zeile.
+In jeder Zeile stehen nacheinander die Anzahl der primitiven Elemente, die
+Anzahl der normalen Elemente und die Anzahl derer, die beide Eigenschaften
+besitzen.
+
+\foreach \x in {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,61,67,71,73,79,83,89,97,101} {
+  \DTLloadrawdb{tab\x}{CSVs/CalcPrimNubers_p=\x.csv}
+  \begin{table}[!htbp]
+    \caption{Werte für $p=\x$}
+    \DTLdisplaydb{tab\x}
+  \end{table}
+}

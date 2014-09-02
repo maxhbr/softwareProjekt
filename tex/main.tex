@@ -26,6 +26,11 @@
 
 \let\tilde\widetilde
 
+%\usepackage{csvsimple}
+%\usepackage{pgfplotstable}
+\usepackage{datatool}
+\usepackage{morefloats}
+
 \begin{document}
 
 \ifnum\myDevelopVariable=0
@@ -81,6 +86,13 @@
 
 \chapter{Zusammenfassung und Ausblicke}
 \input{schluss.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagebreak
+\appendix
+\addcontentsline{toc}{chapter}{Anhang}
+
+\input{berechnet.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagebreak
