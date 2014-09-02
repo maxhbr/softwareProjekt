@@ -5,7 +5,7 @@
 #    cPN.sh TOP
 #    cPN.sh TOP "PRIME1 PRIME2 ..."
 #
-# Last modified: Tue Sep 02, 2014  09:52
+# Last modified: Tue Sep 02, 2014  10:03
 
 ###############################################################################
 # Config
@@ -20,10 +20,9 @@ else
   LIST="2" # 3 5 7 11 13 17"
   LIMIT=3
 fi
+LISTm="2 3 4"
 
 nCPUm1=3
-
-m=3
 
 ###############################################################################
 FAIL=0
@@ -33,13 +32,13 @@ mkdir -p "${DIR}/cPNout/"
 SRC="${DIR}/../src/"
 
 genPathHS(){
-  echo "${SRC}cPN${1}m${m}.hs"
+  echo "${SRC}cPN${1}m${2}.hs"
 }
 genPathEx(){
-  echo "${PATHBASE}cPN${1}m${m}"
+  echo "${PATHBASE}cPN${1}m${2}"
 }
 genPathCSV(){
-  echo "${DIR}/cPNout/CalcPrimNubersRel_p=${1}_m=${m}.csv"
+  echo "${DIR}/cPNout/CalcPrimNubersRel_p=${1}_m=${2}.csv"
 }
 
 genHS(){
@@ -60,9 +59,9 @@ import GalFld.More.SpecialPolys
 
 p = ${1}
 \$(genPrimeField ${1} "PF")
-outFile = "$(genPathCSV $1)"
+outFile = "$(genPathCSV $1 $2)"
 
-m = ${m}
+m = ${2}
 
 pf = 1::PF
 
@@ -109,7 +108,7 @@ HS
 }
 
 getDoneNumber(){
-  csv=$(genPathCSV $1)
+  csv=$(genPathCSV $1 $2)
   if [ -f $csv ]; then
     echo `expr $(tail -n1 $csv | cut -d',' -f2) + 1`
   else
@@ -120,30 +119,35 @@ getDoneNumber(){
 ###############################################################################
 # gen and compile HS
 pushd $SRC
-for p in $LIST; do
-  if [ ! -f $(genPathEx $p) ]; then
-    genHS $p >$(genPathHS $p)
-    mkdir -p "${PATHBASE}compileOut/"
-    ghc -j \
-      -outputdir "${PATHBASE}compileOut/" \
-      -o "$(genPathEx $p)" \
-      -O2 -isrc -threaded \
-      "$(genPathHS $p)"
-    rm $(genPathHS $p)
-  fi
+
+for m in $LISTm ; do
+  for p in $LIST; do
+    if [ ! -f $(genPathEx $p $m) ]; then
+      genHS $p $m >$(genPathHS $p $m)
+      mkdir -p "${PATHBASE}compileOut/"
+      ghc -j \
+        -outputdir "${PATHBASE}compileOut/" \
+        -o "$(genPathEx $p $m)" \
+        -O2 -isrc -threaded \
+        "$(genPathHS $p $m)"
+      rm $(genPathHS $p $m)
+    fi
+  done
 done
 popd
 
 ###############################################################################
-for p in $LIST; do
-  if [ -f $(genPathEx $p) ]; then
-    #echo $(getDoneNumber $p)
-    $(genPathEx $p) $(getDoneNumber $p) $LIMIT &
-  fi
+for m in $LISTm ; do
+  for p in $LIST; do
+    if [ -f $(genPathEx $p $m) ]; then
+      #echo $(getDoneNumber $p $m)
+      $(genPathEx $p $m) $(getDoneNumber $p $m) $LIMIT &
+    fi
 
-  # limit subprocesses to 4
-  while [ $(jobs -p | wc -l) -gt $nCPUm1 ] ; do
-    sleep 1
+    # limit subprocesses to 4
+    while [ $(jobs -p | wc -l) -gt $nCPUm1 ] ; do
+      sleep 1
+    done
   done
 done
 
