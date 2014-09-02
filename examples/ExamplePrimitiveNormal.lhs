@@ -32,7 +32,7 @@ import GalFld.More.SpecialPolys
 Wir erzeugen einen Primkörper der Charakteristik 2 mit dem Namen ħPFħ.
 
 \begin{code}
-$(genPrimeField 3 "PF")
+$(genPrimeField 2 "PF")
 
 pf = 1::PF
 p = charakteristik pf
@@ -42,7 +42,8 @@ Anschließend erstellen wir eine neue Datenstruktur, genannt ħTħ, die die
 gesammelten Informationen speichern soll.
 
 \begin{code}
-data T = T { deg :: Int -- Grad der Erweiterung
+data T = T { ext :: Int -- Grad des Grundkörpers über dem Primkörper
+           , deg :: Int -- Grad der Erweiterung
            , countP :: Int -- Anzahl primitiver Elemente
            , countN :: Int -- Anzahl normaler Elemente
            , countPN :: Int } -- Anzahl primitiv-normaler Elemente
@@ -55,13 +56,14 @@ Faktorisierung des $\ggT$ des Kreisteilungspolynoms und des passenden
 Pi-Polynoms.
 
 \begin{code}
-genPrimNorm :: Int -> (T, [(Int, Polynom PF)])
-genPrimNorm n = (record, fac)
-  where cyP    = cyclotomicPoly (p^n-1) pf
-        piP    = piPoly $ pTupUnsave [(n,pf),(0,-1)]
-        ggT    = ggTP cyP piP
-        fac    = factorP ggT
-        record = T n (uDegP cyP) (uDegP piP) (uDegP ggT)
+genPrimNorm :: Int -> Int -> (T, [(Int, Polynom (FFElem PF))])
+genPrimNorm m n = (record, fac)
+  where one     = extendFFBy m pf
+        cyP     = cyclotomicPoly (p^(n*m)-1) one
+        piP     = piPoly $ pTupUnsave [(n,one),(0,-1)]
+        ggT     = ggTP cyP piP
+        fac     = factorP ggT
+        record  = T m n (uDegP cyP) (uDegP piP) (uDegP ggT)
 \end{code}
 
 Bleibt nur noch ħif'ħ als kleines Hilfsmittel zu formulieren
@@ -82,14 +84,14 @@ main = do
                   ( if' (length args == 1)
                         [2..(read $ head args)]
                         [2..] )
-  mapM_ (\n -> do
+  mapM_ (\m -> (mapM_ (\n -> do
     st <- getCPUTime
-    let gpn = genPrimNorm n
+    let gpn = genPrimNorm m n
     putInfo $ fst gpn
     putPolys $ snd gpn
-    putTime st ) indxs
-      where putInfo (T n cP cN cPN) = do
-              putStrLn $ "In F" ++ show p ++ "^" ++ show n ++ " über F" ++ show p
+    putTime st ) indxs)) [2..5]
+      where putInfo (T m n cP cN cPN) = do
+              putStrLn $ "In F" ++ show (p^m) ++ "^" ++ show n ++ " über F" ++ show (p^m)
                 ++ " gibt es:"
               putStrLn $ "\t\t" ++ show cP ++ " primitive Elemente"
               putStrLn $ "\t\t" ++ show cN ++ " normale Elemente"
