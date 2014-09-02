@@ -15,17 +15,20 @@ import GalFld.More.SpecialPolys
  -}
 $(genPrimeField 11 "F11")
 
-data T = T { deg :: Int -- Grad der Erweiterung
+data T = T { ext :: Int -- Grad des Grundkörpers über dem Primkörper
+           , deg :: Int -- Grad der Erweiterung
            , countP :: Int -- Anzahl primitiver Elemente
            , countN :: Int -- Anzahl normaler Elemente
            , countPN :: Int } -- Anzahl primitiv-normaler Elemente
 
-genPrimNorm n pf p = (record, fac)
-  where cyP    = cyclotomicPoly (p^n-1) pf
-        piP    = piPoly $ pTupUnsave [(n,pf),(0,-1)]
-        ggT    = ggTP cyP piP
-        fac    = factorP ggT
-        record = T n (uDegP cyP) (uDegP piP) (uDegP ggT)
+genPrimNorm :: Int -> Int -> (T, [(Int, Polynom (FFElem PF))])
+genPrimNorm m n = (record, fac)
+  where one     = extendFFBy m pf
+        cyP     = cyclotomicPoly (p^(n*m)-1) one
+        piP     = piPoly $ pTupUnsave [(n,one),(0,-1)]
+        ggT     = ggTP cyP piP
+        fac     = factorP ggT
+        record  = T m n (uDegP cyP) (uDegP piP) (uDegP ggT)
 
 if' :: Bool -> a -> a -> a
 if' True  x _ = x
@@ -47,12 +50,12 @@ mainSub pf = do
                   ( if' (length args == 1)
                         [2..(read $ head args)]
                         [2..] )
-  mapM_ (\n -> do
+  mapM_ (\m -> (mapM_ (\n -> do
     st <- getCPUTime
-    let t = fst $ genPrimNorm n pf p
+    let t = fst $ genPrimNorm 1 n pf p
     putInfo t p
-    putToFile t p
-    putTime st) indxs
+    {-putToFile t p-}
+    putTime st) indxs)) [1..5]
       where putInfo (T n cP cN cPN) p = do
               putStrLn $ "In F" ++ show p ++ "^" ++ show n ++ " über F" ++ show p
                 ++ " gibt es:"
