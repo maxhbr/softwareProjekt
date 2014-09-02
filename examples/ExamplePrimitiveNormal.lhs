@@ -88,7 +88,7 @@ main = do
     st <- getCPUTime
     let gpn = genPrimNorm m n
     putInfo $ fst gpn
-    putPolys $ snd gpn
+    --putPolys $ snd gpn
     putTime st ) indxs)) [2..5]
       where putInfo (T m n cP cN cPN) = do
               putStrLn $ "In F" ++ show (p^m) ++ "^" ++ show n ++ " über F" ++ show (p^m)
