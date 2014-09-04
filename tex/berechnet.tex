@@ -1,4 +1,5 @@
 \chapter{Berechnete Werte} \label{Anh:Werte}
+\section{Nicht-relativer Fall}
 Die folgenden Tabellen sind nach Charakteristik der Körper sortiert. Diese
 Charakteristik wird mit $p$ bezeichnet. In jeder Tabelle gibt es zu
 verschiedenen Körpererweiterungen, welche mit $n$ bezeichnet werden, je eine
@@ -7,8 +8,7 @@ In jeder Zeile stehen nacheinander die Anzahl der primitiven Elemente, die
 Anzahl der normalen Elemente und die Anzahl derer, die beide Eigenschaften
 besitzen.
 
-Im nächstem Kapitel \ref{Anh:quelle} ist der dazu verwendete Quellcode
-gelistet.
+Im Kapitel \ref{Anh:quelle} ist der dazu verwendete Quellcode gelistet.
 
 \foreach \x in {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,61,67,71,73,79,83,89,97,101} {
   \DTLloadrawdb{tab\x}{CSVs/CalcPrimNubers_p=\x.csv}
@@ -18,8 +18,35 @@ gelistet.
   \end{table}
 }
 
+\section{Relativer Fall}
+Hier wird der relative Fall, also eine Erweiterung von einer Erweiterung eines
+Primkörpers betrachtet. Hier steht $m$ für den Grad der ersten Erweiterung.
+\foreach \x in {2,3,4} {
+  \DTLloadrawdb{tab2m\x}{CSVs/CalcPrimNubersRel_p=2_m=\x.csv}
+  \begin{table}[!htbp]
+    \caption{Werte für $p=2$ und $m=\x$}
+    \DTLdisplaydb{tab2m\x}
+  \end{table}
+}
+
+\pagebreak
 \section{Der Quellcode} \label{Anh:quelle}
+\subsection{Nicht-relativer Fall}
 Hier das Bash-Script, das den Haskell Code generiert, der zur Berechnung der
 Werte genutzt wurde. Das Script compiliert und startet die erzeugten Programme
 danach parallel.
-\lstinputlisting[language={}]{../examples/cPN.sh}
+\lstinputlisting[language={},numbers=none,frame=L
+                ,basicstyle=\footnotesize\ttfamily
+                ,keywordstyle=\bfseries\color{black}
+                ,commentstyle=\itshape\color{black}
+                ,identifierstyle=\color{black}
+                ,stringstyle=\color{black}
+                ]{../calculation/cPN.sh}
+\subsection{Relativer Fall}
+\lstinputlisting[language={},numbers=none,frame=L
+                ,basicstyle=\footnotesize\ttfamily
+                ,keywordstyle=\bfseries\color{black}
+                ,commentstyle=\itshape\color{black}
+                ,identifierstyle=\color{black}
+                ,stringstyle=\color{black}
+                ]{../calculation/cPN.sh}
