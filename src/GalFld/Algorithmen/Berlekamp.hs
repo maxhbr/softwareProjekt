@@ -97,7 +97,6 @@ berlekampBasis f = transposeM $ kernelM $ transposeM $!
         {-# INLINE red #-}
         red i = takeFill 0 n $ p2List $ modByP (pTupUnsave [(i*q,1)]) f
 
-#if 1
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
@@ -133,13 +132,26 @@ berlekampFactor f | isNullP f   = []
                                   modByP (pList (getRowM m i)) g | i <- [1..k]]
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
-#else
+
+
+{-# INLINE takeFill #-}
+takeFill :: Num a => a -> Int -> [a] -> [a]
+takeFill a n [] = replicate n a
+takeFill a n (x:xs) = x : takeFill a (n-1) xs
+
+
+#if 0
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
-berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
+--
+--  ACHTUNG: dieser Algorithmus ist NOCH NICHT FERTIG implementiert.
+--           Er liefert NUR MEISTENS das richtige und sollte nicht verwendet
+--           werden.
+--
+berlekampFactor2 :: (Show a, Fractional a, Num a, FiniteField a)
                                               => Polynom a -> [(Int,Polynom a)]
-berlekampFactor f | isNullP f   = []
+berlekampFactor2 f | isNullP f   = []
                   | uDegP f < 2 = [(1,f)]
                   | otherwise   = berlekampFactor' f m
   where !m = berlekampBasis f
@@ -164,10 +176,3 @@ berlekampFactor f | isNullP f   = []
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                                  $ reverse m')
 #endif
-
-
-{-# INLINE takeFill #-}
-takeFill :: Num a => a -> Int -> [a] -> [a]
-takeFill a n [] = replicate n a
-takeFill a n (x:xs) = x : takeFill a (n-1) xs
-
