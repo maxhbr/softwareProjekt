@@ -16,7 +16,6 @@ module GalFld.Algorithmen.Berlekamp
   -- Algorithmus
   , berlekampBasis
   , berlekampFactor
-  , berlekampFactor2, appBerlekamp2
   )where
 
 import Data.Maybe
@@ -34,10 +33,6 @@ import GalFld.Algorithmen.SFreeFactorization
 appBerlekamp :: (Show a, FiniteField a, Num a, Fractional a) =>
                                         [(Int,Polynom a)] -> [(Int,Polynom a)]
 appBerlekamp = appFact berlekampFactor
-
-appBerlekamp2 :: (Show a, FiniteField a, Num a, Fractional a) =>
-                                        [(Int,Polynom a)] -> [(Int,Polynom a)]
-appBerlekamp2 = appFact berlekampFactor2
 
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 -- Benutzt wird dazu die Quadratfreie Faktorisierung mit anschließendem
@@ -102,12 +97,13 @@ berlekampBasis f = transposeM $ kernelM $ transposeM $!
         {-# INLINE red #-}
         red i = takeFill 0 n $ p2List $ modByP (pTupUnsave [(i*q,1)]) f
 
+#if 1
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
-berlekampFactor2 :: (Show a, Fractional a, Num a, FiniteField a)
-                                              => Polynom a -> [(Int,Polynom a)]
-berlekampFactor2 f | isNullP f   = []
+berlekampFactor :: (Show a, Fractional a, Num a, FiniteField a)
+                                             => Polynom a -> [(Int,Polynom a)]
+berlekampFactor f | isNullP f   = []
                   | uDegP f < 2 = [(1,f)]
                   | otherwise   = berlekampFactor' f m
   where !m = berlekampBasis f
@@ -137,7 +133,7 @@ berlekampFactor2 f | isNullP f   = []
                                   modByP (pList (getRowM m i)) g | i <- [1..k]]
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                         $ reverse m')
-
+#else
 -- |Faktorisiert ein Polynom f über einem endlichen Körper
 --  Voraussetzungen: f ist quadratfrei
 --  Ausgabe: Liste von irreduziblen, pw teilerfremden Polynomen
@@ -167,6 +163,7 @@ berlekampFactor f | isNullP f   = []
                                   modByP (pList (getRowM m i)) g | i <- [1..k]]
                         !r     = k-1- fromMaybe (-1) (findIndex (all (==0))
                                                                  $ reverse m')
+#endif
 
 
 {-# INLINE takeFill #-}
