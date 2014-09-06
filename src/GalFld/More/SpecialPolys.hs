@@ -33,10 +33,7 @@ piPoly :: (Show a, Num a, Fractional a, FiniteField a) =>
                                                         Polynom a -> Polynom a
 piPoly f
   | isSqfree  = piSqFree
-  | otherwise = --trace ("facs = "++(show facs)++" => pFst="++(show pFst)++" piSqFree="++(show piSqFree)
-                --  ++" fNonSqFree="++(show fNonSqFree)++" assoz fNonSqFree = "
-                --  ++(show (assozPoly fNonSqFree)))$ 
-                piSqFree `odot` fNonSqFree
+  | otherwise = piSqFree `odot` fNonSqFree
   where -- P_(tau f), wobei tau f der quadratfreie Teil von f ist
         piSqFree = foldl (\p f -> (p `odot` f) @/ p) pFst (map snd $ tail facs)
         -- Faktorisierung von f
@@ -63,12 +60,5 @@ assozPoly f = pTupUnsave $ map (A.first (q^)) $ p2Tup f
 evalPInP :: (Show a, Eq a, Num a) => Polynom a -> Polynom a -> Polynom a
 evalPInP f g = evalP' g $ p2Tup f
 evalP' g []   = 0
-evalP' g fs   = --trace ("fs = "++(show fs)++" fs' = "++(show fs')++" map = "++
-                --  (show (map (\(i,fi) -> fi*g) fs'))) $
-                sum $ map (\(i,fi) -> fi*g^i) fs'
-{-evalP' g fs   = trace ("evalP' g="++(show g)++" fs="++(show fs)++" ->fs'="++(show fs')) $ -}
-                {-snd $ foldl' (\(i,h) (j,y) -> -}
-                      {-trace ("i="++(show i)++" h="++(show h)-}
-                          {-++" j="++(show j)++" y="++(show y))  -}
-                      {-(j,h*g^(i-j)+y)) (head fs') (tail fs') -}
+evalP' g fs   = sum $ map (\(i,fi) -> fi*g^i) fs'
   where fs' = map (A.second pKonst) fs

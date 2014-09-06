@@ -352,7 +352,7 @@ $\omega\in R$ eine primitive $n$-te Einheitswurzel.
 \begin{definition}
    Ist $f\in R[X]$ ein Polynom, so ist seine
   \emph{diskrete Fourier-Transformation (DFT)} definiert als
-  \[ f^\wedge(\omega) = (f(\omega^j):\ j=1,\ldots,n-1) \in R^n\,.\]
+  \[ f^\wedge(\omega) = (f(\omega^j):\ j=0,\ldots,n-1) \in R^n\,.\]
 \end{definition}
 
 Eine wesentliche Eigenschaft liefert folgende Proposition. 
@@ -408,8 +408,11 @@ Es bleiben ein paar Probleme offen: Um mit obigem Algorithmus Polynome zu
 multiplizieren, muss in $R$ für jede Zweierpotenz $n$ eine primitive $n$-te
 Einheitswurzel existieren und $2$ eine Einheit sein. Die Tatsache, dass 2 eine
 Einheit sein muss, spielt für den Fall der Anwendung -- nämlich Multiplikation 
-von Polynomen über endlichen Körpern -- keine Rolle, da dies dort ja immer 
-gegeben ist. Jedoch bleibt offen, wie man eine $n$-te Einheitswurzel finden 
+von Polynomen über endlichen Körpern -- quasi keine Rolle, da für
+Charakteristik ungleich 2 dies dort ja immer 
+gegeben ist.\footnote{Für Charakteristik 2 existieren ohnehin spezielle
+Algorithmen auf Basis von Binäroperationen!}
+Jedoch bleibt offen, wie man eine $n$-te Einheitswurzel finden 
 soll.  Die allgemeine Antwort lautet in diesem Fall: Wir suchen gar nicht, 
 sondern modifizieren das Setting so, dass stets eine $n$-te Einheitswurzel 
 gegeben ist:
