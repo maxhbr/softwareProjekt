@@ -55,8 +55,9 @@ appFact alg = withStrategy (parList rpar) . concatMap
 
 -- |Fasst in einer Faktorisierung gleiche Faktoren zusammen
 aggFact :: (Num a, Eq a) => [(Int,Polynom a)] -> [(Int,Polynom a)]
-aggFact l = [(sum [i | (i,g) <- l , f==g],f) | f <- nub [f | (_,f) <- l], 
-                                                                f /= pKonst 1]
+aggFact l = [(sum [i | (i,g) <- l , f==g],f)
+              | f <- nub [f | (_,f) <- l]
+              , f /= pKonst 1]
 
 -- |Sagt, ob die gegebene Faktorisierung trivial ist, also aus nur einem
 -- echten Faktor besteht
@@ -68,7 +69,7 @@ isTrivialFact ms = sum (map fst ms') == 1
 
 -- |Gibt alle Faktorisierungen zurück, welche nach der offensichtlichen
 -- Faktorisierung noch trivial sind
-findTrivialsOb :: (Show a, Fractional a, Num a, FiniteField a) => 
+findTrivialsOb :: (Show a, Fractional a, Num a, FiniteField a) =>
                                           [Polynom a] -> [[(Int,Polynom a)]]
 findTrivialsOb ps = [fs | fs <- parMap rpar appObFact
                      [toFact f | f <- ps , not (isNullP f)], isTrivialFact fs]
