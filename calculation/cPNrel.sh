@@ -5,7 +5,7 @@
 #    cPN.sh TOP
 #    cPN.sh TOP "PRIME1 PRIME2 ..."
 #
-# Last modified: Tue Sep 02, 2014  10:03
+# Last modified: Sun Sep 07, 2014  09:33
 
 ###############################################################################
 # Config
@@ -96,7 +96,7 @@ main = do
                 ++ "\t" ++ show cN
                 ++ "\t" ++ show cPN
             putHeaderToFile p =
-              writeFile outFile "p,m,n,#primilive,#normal,#primitivNormal\n"
+              writeFile outFile "p,m,n,#primitive,#normal,#primitivNormal\n"
             putToFile (T m n cP cN cPN) p =
               appendFile outFile $ show p ++ ","
                                      ++ show m ++ ","
