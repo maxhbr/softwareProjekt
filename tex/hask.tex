@@ -122,7 +122,7 @@ Die Folgenden wurden für dieses Projekt genutzt.
 testen.
 
 Ein einfaches und selbsterklärendes
-Beispiel\footnote{\url{http://hspec.github.io/}} ist
+Beispiel\footnote{\url{http://hspec.github.io/}}:
 \begin{hcode}
 -- Datei Spec.hs
 import Test.Hspec
@@ -167,7 +167,7 @@ Um Funktionen mit sehr kurzer Ausführungszeit zu vergleichen oder um
 statistische Schwankungen auszugleichen, werden Tests mehrfach ausgeführt.
 
 Damit das Ergebnis trotz Lazyness vollständig ausgewertet wird, muss der Typ
-der Berechnung eine Instanz von \texttt{NFData}.
+der Berechnung eine Instanz von \texttt{NFData} haben.
 
 Weitere Frameworks für Tests sind beispielsweise
 \begin{itemize}
@@ -224,7 +224,7 @@ beispielsweise erklärt die Variable ħcountħ zum Typen ħIntħ.
 Da es in Haskell Funktionen höherer Ordnung (engl.
 \emph{higher-order-functions}) gibt, ist eine Typenangabe bei Funktionen
 obligatorisch. 
-So hat die Funktion ħheadħ, welche das erste Element einer List wiedergibt, 
+So hat die Funktion ħheadħ, welche das erste Element einer Liste wiedergibt, 
 den Typ:
 \begin{hcode}
 head :: [a] -> a
