@@ -134,8 +134,11 @@ kanonischen Basis von $\F_q[X]\big/(f(X))$.
 Berlekamp-Algorithmus bleibt immer die Frage, wie ein Element $g(X)\in
 \cB_f\setminus \F_q$ zu wählen ist. Wir haben uns entschieden, stets das zweite
 Basiselement (das erste ist immer $1$) zu wählen. Sicherlich könnte man auch
-ein zufälliges Element wählen; dies widerspricht aber des funktionalen
-Prinzips, das Haskell zugrunde liegt.
+ein zufälliges Element wählen; dies widerspricht aber dem funktionalen
+Prinzip, das Haskell zugrunde liegt.
+Anschließend suchen wir den ersten nichttrivialen $\ggT$ nach
+\thref{satz:berlekamp1} und rufen den Berlekamp-Algorithmus rekursiv mit jenem
+$\ggT$ und seinem Kofaktor in $f(X)$ wieder auf.
 
 \haskellinput{Algorithmen/Berlekamp}{berlekampFactor}
 
@@ -158,11 +161,11 @@ vorhandene Berlekampbasis angewendet werden kann.
   $\{ 1, X, X^2, X^3, X^4\}$ von $\F_5[X]_{<5}$ und können diese in
   Zeilenstufenform bringen:
   \[ D_\Gamma = \begin{bmatrix}
-      1& 0& 0& 0& 0\\
-      3& 3& 2& 2& 4\\
-      0& 0& 1& 0& 0\\
-      4& 1& 1& 2& 2\\
-      0& 0& 0& 0& 1\end{bmatrix} \rightsquigarrow
+      0& 0& 0& 0& 0\\
+      3& 2& 2& 2& 4\\
+      0& 0& 0& 0& 0\\
+      4& 1& 1& 1& 2\\
+      0& 0& 0& 0& 0\end{bmatrix} \rightsquigarrow
       \begin{bmatrix}
       1& 0& 0& 0& 0\\
       0& 1& 0& 3& 0\\
@@ -170,26 +173,53 @@ vorhandene Berlekampbasis angewendet werden kann.
       0& 0& 0& 0& 1\\
       0& 0& 0& 0& 0\end{bmatrix}\,. \]
   Also ist eine Basis von $\cB_f$ gegeben durch
-  \[ B_f := \{ 1, X^3 +X, X^2, X^4\}\,.\]
-  Wir wählen -- wie oben beschrieben -- das zweite Basiselement $h(X) = X^3 +X$
+  \[ B_f := \{ 1, 3X^3 +X, X^2, X^4\}\,.\]
+  Wir wählen -- wie oben beschrieben -- das zweite Basiselement $h_1(X) = 3X^3 +X$
   aus und berechnen
   \[ \begin{array}{r|lllll}
       a\in \F_q & 0 & 1 & 2 & 3 & 4 \\\hline
-      \ggT(f(X), h(X)-a) & X^2+2 & X^2+4X+3 & 1 & 1 & X+2\end{array}\,.\]
-  Dies erlaubt nun iterative Anwendung des Berlekamp-Algorithmus, nämlich für
-  $X^2+2$, $X^2+4X+3$ und für $X+2$. Letzteres ist natürlich offensichtlich
-  irreduzibel.
-
+      \ggT(f(X), h_1(X)-a) & X^2+2 & X^2+4X+3 & 1 & 1 & X+2\end{array}\,.\]
+  Dies erlaubt nun iterative Anwendung des Berlekamp-Algorithmus, nämlich für 
+  $X^2+2$ und seinen Kofaktor $\tfrac{f(X)}{X^2+2} = X^3+X^2+X+1$.
   Für $f_1(X) := X^2+2$ haben wir
-  \[ B_f \bmod f_1(X) = \{ 1, 0, 3, 4\}\]
-  und für $f_2(X) := X^2+4X+3$
-  \[ B_f \bmod f_2(X) = \{1,1,X+2,1\}\,.\]
-  Für $f_1$ bricht der Berlekamp-Algorithmus sofort ab, da offenbar die
-  Dimension des Berlekampraumes $1$ ist.
-  Für $f_2$ wählen wir $h(X) = X+2$ und erhalten
+  \[ B_f \bmod f_1(X) = \{ 1, 0, 3, 4\}\,.\]
+  Hier bricht der Berlekamp-Algorithmus sofort ab, da offenbar die Dimension
+  des neuen Berlekampraumes $1$ ist.
+  Für $f_2(X) := X^3+X^2+X+1$ ist
+  \[ B_f \bmod f_2(X) = \{ 1, 2X^2+3X+2, X^2, 1\} =: B_{f_2}\,.\]
+  Wir wählen wieder das zweite Basiselement, also $h_2(X) = 2X^2+3X+2$
   \[ \begin{array}{r|lllll}
       a\in \F_q & 0 & 1 & 2 & 3 & 4 \\\hline
-      \ggT(f_2(X), h(X)-a) & 1 & 1 & X+3 & 1 & X+1\end{array}\,.\]
-  Damit ist die vollständige Faktorisierung von $f(X)$ über $\F_5$ bekannt:
+      \ggT(f_2(X), h_2(X)-a) &1 & X^2+4X+3 & 1 & 1 & X+2\end{array}\,.\]
+  Nun folgt ein neuer Iterationsschritt mit $f_3(X) = X^2+4X+3$ und
+  $f_4(X) = X+2$.
+  Durch 
+  \[ B_{f_2} \bmod f_4(X) = \{ 1, 4, 4, 1\}\]
+  erkennen wir die Irreduzibilität von $f_4$. Für 
+  \[ B_{f_2} \bmod f_3(X) = \{ 1, 1, X+2, 1\}\]
+  wählen wir $h_3(X) = X+2$ und berechnen 
+  \[ \begin{array}{r|lllll}
+      a\in \F_q & 0 & 1 & 2 & 3 & 4 \\\hline
+      \ggT(f_3(X), h_3(X)-a) &1 & X+1 & 1 & 1 & X+3\end{array}\,.\]
+  Wir schließen den Berlekamp-Algorithmus mit der vollständigen 
+  Faktorisierung von $f(X)$ über $\F_5$:
   \[ f(X) = (X+1)(X+2)(X+3)(X^2+2)\,.\]
+
+
+  %Dies erlaubt nun iterative Anwendung des Berlekamp-Algorithmus, nämlich für
+  %$X^2+2$, $X^2+4X+3$ und für $X+2$. Letzteres ist natürlich offensichtlich
+  %irreduzibel.
+
+  %Für $f_1(X) := X^2+2$ haben wir
+  %\[ B_f \bmod f_1(X) = \{ 1, 0, 3, 4\}\]
+  %und für $f_2(X) := X^2+4X+3$
+  %\[ B_f \bmod f_2(X) = \{1,1,X+2,1\}\,.\]
+  %Für $f_1$ bricht der Berlekamp-Algorithmus sofort ab, da offenbar die
+  %Dimension des Berlekampraumes $1$ ist.
+  %Für $f_2$ wählen wir $h(X) = X+2$ und erhalten
+  %\[ \begin{array}{r|lllll}
+      %a\in \F_q & 0 & 1 & 2 & 3 & 4 \\\hline
+      %\ggT(f_2(X), h(X)-a) & 1 & 1 & X+3 & 1 & X+1\end{array}\,.\]
+  %Damit ist die vollständige Faktorisierung von $f(X)$ über $\F_5$ bekannt:
+  %\[ f(X) = (X+1)(X+2)(X+3)(X^2+2)\,.\]
 \end{beispiel}
