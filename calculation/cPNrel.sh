@@ -5,7 +5,7 @@
 #    cPN.sh TOP
 #    cPN.sh TOP "PRIME1 PRIME2 ..."
 #
-# Last modified: Sun Sep 07, 2014  09:33
+# Last modified: Tue Sep 09, 2014  03:32
 
 ###############################################################################
 # Config
@@ -17,10 +17,10 @@ elif [ $# -eq 1 ]; then
   LIST="2" # 3 5 7 11 13 17"
   LIMIT=$1
 else
-  LIST="2" # 3 5 7 11 13 17"
-  LIMIT=3
+  LIST="2"
+  LIMIT=4
 fi
-LISTm="2 3 4"
+LISTm="5 6"
 
 nCPUm1=3
 
