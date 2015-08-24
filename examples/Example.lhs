@@ -2,6 +2,7 @@ Zunächst brauchen wir zwei Haskell Erweiterungen:
 \begin{code}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE LambdaCase #-}
 \end{code}
@@ -16,6 +17,7 @@ import System.Environment
 import System.Directory
 import Data.List
 import Control.Monad
+import GHC.Generics (Generic)
 
 import qualified Data.Binary as B
 import Data.ByteString.Lazy (writeFile, readFile, appendFile)

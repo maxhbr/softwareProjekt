@@ -16,7 +16,8 @@
 --      type F7 = Mod Numeral7
 -- Also zusammengefasst:
 {-
-data Numeral7
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+data Numeral7 deriving (Generic, NFData)
 instance Numeral Numeral7 where {numValue x = 7}
 instance Show Numeral7 where {show = show}
 instance NFData Numeral7
@@ -35,6 +36,7 @@ $(genPrimeField 7 "F7")
 --------------------------------------------------------------------------------
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module GalFld.Core.PrimeFields
   ( Numeral (..)
   -- Endliche Körper
@@ -48,6 +50,7 @@ import Data.Binary
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
 import Control.DeepSeq
+import GHC.Generics (Generic)
 
 import GalFld.Core.FiniteField
 import GalFld.Core.ShowTex
@@ -156,7 +159,7 @@ instance (Numeral a, NFData a) => NFData (Mod a) where
 -- |Erzeugen von Primkörpern durch TemplateHaskell
 genPrimeField :: Integer -> String -> Q [Dec]
 genPrimeField p pfName = do
-  d <- dataD (cxt []) (mkName mName) [] [] []
+  d <- dataD (cxt []) (mkName mName) [] [] (map mkName ["Generic", "NFData"])
   i1 <- instanceD (cxt [])
     (appT (conT ''Numeral) (conT (mkName mName)))
     [funD (mkName "numValue")
@@ -166,8 +169,8 @@ genPrimeField p pfName = do
     (appT (conT ''Show) (conT (mkName mName)))
     [funD (mkName "show")
       [clause [] ( normalB $ appsE [varE (mkName "show")] ) [] ] ]
-  i3 <- instanceD (cxt [])
-    (appT (conT ''NFData) (conT (mkName mName))) []
+  -- i3 <- instanceD (cxt [])
+  --   (appT (conT ''NFData) (conT (mkName mName))) []
   t <- tySynD (mkName pfName) []
     (appT (conT ''Mod) (conT $ mkName mName))
   return [d,i1,i2,t]
@@ -176,10 +179,9 @@ genPrimeField p pfName = do
 
 -- Erzeugen von Primkörpern mittels CPP Compiler Befehlen
 #define PFInstance(MName,MValue,PFName) \
-data MName; \
+data MName deriving (Generic, NFData); \
 instance Numeral MName where {numValue _ = MValue} ; \
 instance Show MName where {show = show} ; \
-instance NFData MName ; \
 type PFName = Mod MName
 
 PFInstance(Numeral2,2,F2)

@@ -1,9 +1,11 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module Main
   where
 import System.CPUTime
 import System.Environment
+import GHC.Generics (Generic)
 
 import Control.DeepSeq
 

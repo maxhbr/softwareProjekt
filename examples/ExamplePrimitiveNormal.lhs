@@ -1,15 +1,16 @@
-Wir beginnen mit einer Körpererweiterung $\F_{q^n} \mid \F_q$ und stellen uns 
-die Frage nach einer Enumeration aller primitiven und normalen Elemente dieser 
+Wir beginnen mit einer Körpererweiterung $\F_{q^n} \mid \F_q$ und stellen uns
+die Frage nach einer Enumeration aller primitiven und normalen Elemente dieser
 Erweiterung.
 Wie bereits in \thref{bem:primnorm} erläutert, sind die Nullstellen des
-Pi-Polynoms zu $X^n-1$ gerade die normalen Elemente der Körpererweiterung und die 
-Nullstellen des Kreisteilungspolynoms $\Phi_{n-1}$ gerade die primitiven 
+Pi-Polynoms zu $X^n-1$ gerade die normalen Elemente der Körpererweiterung und die
+Nullstellen des Kreisteilungspolynoms $\Phi_{n-1}$ gerade die primitiven
 Elemente. Folglich ist der $\ggT$ beider gerade das Produkt der Minimalpolynome
 aller primitiven \emph{und} normalen Elemente!
 
 \begin{code}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module Main
   where
 \end{code}
@@ -19,9 +20,11 @@ Imports zum Messen der Ausführungszeit und zum Verarbeiten von Input-Parametern
 \begin{code}
 import System.CPUTime
 import System.Environment
+import GHC.Generics (Generic)
+import Control.DeepSeq
 \end{code}
 
-Ferner benötigen wir die Bibliothek ħGalFldħ und 
+Ferner benötigen wir die Bibliothek ħGalFldħ und
 ħGalFld.More.SpecialPolysħ.
 
 \begin{code}
@@ -38,7 +41,7 @@ pf = 1::PF
 p = charakteristik pf
 \end{code}
 
-Anschließend erstellen wir eine neue Datenstruktur, genannt ħTħ, die die 
+Anschließend erstellen wir eine neue Datenstruktur, genannt ħTħ, die die
 gesammelten Informationen speichern soll.
 
 \begin{code}
@@ -50,9 +53,9 @@ data T = T { ext :: Int -- Grad des Grundkörpers über dem Primkörper
 \end{code}
 
 
-Nach diesen Schritten der Vorbereitung können wir nun den zentralen Teil 
-des Beispiels formulieren: Die Berechnung der primitiv-normalen Elemente durch 
-Faktorisierung des $\ggT$ des Kreisteilungspolynoms und des passenden 
+Nach diesen Schritten der Vorbereitung können wir nun den zentralen Teil
+des Beispiels formulieren: Die Berechnung der primitiv-normalen Elemente durch
+Faktorisierung des $\ggT$ des Kreisteilungspolynoms und des passenden
 Pi-Polynoms.
 
 \begin{code}
